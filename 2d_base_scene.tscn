@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://v6xjbr0o43p4"]
+[gd_scene load_steps=6 format=3 uid="uid://v6xjbr0o43p4"]
 
 [ext_resource type="Shader" uid="uid://bkfljmi5pdpqh" path="res://ball.tres" id="1_kamic"]
-[ext_resource type="Script" uid="uid://c1np2gx6wl8nb" path="res://PrimitiveBall.gd" id="2_na87o"]
+[ext_resource type="Script" uid="uid://dcjw3yqlt8je" path="res://2DBaseScene.gd" id="1_oyw0x"]
+[ext_resource type="PackedScene" uid="uid://cv1p2e28ye54x" path="res://ColliderLine.tscn" id="3_oyw0x"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_na87o"]
 shader = ExtResource("1_kamic")
@@ -9,14 +10,46 @@ shader = ExtResource("1_kamic")
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_oyw0x"]
 size = Vector2(32, 32)
 
-[node name="Node2D" type="Node2D"]
+[node name="2DBaseScene" type="Node2D"]
+script = ExtResource("1_oyw0x")
 
-[node name="Ball" type="Sprite2D" parent="."]
+[node name="BallSprite" type="Sprite2D" parent="."]
+unique_name_in_owner = true
 material = SubResource("ShaderMaterial_na87o")
 texture = SubResource("PlaceholderTexture2D_oyw0x")
-script = ExtResource("2_na87o")
-radius = 16.0
-deceleration = 8.0
-speed_up_factor = 2.0
 
 [node name="Camera2D" type="Camera2D" parent="."]
+
+[node name="Lines" type="Node2D" parent="."]
+unique_name_in_owner = true
+
+[node name="ColliderLine" parent="Lines" instance=ExtResource("3_oyw0x")]
+
+[node name="DebugPoint1" parent="Lines/ColliderLine" index="0"]
+position = Vector2(308, -149)
+
+[node name="DebugPoint2" parent="Lines/ColliderLine" index="1"]
+position = Vector2(33, 106)
+
+[node name="DebugLine" parent="Lines/ColliderLine" index="2"]
+polygon = PackedVector2Array(307.32007, -149.73326, 308.67993, -148.26674, 33.67994, 106.73327, 32.32006, 105.26673)
+
+[node name="DebugNormal" parent="Lines/ColliderLine" index="3"]
+polygon = PackedVector2Array(171.23326, -22.17994, 169.76674, -20.82006, 159.62097, -33.232292)
+
+[node name="ColliderLine2" parent="Lines" instance=ExtResource("3_oyw0x")]
+
+[node name="DebugPoint1" parent="Lines/ColliderLine2" index="0"]
+position = Vector2(-271, -227)
+
+[node name="DebugPoint2" parent="Lines/ColliderLine2" index="1"]
+position = Vector2(-272, 51)
+
+[node name="DebugLine" parent="Lines/ColliderLine2" index="2"]
+polygon = PackedVector2Array(-272, -227.0036, -270, -226.9964, -271, 51.003597, -273, 50.996403)
+
+[node name="DebugNormal" parent="Lines/ColliderLine2" index="3"]
+polygon = PackedVector2Array(-271.4964, -88.99999, -271.5036, -87.00001, -287.4999, -88.057556)
+
+[editable path="Lines/ColliderLine"]
+[editable path="Lines/ColliderLine2"]
