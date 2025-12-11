@@ -92,27 +92,33 @@ func handle_line_collision(line: ColliderLine) -> bool:
 	# for more info see: https://youtu.be/nXrEX6j-Mws?si=8GdqyyBu0hQkDFsm&t=224
 	var distance_from_line: float = abs((ball.position - p1).dot(line.normal))
 
+	var case: float = (ball.position - p1).dot(line.tangent)
+
+	var current_normal: Vector2 = line.normal
+
+	if case < 0:
+		distance_from_line = (ball.position - p1).length()
+		current_normal = (ball.position - p1).normalized()
+	elif case > (p1 - p2).length():
+		distance_from_line = (ball.position - p2).length()
+		current_normal = (ball.position - p2).normalized()
+
 	if (distance_from_line < ball.radius):
+		var speed_along_normal: float = ball.velocity.dot(current_normal)
+
+		if speed_along_normal <= 0:
+			var correction: float = ball.radius - distance_from_line
+
+			ball.position += current_normal * correction * 2
+
+			ball.velocity *= -1
+			var angle: float = ball.velocity.angle_to(current_normal)
+			ball.velocity = ball.velocity.rotated(2 * angle)
+
+			collided = true
 		
-		var case: float = (ball.position - p1).dot(line.tangent)
 
-		print(case)
 
-		if case >= 0 && case <= (p1 - p2).length():
-			var speed_along_normal: float = ball.velocity.dot(line.normal)
-			var speed_along_tangent: float = ball.velocity.dot(line.tangent)
-
-			if speed_along_normal <= 0:
-			# 	ball.velocity = -line.normal * speed_along_normal + line.tangent * speed_along_tangent
-				var correction: float = ball.radius - distance_from_line
-
-				ball.position += line.normal * correction * 2
-
-				ball.velocity *= -1
-				var angle: float = ball.velocity.angle_to(line.normal)
-				ball.velocity = ball.velocity.rotated(2 * angle)
-
-				collided = true
 
 	# print(distance_from_line)
 
