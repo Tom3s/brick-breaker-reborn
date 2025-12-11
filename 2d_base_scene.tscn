@@ -1,0 +1,22 @@
+[gd_scene load_steps=5 format=3 uid="uid://v6xjbr0o43p4"]
+
+[ext_resource type="Shader" uid="uid://bkfljmi5pdpqh" path="res://ball.tres" id="1_kamic"]
+[ext_resource type="Script" uid="uid://c1np2gx6wl8nb" path="res://PrimitiveBall.gd" id="2_na87o"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_na87o"]
+shader = ExtResource("1_kamic")
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_oyw0x"]
+size = Vector2(32, 32)
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Ball" type="Sprite2D" parent="."]
+material = SubResource("ShaderMaterial_na87o")
+texture = SubResource("PlaceholderTexture2D_oyw0x")
+script = ExtResource("2_na87o")
+radius = 16.0
+deceleration = 8.0
+speed_up_factor = 2.0
+
+[node name="Camera2D" type="Camera2D" parent="."]

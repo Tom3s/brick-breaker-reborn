@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://dkt7beqttedpc"]
+
+[ext_resource type="Shader" uid="uid://w3s6ewydq4cj" path="res://box_shader.tres" id="1_8uh7m"]
+[ext_resource type="ArrayMesh" uid="uid://dedqeka3xgpvc" path="res://rounded cube.obj" id="2_6uqi0"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ppyta"]
+render_priority = 0
+shader = ExtResource("1_8uh7m")
+shader_parameter/Color = Color(0.8244748, 0.7376431, 0.36303118, 1)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="RoundedCube" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+material_override = SubResource("ShaderMaterial_ppyta")
+mesh = ExtResource("2_6uqi0")
+
+[node name="RoundedCube2" type="MeshInstance3D" parent="."]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, -1, 0, 0)
+material_override = SubResource("ShaderMaterial_ppyta")
+mesh = ExtResource("2_6uqi0")

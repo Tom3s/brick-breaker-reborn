@@ -14,6 +14,10 @@ config/name="brick-breaker-reborn"
 config/features=PackedStringArray("4.5", "Mobile")
 config/icon="res://icon.svg"
 
+[debug]
+
+gdscript/warnings/untyped_declaration=2
+
 [rendering]
 
 renderer/rendering_method="mobile"
