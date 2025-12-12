@@ -12,23 +12,23 @@ class Ball:
 	
 	var speed_up_factor: float = 2.0
 
+
+@onready var collider_line_scene: PackedScene = preload("res://ColliderLine.tscn")
+
 @onready var ball_sprite: Sprite2D = %BallSprite
 @onready var line_parent: Node2D = %Lines
 
 var ball: Ball = Ball.new()
 
-var screen_bounds: Vector2
-
 func _ready() -> void:
 	ball.velocity = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
 	ball.velocity *= ball.target_velocity
 
-	screen_bounds = DisplayServer.window_get_size()
+	# screen_bounds = DisplayServer.window_get_size()
+	set_up_screen_collision()
 
 
 func _process(delta: float) -> void:
-	print(ball.position)
-
 	if ball.velocity.length() > ball.target_velocity:
 		ball.velocity = ball.velocity.normalized() * (ball.velocity.length() - ball.deceleration)
 	else:
@@ -37,7 +37,7 @@ func _process(delta: float) -> void:
 	ball.position += ball.velocity * delta
 
 	# handle collision
-	var collided: bool = handle_screen_collision()
+	var collided: bool = false
 
 	for collider_line in line_parent.get_children():
 		collided = collided || handle_line_collision(collider_line)
@@ -49,34 +49,60 @@ func _process(delta: float) -> void:
 
 	ball_sprite.global_position = ball.position
 
+func set_up_screen_collision() -> void:
+	var screen_bounds: Vector2 = DisplayServer.window_get_size()
 
-func handle_screen_collision() -> bool:
-	var collided: bool = false
-	# collision on Y
-	if ball.velocity.y > 0:
-		if ball.position.y + ball.radius > screen_bounds.y / 2:
-			ball.velocity.y *= -1
-			ball.position.y -= screen_bounds.y / 2 - (ball.position.y + ball.radius)
-			collided = true
-	else:
-		if ball.position.y - ball.radius < -screen_bounds.y / 2:
-			ball.velocity.y *= -1
-			ball.position.y +=  -screen_bounds.y / 2 - (ball.position.y - ball.radius)
-			collided = true
+	var p1: Vector2 = Vector2(-screen_bounds.x / 2, -screen_bounds.y / 2)
+	var p2: Vector2 = Vector2(screen_bounds.x / 2, -screen_bounds.y / 2)
+	var p3: Vector2 = Vector2(screen_bounds.x / 2, screen_bounds.y / 2)
+	var p4: Vector2 = Vector2(-screen_bounds.x / 2, screen_bounds.y / 2)
+
+	var line: ColliderLine = collider_line_scene.instantiate()
+	line_parent.add_child(line)
+	line.set_points(p1, p2)
+
+	line = collider_line_scene.instantiate()
+	line_parent.add_child(line)
+	line.set_points(p2, p3)
+
+	line = collider_line_scene.instantiate()
+	line_parent.add_child(line)
+	line.set_points(p3, p4)
+
+	line = collider_line_scene.instantiate()
+	line_parent.add_child(line)
+	line.set_points(p4, p1)
+
+
+
+
+# func handle_screen_collision() -> bool:
+# 	var collided: bool = false
+# 	# collision on Y
+# 	if ball.velocity.y > 0:
+# 		if ball.position.y + ball.radius > screen_bounds.y / 2:
+# 			ball.velocity.y *= -1
+# 			ball.position.y -= screen_bounds.y / 2 - (ball.position.y + ball.radius)
+# 			collided = true
+# 	else:
+# 		if ball.position.y - ball.radius < -screen_bounds.y / 2:
+# 			ball.velocity.y *= -1
+# 			ball.position.y +=  -screen_bounds.y / 2 - (ball.position.y - ball.radius)
+# 			collided = true
 	
-	# collision on X
-	if ball.velocity.x > 0:
-		if ball.position.x + ball.radius > screen_bounds.x / 2:
-			ball.velocity.x *= -1
-			ball.position.x -= screen_bounds.x / 2 - (ball.position.x + ball.radius)
-			collided = true
-	else:
-		if ball.position.x - ball.radius < -screen_bounds.x / 2:
-			ball.velocity.x *= -1
-			ball.position.x +=  -screen_bounds.x / 2 - (ball.position.x - ball.radius)
-			collided = true
+# 	# collision on X
+# 	if ball.velocity.x > 0:
+# 		if ball.position.x + ball.radius > screen_bounds.x / 2:
+# 			ball.velocity.x *= -1
+# 			ball.position.x -= screen_bounds.x / 2 - (ball.position.x + ball.radius)
+# 			collided = true
+# 	else:
+# 		if ball.position.x - ball.radius < -screen_bounds.x / 2:
+# 			ball.velocity.x *= -1
+# 			ball.position.x +=  -screen_bounds.x / 2 - (ball.position.x - ball.radius)
+# 			collided = true
 	
-	return collided
+# 	return collided
 
 func handle_line_collision(line: ColliderLine) -> bool:
 	var collided: bool = false
@@ -122,4 +148,4 @@ func handle_line_collision(line: ColliderLine) -> bool:
 
 	# print(distance_from_line)
 
-	return false
+	return collided

@@ -10,10 +10,16 @@ class_name ColliderLine
 @export
 var show_debug: bool = false
 
+var p1: Vector2
+var p2: Vector2
+
 var tangent: Vector2
 var normal: Vector2
 
 func _ready() -> void:
+	p1 = debug_point1.global_position
+	p2 = debug_point2.global_position
+
 	tangent = (debug_point2.global_position - debug_point1.global_position).normalized()
 	normal = tangent.rotated(PI / 2)
 
@@ -48,3 +54,10 @@ func set_moving_towards(moving_towards: bool) -> void:
 		debug_line.color = Color.from_string("ff220067", Color.WHITE)
 	else:
 		debug_line.color = Color.from_string("0088ff67", Color.WHITE)
+	
+func set_points(p1_new: Vector2, p2_new: Vector2) -> void:
+	p1 = p1_new
+	p2 = p2_new
+
+	debug_point1.global_position = p1
+	debug_point2.global_position = p2

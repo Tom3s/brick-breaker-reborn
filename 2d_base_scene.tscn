@@ -37,6 +37,20 @@ polygon = PackedVector2Array(307.32007, -149.73326, 308.67993, -148.26674, 33.67
 [node name="DebugNormal" parent="Lines/ColliderLine" index="3"]
 polygon = PackedVector2Array(171.23326, -22.17994, 169.76674, -20.82006, 159.62097, -33.232292)
 
+[node name="ColliderLine3" parent="Lines" instance=ExtResource("3_oyw0x")]
+
+[node name="DebugPoint1" parent="Lines/ColliderLine3" index="0"]
+position = Vector2(-94, -133)
+
+[node name="DebugPoint2" parent="Lines/ColliderLine3" index="1"]
+position = Vector2(290, -211)
+
+[node name="DebugLine" parent="Lines/ColliderLine3" index="2"]
+polygon = PackedVector2Array(-93.80094, -132.02002, -94.19906, -133.97998, 289.80093, -211.97998, 290.19907, -210.02002)
+
+[node name="DebugNormal" parent="Lines/ColliderLine3" index="3"]
+polygon = PackedVector2Array(97.02001, -171.80093, 98.97999, -172.19907, 101.18496, -156.3202)
+
 [node name="ColliderLine2" parent="Lines" instance=ExtResource("3_oyw0x")]
 
 [node name="DebugPoint1" parent="Lines/ColliderLine2" index="0"]
@@ -52,4 +66,5 @@ polygon = PackedVector2Array(-272, -227.0036, -270, -226.9964, -271, 51.003597, 
 polygon = PackedVector2Array(-271.4964, -88.99999, -271.5036, -87.00001, -287.4999, -88.057556)
 
 [editable path="Lines/ColliderLine"]
+[editable path="Lines/ColliderLine3"]
 [editable path="Lines/ColliderLine2"]
