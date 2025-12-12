@@ -1,0 +1,25 @@
+[gd_scene load_steps=2 format=3 uid="uid://cv1p2e28ye54x"]
+
+[ext_resource type="Script" uid="uid://dx34tsbmlofpg" path="res://ColliderLine.gd" id="1_22i34"]
+
+[node name="ColliderLine" type="Node2D"]
+script = ExtResource("1_22i34")
+show_debug = true
+
+[node name="DebugPoint1" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(270, 159)
+
+[node name="DebugPoint2" type="Node2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(63, 96)
+
+[node name="DebugLine" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+color = Color(0, 0.5333333, 1, 0.40392157)
+polygon = PackedVector2Array(270.29117, 158.04332, 269.70883, 159.95668, 62.70884, 96.95667, 63.29116, 95.04333)
+
+[node name="DebugNormal" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+color = Color(0.2166667, 1, 0, 0.40392157)
+polygon = PackedVector2Array(167.45668, 127.79116, 165.54332, 127.20884, 171.15858, 112.19322)

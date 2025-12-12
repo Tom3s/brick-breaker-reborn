@@ -10,7 +10,7 @@ constant = Color(0.9238784, 0, 0.12030835, 1)
 operator = 2
 
 [sub_resource type="VisualShaderNodeRemap" id="VisualShaderNodeRemap_1g0yc"]
-default_input_values = [1, 0.215, 2, 0.685, 3, 0.48, 4, 1.2349999999999999, 0, 0.0]
+default_input_values = [1, 0.215, 2, 0.685, 3, 0.48, 4, 1.235, 0, 0.0]
 
 [sub_resource type="VisualShaderNodeColorOp" id="VisualShaderNodeColorOp_8efru"]
 
