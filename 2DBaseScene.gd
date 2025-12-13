@@ -14,9 +14,11 @@ class Ball:
 
 
 @onready var collider_line_scene: PackedScene = preload("res://ColliderLine.tscn")
+@onready var breakable_block_scene: PackedScene = preload("res://BreakableBlock.tscn")
 
 @onready var ball_sprite: Sprite2D = %BallSprite
 @onready var line_parent: Node2D = %Lines
+@onready var block_parent: Node2D = %Blocks
 
 var ball: Ball = Ball.new()
 
@@ -26,6 +28,15 @@ func _ready() -> void:
 
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
+
+	for i in 20:
+		var block: BreakableBlock = breakable_block_scene.instantiate()
+
+		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE - 1))
+		block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
+		block_parent.add_child(block)
+		block.prepare_collision()
+
 
 
 func _process(delta: float) -> void:
@@ -41,6 +52,10 @@ func _process(delta: float) -> void:
 
 	for collider_line in line_parent.get_children():
 		collided = collided || handle_line_collision(collider_line)
+	
+	for block in block_parent.get_children():
+		for collider_line: ColliderLine in block.line_parent.get_children():
+			collided = collided || handle_line_collision(collider_line)
 
 	
 
@@ -52,10 +67,16 @@ func _process(delta: float) -> void:
 func set_up_screen_collision() -> void:
 	var screen_bounds: Vector2 = DisplayServer.window_get_size()
 
-	var p1: Vector2 = Vector2(-screen_bounds.x / 2, -screen_bounds.y / 2)
-	var p2: Vector2 = Vector2(screen_bounds.x / 2, -screen_bounds.y / 2)
-	var p3: Vector2 = Vector2(screen_bounds.x / 2, screen_bounds.y / 2)
-	var p4: Vector2 = Vector2(-screen_bounds.x / 2, screen_bounds.y / 2)
+	# var p1: Vector2 = Vector2(-screen_bounds.x / 2, -screen_bounds.y / 2)
+	# var p2: Vector2 = Vector2(screen_bounds.x / 2, -screen_bounds.y / 2)
+	# var p3: Vector2 = Vector2(screen_bounds.x / 2, screen_bounds.y / 2)
+	# var p4: Vector2 = Vector2(-screen_bounds.x / 2, screen_bounds.y / 2)
+
+	var grid_unit_size: Vector2 = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
+	var p1: Vector2 = Vector2(-grid_unit_size.x / 2, -grid_unit_size.y / 2)
+	var p2: Vector2 = Vector2(grid_unit_size.x / 2, -grid_unit_size.y / 2)
+	var p3: Vector2 = Vector2(grid_unit_size.x / 2, grid_unit_size.y / 2)
+	var p4: Vector2 = Vector2(-grid_unit_size.x / 2, grid_unit_size.y / 2)
 
 	var line: ColliderLine = collider_line_scene.instantiate()
 	line_parent.add_child(line)

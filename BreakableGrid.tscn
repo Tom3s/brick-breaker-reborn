@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://q8nvnnklfsns"]
+
+[ext_resource type="Script" uid="uid://cs7hd2rheths7" path="res://BreakableGrid.gd" id="1_32sgw"]
+
+[node name="BreakableGrid" type="Node2D"]
+script = ExtResource("1_32sgw")
