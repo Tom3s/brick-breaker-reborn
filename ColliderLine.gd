@@ -23,8 +23,10 @@ func _ready() -> void:
 	tangent = (debug_point2.global_position - debug_point1.global_position).normalized()
 	normal = tangent.rotated(PI / 2)
 
+var debug_set_up: bool = false
+
 func _process(delta: float) -> void:
-	if show_debug:
+	if show_debug && !debug_set_up:
 		tangent = (debug_point2.global_position - debug_point1.global_position).normalized()
 		normal = tangent.rotated(PI / 2)
 
@@ -48,6 +50,7 @@ func _process(delta: float) -> void:
 
 		debug_normal.polygon = normal_points
 
+		debug_set_up = true
 
 func set_moving_towards(moving_towards: bool) -> void:
 	if moving_towards:
