@@ -10,6 +10,8 @@ var size: Vector2i = Vector2i.ONE
 
 @onready var line_parent: Node2D = %Lines
 
+# TODO: set this to a counter for multi layered block
+# TODO: maybe add immunities, so certain blocks need certain damage type to be broken
 var broken: bool = false
 
 func _process(delta: float) -> void:
