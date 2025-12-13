@@ -61,3 +61,4 @@ func set_points(p1_new: Vector2, p2_new: Vector2) -> void:
 
 	debug_point1.global_position = p1
 	debug_point2.global_position = p2
+
