@@ -137,7 +137,12 @@ func handle_line_collision(line: ColliderLine) -> bool:
 
 	# idfk what im doing here, but it's dot product magic
 	# for more info see: https://youtu.be/nXrEX6j-Mws?si=8GdqyyBu0hQkDFsm&t=224
-	var distance_from_line: float = abs((ball.position - p1).dot(line.normal))
+	var distance_from_line: float = (ball.position - p1).dot(line.normal)
+
+	if distance_from_line < 0:
+		return collided
+	
+	distance_from_line = abs(distance_from_line)
 
 	var case: float = (ball.position - p1).dot(line.tangent)
 
