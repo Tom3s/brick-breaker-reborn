@@ -10,6 +10,12 @@ var size: Vector2i = Vector2i.ONE
 
 @onready var line_parent: Node2D = %Lines
 
+var broken: bool = false
+
+func _process(delta: float) -> void:
+	if broken:
+		line_parent.hide()
+
 func prepare_collision() -> void:
 	var p1: Vector2 = _get_collision_vertex_position(Vector2.ZERO)
 	var p2: Vector2 = _get_collision_vertex_position(Vector2(0, BreakableGrid.CELL_SIZE * size.y))

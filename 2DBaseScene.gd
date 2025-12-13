@@ -29,7 +29,7 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
-	for i in 20:
+	for i in 50:
 		var block: BreakableBlock = breakable_block_scene.instantiate()
 
 		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE - 1))
@@ -55,7 +55,10 @@ func _process(delta: float) -> void:
 	
 	for block in block_parent.get_children():
 		for collider_line: ColliderLine in block.line_parent.get_children():
-			collided = collided || handle_line_collision(collider_line)
+			if block.broken:
+				continue
+			block.broken = handle_line_collision(collider_line)
+			collided = collided || block.broken
 
 	
 
