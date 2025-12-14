@@ -19,6 +19,9 @@ class Ball:
 @onready var ball_sprite: Sprite2D = %BallSprite
 @onready var line_parent: Node2D = %Lines
 @onready var block_parent: Node2D = %Blocks
+@onready var paddle: Paddle = %Paddle
+@onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
+
 
 var ball: Ball = Ball.new()
 
@@ -32,11 +35,12 @@ func _ready() -> void:
 	for i in 50:
 		var block: BreakableBlock = breakable_block_scene.instantiate()
 
-		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE - 1))
+		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE / 2))
 		block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
 		block_parent.add_child(block)
 		block.prepare_collision()
 
+	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
 
 
 func _process(delta: float) -> void:
@@ -178,3 +182,11 @@ func handle_line_collision(line: ColliderLine) -> bool:
 	# print(distance_from_line)
 
 	return collided
+
+func handle_mouse_movement(movement: Vector2) -> void:
+	paddle.global_position.x += movement.x
+
+	if paddle.global_position.x > BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2:
+		paddle.global_position.x = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2
+	elif paddle.global_position.x < - BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2:
+		paddle.global_position.x = - BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2
