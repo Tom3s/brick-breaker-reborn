@@ -1,7 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://v6xjbr0o43p4"]
+[gd_scene load_steps=6 format=3 uid="uid://v6xjbr0o43p4"]
 
 [ext_resource type="Shader" uid="uid://bkfljmi5pdpqh" path="res://ball.tres" id="1_kamic"]
 [ext_resource type="Script" uid="uid://dcjw3yqlt8je" path="res://2DBaseScene.gd" id="1_oyw0x"]
+[ext_resource type="Script" uid="uid://dv3dkfk652ejt" path="res://IngameCamera.gd" id="3_oyw0x"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_na87o"]
 shader = ExtResource("1_kamic")
@@ -18,6 +19,7 @@ material = SubResource("ShaderMaterial_na87o")
 texture = SubResource("PlaceholderTexture2D_oyw0x")
 
 [node name="Camera2D" type="Camera2D" parent="."]
+script = ExtResource("3_oyw0x")
 
 [node name="Lines" type="Node2D" parent="."]
 unique_name_in_owner = true
