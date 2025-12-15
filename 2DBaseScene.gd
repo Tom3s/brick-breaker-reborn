@@ -42,6 +42,10 @@ func _ready() -> void:
 
 	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
 
+	handle_mouse_movement(Vector2.ZERO)
+
+	paddle.collider_line.debug_set_up = false
+
 
 func _process(delta: float) -> void:
 	if ball.velocity.length() > ball.target_velocity:
@@ -186,7 +190,12 @@ func handle_line_collision(line: ColliderLine) -> bool:
 func handle_mouse_movement(movement: Vector2) -> void:
 	paddle.global_position.x += movement.x
 
-	if paddle.global_position.x > BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2:
-		paddle.global_position.x = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2
-	elif paddle.global_position.x < - BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2:
-		paddle.global_position.x = - BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2
+	var paddle_size: float = 128 # TODO: move variable to paddle
+	var limits: float = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2 - (paddle_size / 2)
+
+	if paddle.global_position.x > limits:
+		paddle.global_position.x = limits
+	elif paddle.global_position.x < - limits:
+		paddle.global_position.x = - limits
+
+	paddle.global_position.y = (BreakableGrid.GRID_SIZE / 2 - 1) * BreakableGrid.CELL_SIZE
