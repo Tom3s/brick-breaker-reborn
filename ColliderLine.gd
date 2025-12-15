@@ -32,25 +32,27 @@ func _process(delta: float) -> void:
 
 		var points: PackedVector2Array
 		
-		points.append(debug_point1.global_position + normal)
-		points.append(debug_point1.global_position - normal)
-		points.append(debug_point2.global_position - normal)
-		points.append(debug_point2.global_position + normal)
+		points.append(debug_point1.position + normal)
+		points.append(debug_point1.position - normal)
+		points.append(debug_point2.position - normal)
+		points.append(debug_point2.position + normal)
 
 		debug_line.polygon = points
 
 
 		var normal_points: PackedVector2Array
 
-		var half_point: Vector2 = lerp(debug_point1.global_position, debug_point2.global_position, 0.5)
+		var half_point: Vector2 = lerp(debug_point1.position, debug_point2.position, 0.5)
 
-		normal_points.append(half_point.move_toward(debug_point1.global_position, 1.0))
-		normal_points.append(half_point.move_toward(debug_point2.global_position, 1.0))
+		normal_points.append(half_point.move_toward(debug_point1.position, 1.0))
+		normal_points.append(half_point.move_toward(debug_point2.position, 1.0))
 		normal_points.append(half_point + normal * 16)
 
 		debug_normal.polygon = normal_points
 
 		debug_set_up = true
+	else:
+		debug_set_up = false
 
 func set_moving_towards(moving_towards: bool) -> void:
 	if moving_towards:
@@ -62,6 +64,8 @@ func set_points(p1_new: Vector2, p2_new: Vector2) -> void:
 	p1 = p1_new
 	p2 = p2_new
 
-	debug_point1.global_position = p1
-	debug_point2.global_position = p2
+	debug_point1.position = p1
+	debug_point2.position = p2
+
+	debug_set_up = false
 

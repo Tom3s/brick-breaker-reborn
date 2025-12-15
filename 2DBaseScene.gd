@@ -19,6 +19,9 @@ class Ball:
 @onready var ball_sprite: Sprite2D = %BallSprite
 @onready var line_parent: Node2D = %Lines
 @onready var block_parent: Node2D = %Blocks
+@onready var paddle: Paddle = %Paddle
+@onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
+
 
 var ball: Ball = Ball.new()
 
@@ -32,11 +35,20 @@ func _ready() -> void:
 	for i in 50:
 		var block: BreakableBlock = breakable_block_scene.instantiate()
 
-		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE - 1))
+		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE / 2))
 		block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
 		block_parent.add_child(block)
 		block.prepare_collision()
 
+	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
+
+	handle_mouse_movement(Vector2.ZERO)
+
+	# paddle.collider_line.debug_set_up = false
+	paddle.collider_line.set_points(
+		Vector2(-128 / 2 - ball.radius, -8),
+		Vector2(+128 / 2 + ball.radius, -8)
+	)
 
 
 func _process(delta: float) -> void:
@@ -59,6 +71,8 @@ func _process(delta: float) -> void:
 				continue
 			block.broken = handle_line_collision(collider_line)
 			collided = collided || block.broken
+	
+	collided = collided || handle_paddle_collision()
 
 	
 
@@ -131,6 +145,7 @@ func set_up_screen_collision() -> void:
 func handle_line_collision(line: ColliderLine) -> bool:
 	var collided: bool = false
 
+	# TODO: collider line should abstract p1 and p2, use them instead of accessing debug point coordinates
 	var p1: Vector2 = line.debug_point1.global_position
 	var p2: Vector2 = line.debug_point2.global_position
 
@@ -168,7 +183,7 @@ func handle_line_collision(line: ColliderLine) -> bool:
 
 			ball.velocity *= -1
 			var angle: float = ball.velocity.angle_to(current_normal)
-			ball.velocity = ball.velocity.rotated(2 * angle)
+			ball.velocity = ball.velocity.rotated(2 * angle) # TODO: set proper speed, this relies on the collision speed up logic
 
 			collided = true
 		
@@ -178,3 +193,58 @@ func handle_line_collision(line: ColliderLine) -> bool:
 	# print(distance_from_line)
 
 	return collided
+
+var paddle_reflect_angle: float = PI / 4
+
+
+func handle_paddle_collision() -> bool:
+	var line: ColliderLine = paddle.collider_line
+
+	# TODO: collider line should abstract p1 and p2, use them instead of accessing debug point coordinates
+	var p1: Vector2 = line.debug_point1.global_position
+	var p2: Vector2 = line.debug_point2.global_position
+
+	var moving_towards_line: bool = ball.velocity.dot(line.normal) < 0
+	if !moving_towards_line:
+		return false
+
+	var distance_from_line: float = (ball.position - p1).dot(line.normal)
+	if distance_from_line < 0:
+		return false
+
+	var case: float = (ball.position - p1).dot(line.tangent)
+
+	if case < 0 || case > (p1 - p2).length():
+		return false
+
+	var t: float = case / (p1 - p2).length()
+
+	var reflection_angle: float = lerpf(paddle_reflect_angle, -paddle_reflect_angle, t)
+
+	if (distance_from_line < ball.radius):
+		var speed_along_normal: float = ball.velocity.dot(line.normal)
+
+		if speed_along_normal <= 0:
+			var correction: float = ball.radius - distance_from_line
+
+			ball.position += line.normal * correction * 2
+			ball.velocity = Vector2.UP.rotated(reflection_angle)
+
+			return true
+	
+	return false
+
+
+
+func handle_mouse_movement(movement: Vector2) -> void:
+	paddle.global_position.x += movement.x
+
+	var paddle_size: float = 128 # TODO: move variable to paddle
+	var limits: float = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2 - (paddle_size / 2)
+
+	if paddle.global_position.x > limits:
+		paddle.global_position.x = limits
+	elif paddle.global_position.x < - limits:
+		paddle.global_position.x = - limits
+
+	paddle.global_position.y = (BreakableGrid.GRID_SIZE / 2 - 1) * BreakableGrid.CELL_SIZE
