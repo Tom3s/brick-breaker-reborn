@@ -79,3 +79,41 @@ func collide_with(line: LineCollider, boost_on_collision: bool = true) -> void:
 			# collided = true
 			if boost_on_collision:
 				boost()
+
+
+func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> void:
+	var line: LineCollider = paddle.line
+
+	var p1: Vector2 = line.p1 + paddle.position
+	var p2: Vector2 = line.p2 + paddle.position
+
+	var moving_towards_line: bool = velocity.dot(line.normal) < 0
+	if !moving_towards_line:
+		return 
+
+	var distance_from_line: float = (position - p1).dot(line.normal)
+	if distance_from_line < 0:
+		return 
+
+	var case: float = (position - p1).dot(line.tangent)
+
+	if case < 0 || case > (p1 - p2).length():
+		return 
+
+	var t: float = case / (p1 - p2).length()
+
+	var reflection_angle: float = lerpf(paddle.reflection_angle, -paddle.reflection_angle, t)
+
+	if (distance_from_line < radius):
+		var speed_along_normal: float = velocity.dot(line.normal)
+
+		if speed_along_normal <= 0:
+			var correction: float = radius - distance_from_line
+
+			position += line.normal * correction * 2
+			velocity = Vector2.UP.rotated(reflection_angle)
+
+			if boost_on_collision:
+				boost()
+	
+	return 

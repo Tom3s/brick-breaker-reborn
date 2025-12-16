@@ -1,9 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://v6xjbr0o43p4"]
+[gd_scene load_steps=10 format=3 uid="uid://v6xjbr0o43p4"]
 
 [ext_resource type="Shader" uid="uid://bkfljmi5pdpqh" path="res://ball.tres" id="1_kamic"]
 [ext_resource type="Script" uid="uid://dcjw3yqlt8je" path="res://2DBaseScene.gd" id="1_oyw0x"]
+[ext_resource type="Shader" uid="uid://dc1fl7ob7i8nu" path="res://paddle_shader.tres" id="3_3bc2o"]
 [ext_resource type="Script" uid="uid://dv3dkfk652ejt" path="res://IngameCamera.gd" id="3_oyw0x"]
-[ext_resource type="PackedScene" uid="uid://c61066pkkhmr2" path="res://Paddle.tscn" id="4_1dykg"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="5_3bc2o"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_na87o"]
@@ -11,6 +11,12 @@ shader = ExtResource("1_kamic")
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_oyw0x"]
 size = Vector2(32, 32)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_svqwc"]
+shader = ExtResource("3_3bc2o")
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_bu8f3"]
+size = Vector2(128, 16)
 
 [node name="2DBaseScene" type="Node2D"]
 script = ExtResource("1_oyw0x")
@@ -20,16 +26,15 @@ unique_name_in_owner = true
 material = SubResource("ShaderMaterial_na87o")
 texture = SubResource("PlaceholderTexture2D_oyw0x")
 
+[node name="PaddleSprite" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_svqwc")
+texture = SubResource("PlaceholderTexture2D_bu8f3")
+
 [node name="Camera2D" type="Camera2D" parent="."]
 script = ExtResource("3_oyw0x")
 
-[node name="Lines" type="Node2D" parent="."]
-unique_name_in_owner = true
-
 [node name="Blocks" type="Node2D" parent="."]
-unique_name_in_owner = true
-
-[node name="Paddle" parent="." instance=ExtResource("4_1dykg")]
 unique_name_in_owner = true
 
 [node name="MouseInputHandler" type="Node" parent="."]
