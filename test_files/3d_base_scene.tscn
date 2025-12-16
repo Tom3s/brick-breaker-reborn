@@ -1,0 +1,57 @@
+[gd_scene load_steps=9 format=3 uid="uid://cpp2lk1fm5hnc"]
+
+[ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
+[ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_yrogh"]
+radius = 16.0
+height = 32.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_bcu1a"]
+top_radius = 8.0
+bottom_radius = 8.0
+height = 128.0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_yrogh"]
+size = Vector2(1024, 1024)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_bcu1a"]
+
+[sub_resource type="Sky" id="Sky_ie54n"]
+sky_material = SubResource("ProceduralSkyMaterial_bcu1a")
+
+[sub_resource type="Environment" id="Environment_5hqcb"]
+background_mode = 2
+sky = SubResource("Sky_ie54n")
+
+[node name="3d_base_scene" type="Node3D"]
+script = ExtResource("1_yrogh")
+
+[node name="BallMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_yrogh")
+
+[node name="PaddleMesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_bcu1a")
+
+[node name="Playfield" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_yrogh")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 380, 450)
+fov = 90.0
+
+[node name="Blocks" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="MouseInputHandler" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("2_bcu1a")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_5hqcb")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.9514685, 0.062775366, 0.3012754, -0.30547336, 0.073897764, 0.9493287, 0.03733088, -0.9952881, 0.08948761, 0, 114.729614, 0)

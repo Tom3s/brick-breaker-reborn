@@ -1,0 +1,15 @@
+[gd_scene load_steps=5 format=3 uid="uid://d1oqljrgkjxa7"]
+
+[ext_resource type="Shader" uid="uid://w3s6ewydq4cj" path="res://box_shader.tres" id="1_u6jif"]
+[ext_resource type="ArrayMesh" uid="uid://dedqeka3xgpvc" path="res://rounded cube.obj" id="2_mmbeh"]
+[ext_resource type="Script" uid="uid://cxlwi3loww47" path="res://visuals/BlockMesh.gd" id="3_413et"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_46wxt"]
+render_priority = 0
+shader = ExtResource("1_u6jif")
+shader_parameter/Color = Color(0.195768, 0.546089, 0.584592, 1)
+
+[node name="BlockMesh" type="MeshInstance3D"]
+material_override = SubResource("ShaderMaterial_46wxt")
+mesh = ExtResource("2_mmbeh")
+script = ExtResource("3_413et")
