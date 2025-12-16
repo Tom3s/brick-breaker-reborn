@@ -36,20 +36,21 @@ func boost() -> void:
 	velocity = velocity.normalized() * target_velocity * speed_up_factor
 
 
-func collide_with(line: LineCollider, boost_on_collision: bool = true) -> void:
+func collide_with(line: LineCollider, boost_on_collision: bool = true) -> bool:
 
 	# TODO: collider line should abstract p1 and p2, use them instead of accessing debug point coordinates
 	var p1: Vector2 = line.p1
 	var p2: Vector2 = line.p2
 
-	var moving_towards_line: bool = velocity.dot(line.normal) < 0
+	# TODO: used for debug - prune if unused
+	# var moving_towards_line: bool = velocity.dot(line.normal) < 0
 
 	# idfk what im doing here, but it's dot product magic
 	# for more info see: https://youtu.be/nXrEX6j-Mws?si=8GdqyyBu0hQkDFsm&t=224
 	var distance_from_line: float = (position - p1).dot(line.normal)
 
 	if distance_from_line < 0:
-		return
+		return false
 	
 	distance_from_line = abs(distance_from_line)
 
@@ -79,6 +80,9 @@ func collide_with(line: LineCollider, boost_on_collision: bool = true) -> void:
 			# collided = true
 			if boost_on_collision:
 				boost()
+			return true
+	
+	return false
 
 
 func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> void:

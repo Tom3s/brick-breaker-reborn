@@ -26,6 +26,7 @@ var ball: Ball = Ball.new()
 var paddle: Paddle = Paddle.new()
 
 var screen_collision: Array[LineCollider]
+var blocks: Array[BreakableBlock]
 
 func _ready() -> void:
 	ball.randomize_velocity()
@@ -34,12 +35,22 @@ func _ready() -> void:
 	set_up_screen_collision()
 
 	for i in 50:
-		var block: BreakableBlock = breakable_block_scene.instantiate()
+		var block: BreakableBlock = BreakableBlock.new()
 
 		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE / 2))
 		block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
-		block_parent.add_child(block)
 		block.prepare_collision()
+
+		var block_sprite: Sprite2D = Sprite2D.new()
+		block_parent.add_child(block_sprite)
+		block_sprite.texture = PlaceholderTexture2D.new()
+		block_sprite.texture.size = block.size * BreakableGrid.CELL_SIZE
+		block_sprite.global_position = block.get_origin()
+
+		block.asset_ref = block_sprite
+
+		blocks.push_back(block)
+
 
 	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
 
@@ -58,12 +69,24 @@ func _process(delta: float) -> void:
 	for line in screen_collision:
 		ball.collide_with(line)
 	
-	for block in block_parent.get_children():
-		for collider_line: ColliderLine in block.line_parent.get_children():
+	# for block in block_parent.get_children():
+	# 	for collider_line: ColliderLine in block.line_parent.get_children():
+	# 		if block.broken:
+	# 			continue
+	# 		block.broken = handle_line_collision(collider_line)
+	# 		collided = collided || block.broken
+	for block: BreakableBlock in blocks:
+		if block.broken:
+			continue
+		
+		for line: LineCollider in block.collision:
+			if ball.collide_with(line):
+				block.hit_block()
+
 			if block.broken:
-				continue
-			block.broken = handle_line_collision(collider_line)
-			collided = collided || block.broken
+				print("Block was broken")
+				break
+			
 	
 	ball.collide_with_paddle(paddle)
 
