@@ -1,9 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://bkuw1uwy64bxc"]
-
-[ext_resource type="Script" uid="uid://biy7evv7ejmml" path="res://BreakableBlock.gd" id="1_qiokr"]
-
-[node name="BreakableBlock" type="Node2D"]
-script = ExtResource("1_qiokr")
-
-[node name="Lines" type="Node2D" parent="."]
-unique_name_in_owner = true
