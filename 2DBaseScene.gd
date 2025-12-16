@@ -1,20 +1,7 @@
 extends Node2D
 # class_name # not requiered for test
 
-class BallClass:
-	var radius: float = 16.0
-	var position: Vector2
-	var velocity: Vector2
-	
-	var target_velocity: float = 512.0
-	
-	var deceleration: float = 8.0
-	
-	var speed_up_factor: float = 2.0
 
-
-@onready var collider_line_scene: PackedScene = preload("res://ColliderLine.tscn")
-@onready var breakable_block_scene: PackedScene = preload("res://BreakableBlock.tscn")
 
 @onready var ball_sprite: Sprite2D = %BallSprite
 @onready var paddle_sprite: Sprite2D = %PaddleSprite
@@ -69,12 +56,7 @@ func _process(delta: float) -> void:
 	for line in screen_collision:
 		ball.collide_with(line)
 	
-	# for block in block_parent.get_children():
-	# 	for collider_line: ColliderLine in block.line_parent.get_children():
-	# 		if block.broken:
-	# 			continue
-	# 		block.broken = handle_line_collision(collider_line)
-	# 		collided = collided || block.broken
+
 	for block: BreakableBlock in blocks:
 		if block.broken:
 			continue
@@ -84,7 +66,6 @@ func _process(delta: float) -> void:
 				block.hit_block()
 
 			if block.broken:
-				print("Block was broken")
 				break
 			
 	
@@ -124,55 +105,7 @@ func set_up_screen_collision() -> void:
 	screen_collision.push_back(line)
 
 
-
-
-func handle_line_collision(line: ColliderLine) -> bool:
-	var collided: bool = false
-
-	# TODO: collider line should abstract p1 and p2, use them instead of accessing debug point coordinates
-	var p1: Vector2 = line.debug_point1.global_position
-	var p2: Vector2 = line.debug_point2.global_position
-
-	var moving_towards_line: bool = ball.velocity.dot(line.normal) < 0
-
-	line.set_moving_towards(moving_towards_line)
-
-	# idfk what im doing here, but it's dot product magic
-	# for more info see: https://youtu.be/nXrEX6j-Mws?si=8GdqyyBu0hQkDFsm&t=224
-	var distance_from_line: float = (ball.position - p1).dot(line.normal)
-
-	if distance_from_line < 0:
-		return collided
-	
-	distance_from_line = abs(distance_from_line)
-
-	var case: float = (ball.position - p1).dot(line.tangent)
-
-	var current_normal: Vector2 = line.normal
-
-	if case < 0:
-		distance_from_line = (ball.position - p1).length()
-		current_normal = (ball.position - p1).normalized()
-	elif case > (p1 - p2).length():
-		distance_from_line = (ball.position - p2).length()
-		current_normal = (ball.position - p2).normalized()
-
-	if (distance_from_line < ball.radius):
-		var speed_along_normal: float = ball.velocity.dot(current_normal)
-
-		if speed_along_normal <= 0:
-			var correction: float = ball.radius - distance_from_line
-
-			ball.position += current_normal * correction * 2
-
-			ball.velocity *= -1
-			var angle: float = ball.velocity.angle_to(current_normal)
-			ball.velocity = ball.velocity.rotated(2 * angle) # TODO: set proper speed, this relies on the collision speed up logic
-
-			collided = true
-		
-	return collided
-
-
+# TODO: I dont like this being alone with a signal. 
+# might cause headache lter when debugging
 func handle_mouse_movement(movement: Vector2) -> void:
 	paddle.move(movement)
