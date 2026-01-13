@@ -120,6 +120,9 @@ func on_death() -> void:
 	ball.released = false
 
 func generate_map() -> void:
+	# have X rows where randomly sized (vertical scale) blocks sit next to eachother
+	# there is a margin of 2 grid cells at the sides and top
+	# TODO: no thorough documentation needed, as this is just a placeholder for now
 	var nr_rows: int = 6
 	var nr_cols: int = BreakableGrid.GRID_SIZE - 4
 
@@ -151,24 +154,3 @@ func generate_map() -> void:
 			blocks.push_back(block)
 
 			total += block_size
-
-
-	# for i in 50:
-	# 	var block: BreakableBlock = BreakableBlock.new()
-
-	# 	block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE / 2))
-	# 	block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
-	# 	block.prepare_collision()
-
-
-	# 	var block_mesh: BlockMesh = block_mesh_scene.instantiate()
-	# 	block_parent.add_child(block_mesh)
-	# 	block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-	# 	var final_pos: Vector2 = block.get_origin()
-	# 	block_mesh.global_position.x = final_pos.x
-	# 	block_mesh.global_position.z = final_pos.y
-	# 	block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
-
-	# 	block.asset_ref = block_mesh
-
-	# 	blocks.push_back(block)
