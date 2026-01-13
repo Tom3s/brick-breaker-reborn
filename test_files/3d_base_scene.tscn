@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=10 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
@@ -11,6 +11,9 @@ height = 32.0
 top_radius = 8.0
 bottom_radius = 8.0
 height = 128.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bcu1a"]
+albedo_color = Color(0.0885599, 0.0885599, 0.0885599, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yrogh"]
 size = Vector2(1024, 1024)
@@ -37,6 +40,8 @@ transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0
 mesh = SubResource("CylinderMesh_bcu1a")
 
 [node name="Playfield" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
+material_override = SubResource("StandardMaterial3D_bcu1a")
 mesh = SubResource("PlaneMesh_yrogh")
 
 [node name="Camera3D" type="Camera3D" parent="."]

@@ -13,36 +13,23 @@ var ball: Ball = Ball.new()
 var paddle: Paddle = Paddle.new()
 
 var screen_collision: Array[LineCollider]
+var death_barrier: LineCollider
 var blocks: Array[BreakableBlock]
 
+var broken_block_count: int = 0
+
 func _ready() -> void:
-	ball.randomize_velocity()
+	# ball.randomize_velocity()
 
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
-	for i in 50:
-		var block: BreakableBlock = BreakableBlock.new()
+	generate_map()
 
-		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE / 2))
-		block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
-		block.prepare_collision()
-
-
-		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
-		block_parent.add_child(block_mesh)
-		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-		var final_pos: Vector2 = block.get_origin()
-		block_mesh.global_position.x = final_pos.x
-		block_mesh.global_position.z = final_pos.y
-		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
-
-		block.asset_ref = block_mesh
-
-		blocks.push_back(block)
 
 
 	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
+	mouse_input_handler.release_ball_pressed.connect(release_ball)
 
 	handle_mouse_movement(Vector2.ZERO)
 
@@ -51,10 +38,17 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	ball.move(delta)
+	if !ball.released:
+		ball.set_position(paddle.position + Vector2.UP * ball.radius * 2)
+	else:
+		ball.move(delta)
 
 	# handle collision
-	var collided: bool = false
+	# check for death first
+	if ball.collide_with(death_barrier, false):
+		on_death()
+
+	# var collided: bool = false
 
 	for line in screen_collision:
 		ball.collide_with(line)
@@ -67,17 +61,21 @@ func _process(delta: float) -> void:
 		for line: LineCollider in block.collision:
 			if ball.collide_with(line):
 				block.hit_block()
+				broken_block_count += 1
 
 			if block.broken:
 				break
-			
+	
+	if broken_block_count >= blocks.size():
+		on_board_clear()
+		return
 	
 	ball.collide_with_paddle(paddle)
 
 	
 
-	if collided:
-		ball.boost()
+	# if collided:
+	# 	ball.boost()
 
 	ball_mesh.global_position.x = ball.position.x
 	ball_mesh.global_position.z = ball.position.y
@@ -104,15 +102,72 @@ func set_up_screen_collision() -> void:
 	screen_collision.push_back(line)
 
 	line = LineCollider.new()
-	line.set_points(p3, p4)
-	screen_collision.push_back(line)
-
-	line = LineCollider.new()
 	line.set_points(p4, p1)
 	screen_collision.push_back(line)
+
+	# This is the death barrier
+	death_barrier = LineCollider.new()
+	death_barrier.set_points(p3, p4)
 
 
 # TODO: I dont like this being alone with a signal. 
 # might cause headache lter when debugging
 func handle_mouse_movement(movement: Vector2) -> void:
 	paddle.move(movement)
+
+
+func release_ball() -> void:
+	ball.randomize_velocity()
+	ball.released = true
+
+# Handle any logic for death
+func on_death() -> void:
+	ball.velocity = Vector2.ZERO
+	ball.released = false
+
+func generate_map() -> void:
+	for child in block_parent.get_children():
+		child.queue_free()
+	blocks.clear()
+
+	# have X rows where randomly sized (vertical scale) blocks sit next to eachother
+	# there is a margin of 2 grid cells at the sides and top
+	# TODO: no thorough documentation needed, as this is just a placeholder for now
+	var nr_rows: int = 6
+	var nr_cols: int = BreakableGrid.GRID_SIZE - 4
+
+	for i in nr_rows:
+		var total: int = 0
+		while total < nr_cols:
+			var block_size: int = randi_range(2, 5)
+
+			if total + block_size > nr_cols:
+				block_size = nr_cols - total
+
+			var block: BreakableBlock = BreakableBlock.new()
+
+			block.pos_on_grid = Vector2i(2 + total, 2 * i + 2)
+			block.size = Vector2i(block_size, 2)
+			block.prepare_collision()
+
+
+			var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+			block_parent.add_child(block_mesh)
+			block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+			var final_pos: Vector2 = block.get_origin()
+			block_mesh.global_position.x = final_pos.x
+			block_mesh.global_position.z = final_pos.y
+			block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+
+			block.asset_ref = block_mesh
+
+			blocks.push_back(block)
+
+			total += block_size
+
+func on_board_clear() -> void:
+	# TODO: this resets the ball. shouldn't use death entrypoint for this tho
+	on_death()
+
+	broken_block_count = 0
+	generate_map()
