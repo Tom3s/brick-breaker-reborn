@@ -22,25 +22,8 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
-	for i in 50:
-		var block: BreakableBlock = BreakableBlock.new()
+	generate_map()
 
-		block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE / 2))
-		block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
-		block.prepare_collision()
-
-
-		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
-		block_parent.add_child(block_mesh)
-		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-		var final_pos: Vector2 = block.get_origin()
-		block_mesh.global_position.x = final_pos.x
-		block_mesh.global_position.z = final_pos.y
-		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
-
-		block.asset_ref = block_mesh
-
-		blocks.push_back(block)
 
 
 	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
@@ -135,3 +118,57 @@ func release_ball() -> void:
 func on_death() -> void:
 	ball.velocity = Vector2.ZERO
 	ball.released = false
+
+func generate_map() -> void:
+	var nr_rows: int = 6
+	var nr_cols: int = BreakableGrid.GRID_SIZE - 4
+
+	for i in nr_rows:
+		var total: int = 0
+		while total < nr_cols:
+			var block_size: int = randi_range(2, 5)
+
+			if total + block_size > nr_cols:
+				block_size = nr_cols - total
+
+			var block: BreakableBlock = BreakableBlock.new()
+
+			block.pos_on_grid = Vector2i(2 + total, 2 * i + 2)
+			block.size = Vector2i(block_size, 2)
+			block.prepare_collision()
+
+
+			var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+			block_parent.add_child(block_mesh)
+			block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+			var final_pos: Vector2 = block.get_origin()
+			block_mesh.global_position.x = final_pos.x
+			block_mesh.global_position.z = final_pos.y
+			block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+
+			block.asset_ref = block_mesh
+
+			blocks.push_back(block)
+
+			total += block_size
+
+
+	# for i in 50:
+	# 	var block: BreakableBlock = BreakableBlock.new()
+
+	# 	block.pos_on_grid = Vector2i(randi_range(0, BreakableGrid.GRID_SIZE - 1), randi_range(0, BreakableGrid.GRID_SIZE / 2))
+	# 	block.size = Vector2i(randi_range(1, 5), randi_range(1, 5))
+	# 	block.prepare_collision()
+
+
+	# 	var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+	# 	block_parent.add_child(block_mesh)
+	# 	block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+	# 	var final_pos: Vector2 = block.get_origin()
+	# 	block_mesh.global_position.x = final_pos.x
+	# 	block_mesh.global_position.z = final_pos.y
+	# 	block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+
+	# 	block.asset_ref = block_mesh
+
+	# 	blocks.push_back(block)
