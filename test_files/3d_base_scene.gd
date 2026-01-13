@@ -13,6 +13,7 @@ var ball: Ball = Ball.new()
 var paddle: Paddle = Paddle.new()
 
 var screen_collision: Array[LineCollider]
+var death_barrier: LineCollider
 var blocks: Array[BreakableBlock]
 
 func _ready() -> void:
@@ -58,7 +59,11 @@ func _process(delta: float) -> void:
 		ball.move(delta)
 
 	# handle collision
-	var collided: bool = false
+	# check for death first
+	if ball.collide_with(death_barrier, false):
+		on_death()
+
+	# var collided: bool = false
 
 	for line in screen_collision:
 		ball.collide_with(line)
@@ -80,8 +85,8 @@ func _process(delta: float) -> void:
 
 	
 
-	if collided:
-		ball.boost()
+	# if collided:
+	# 	ball.boost()
 
 	ball_mesh.global_position.x = ball.position.x
 	ball_mesh.global_position.z = ball.position.y
@@ -108,12 +113,12 @@ func set_up_screen_collision() -> void:
 	screen_collision.push_back(line)
 
 	line = LineCollider.new()
-	line.set_points(p3, p4)
-	screen_collision.push_back(line)
-
-	line = LineCollider.new()
 	line.set_points(p4, p1)
 	screen_collision.push_back(line)
+
+	# This is the death barrier
+	death_barrier = LineCollider.new()
+	death_barrier.set_points(p3, p4)
 
 
 # TODO: I dont like this being alone with a signal. 
@@ -125,3 +130,8 @@ func handle_mouse_movement(movement: Vector2) -> void:
 func release_ball() -> void:
 	ball.randomize_velocity()
 	ball.released = true
+
+# Handle any logic for death
+func on_death() -> void:
+	ball.velocity = Vector2.ZERO
+	ball.released = false
