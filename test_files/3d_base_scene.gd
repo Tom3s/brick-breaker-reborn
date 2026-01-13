@@ -16,7 +16,7 @@ var screen_collision: Array[LineCollider]
 var blocks: Array[BreakableBlock]
 
 func _ready() -> void:
-	ball.randomize_velocity()
+	# ball.randomize_velocity()
 
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
@@ -43,6 +43,7 @@ func _ready() -> void:
 
 
 	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
+	mouse_input_handler.release_ball_pressed.connect(release_ball)
 
 	handle_mouse_movement(Vector2.ZERO)
 
@@ -51,7 +52,10 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	ball.move(delta)
+	if !ball.released:
+		ball.set_position(paddle.position + Vector2.UP * ball.radius * 2)
+	else:
+		ball.move(delta)
 
 	# handle collision
 	var collided: bool = false
@@ -116,3 +120,8 @@ func set_up_screen_collision() -> void:
 # might cause headache lter when debugging
 func handle_mouse_movement(movement: Vector2) -> void:
 	paddle.move(movement)
+
+
+func release_ball() -> void:
+	ball.randomize_velocity()
+	ball.released = true

@@ -3,6 +3,7 @@ class_name MouseInputHandler
 
 # TODO: might wanna handle this in an other way to not get race conditions and have more consistent phisycs
 signal mouse_moved(dist: Vector2)
+signal release_ball_pressed()
 
 var mouse_pos: Vector2
 
@@ -25,4 +26,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		mouse_pos = event.screen_relative
 		# print(mouse_pos)
 		mouse_moved.emit(mouse_pos)
-	# else:
+	
+	if Input.is_action_just_pressed("release_ball"):
+		release_ball_pressed.emit()

@@ -18,12 +18,17 @@ var speed_up_factor: float = 2.0
 var position: Vector2
 var velocity: Vector2
 
+var released: bool = false
+
 func randomize_velocity() -> void:
-	velocity = Vector2(randf_range(-1, 1), randf_range(-1, 1)).normalized()
+	velocity = Vector2(randf_range(-0.5, 0.5), -1).normalized()
 	velocity *= target_velocity
 
 ## Approches target_velocity and moves the ball with factor `delta`
 func move(delta: float) -> void:
+	if !released:
+		return
+
 	if velocity.length() > target_velocity:
 		velocity = velocity.normalized() * (velocity.length() - deceleration)
 	else:
@@ -121,3 +126,6 @@ func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> voi
 				boost()
 	
 	return 
+
+func set_position(new_pos: Vector2) -> void:
+	position = new_pos
