@@ -1,0 +1,130 @@
+[gd_resource type="VisualShader" load_steps=13 format=3 uid="uid://15u22op20wvq"]
+
+[sub_resource type="VisualShaderNodeClamp" id="VisualShaderNodeClamp_sf0vl"]
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_sf0vl"]
+default_input_values = [0, 0.0, 1, 1.0]
+operator = 1
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_ltptj"]
+default_input_values = [0, 0.0, 1, 1.0]
+operator = 1
+
+[sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_aiypx"]
+parameter_name = "Gradient"
+texture_filter = 2
+texture_repeat = 2
+
+[sub_resource type="VisualShaderNodeIntParameter" id="VisualShaderNodeIntParameter_sf0vl"]
+parameter_name = "health"
+default_value_enabled = true
+default_value = 3
+
+[sub_resource type="Gradient" id="Gradient_ltptj"]
+interpolation_color_space = 2
+colors = PackedColorArray(1, 0, 0, 1, 0.083333254, 1, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_pahyy"]
+gradient = SubResource("Gradient_ltptj")
+
+[sub_resource type="VisualShaderNodeTexture" id="VisualShaderNodeTexture_bio85"]
+output_port_for_preview = 0
+source = 5
+texture = SubResource("GradientTexture1D_pahyy")
+texture_type = 1
+
+[sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_aiypx"]
+output_port_for_preview = 0
+default_input_values = [0, 0.0, 1, 2.0]
+operator = 3
+
+[sub_resource type="VisualShaderNodeIntConstant" id="VisualShaderNodeIntConstant_stltr"]
+constant = 3
+
+[sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_ltptj"]
+constant = 0.328
+
+[sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_pahyy"]
+constant = 0.682
+
+[resource]
+code = "shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
+
+uniform int health = 3;
+uniform sampler2D Gradient : filter_linear, repeat_disable;
+
+
+
+void fragment() {
+// IntParameter:2
+	int n_out2p0 = health;
+
+
+// FloatOp:11
+	float n_in11p1 = 1.00000;
+	float n_out11p0 = float(n_out2p0) - n_in11p1;
+
+
+// IntConstant:6
+	int n_out6p0 = 3;
+
+
+// FloatOp:12
+	float n_in12p1 = 1.00000;
+	float n_out12p0 = float(n_out6p0) - n_in12p1;
+
+
+// FloatOp:4
+	float n_out4p0 = n_out11p0 / n_out12p0;
+
+
+// Clamp:10
+	float n_in10p1 = 0.00000;
+	float n_in10p2 = 1.00000;
+	float n_out10p0 = clamp(n_out4p0, n_in10p1, n_in10p2);
+
+
+	vec4 n_out3p0;
+// Texture2D:3
+	n_out3p0 = texture(Gradient, vec2(n_out10p0));
+
+
+// FloatConstant:8
+	float n_out8p0 = 0.328000;
+
+
+// FloatConstant:9
+	float n_out9p0 = 0.682000;
+
+
+// Output:0
+	ALBEDO = vec3(n_out3p0.xyz);
+	ROUGHNESS = n_out8p0;
+	SPECULAR = n_out9p0;
+
+
+}
+"
+nodes/fragment/0/position = Vector2(620, 220)
+nodes/fragment/2/node = SubResource("VisualShaderNodeIntParameter_sf0vl")
+nodes/fragment/2/position = Vector2(-1140, 240)
+nodes/fragment/3/node = SubResource("VisualShaderNodeTexture_bio85")
+nodes/fragment/3/position = Vector2(80, 140)
+nodes/fragment/4/node = SubResource("VisualShaderNodeFloatOp_aiypx")
+nodes/fragment/4/position = Vector2(-360, 280)
+nodes/fragment/6/node = SubResource("VisualShaderNodeIntConstant_stltr")
+nodes/fragment/6/position = Vector2(-880, 540)
+nodes/fragment/8/node = SubResource("VisualShaderNodeFloatConstant_ltptj")
+nodes/fragment/8/position = Vector2(280, 340)
+nodes/fragment/9/node = SubResource("VisualShaderNodeFloatConstant_pahyy")
+nodes/fragment/9/position = Vector2(280, 460)
+nodes/fragment/10/node = SubResource("VisualShaderNodeClamp_sf0vl")
+nodes/fragment/10/position = Vector2(-160, 260)
+nodes/fragment/11/node = SubResource("VisualShaderNodeFloatOp_sf0vl")
+nodes/fragment/11/position = Vector2(-629.105, 244.27133)
+nodes/fragment/12/node = SubResource("VisualShaderNodeFloatOp_ltptj")
+nodes/fragment/12/position = Vector2(-640, 440)
+nodes/fragment/15/node = SubResource("VisualShaderNodeTexture2DParameter_aiypx")
+nodes/fragment/15/position = Vector2(-620, 620)
+nodes/fragment/connections = PackedInt32Array(8, 0, 0, 3, 9, 0, 0, 4, 4, 0, 10, 0, 6, 0, 12, 0, 11, 0, 4, 0, 12, 0, 4, 1, 10, 0, 3, 0, 15, 0, 3, 2, 2, 0, 11, 0, 3, 0, 0, 0)

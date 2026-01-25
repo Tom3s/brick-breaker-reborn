@@ -1,6 +1,13 @@
 extends Node
 class_name BreakableBlock
 
+enum BlockType {
+	NORMAL,
+	METAL,
+	ICE,
+}
+
+
 var pos_on_grid: Vector2i = Vector2i.ZERO
 
 # TODO: implement larger blocks
@@ -8,15 +15,17 @@ var size: Vector2i = Vector2i.ONE
 
 var collision: Array[LineCollider]
 
-# TODO: set this to a counter for multi layered block
-# TODO: maybe add immunities, so certain blocks need certain damage type to be broken
-var broken: bool = false
+
+var type: BlockType = BlockType.NORMAL
+
+# var broken: bool = false
+var health: int = 1
 
 # TODO: this is just temporary
 var asset_ref: Node
 
 func _process(delta: float) -> void:
-	if broken:
+	if is_broken():
 		if asset_ref.has_method("hide"):
 			asset_ref.hide()
 
@@ -56,8 +65,14 @@ func get_origin() -> Vector2:
 
 	return p1.lerp(p3, 0.5)
 
-func hit_block() -> void:
-	broken = true
+func hit_block(ball: Ball) -> void:
+	# broken = true
+	health -= ball.get_damage(self)
 	
-	if asset_ref.has_method("hide"):
+	asset_ref.set_hp(health)
+
+	if is_broken() && asset_ref.has_method("hide"):
 		asset_ref.hide()
+
+func is_broken() -> bool:
+	return health <= 0

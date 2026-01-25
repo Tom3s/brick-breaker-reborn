@@ -129,3 +129,7 @@ func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> voi
 
 func set_position(new_pos: Vector2) -> void:
 	position = new_pos
+
+func get_damage(block: BreakableBlock) -> int:
+	# TODO: implement type interactions
+	return 1

@@ -55,15 +55,15 @@ func _process(delta: float) -> void:
 	
 
 	for block: BreakableBlock in blocks:
-		if block.broken:
+		if block.is_broken():
 			continue
 		
 		for line: LineCollider in block.collision:
 			if ball.collide_with(line):
-				block.hit_block()
-				broken_block_count += 1
+				block.hit_block(ball)
 
-			if block.broken:
+			if block.is_broken():
+				broken_block_count += 1
 				break
 	
 	if broken_block_count >= blocks.size():
@@ -148,6 +148,7 @@ func generate_map() -> void:
 
 			block.pos_on_grid = Vector2i(2 + total, 2 * i + 2)
 			block.size = Vector2i(block_size, 2)
+			block.health = randi_range(1, 3)
 			block.prepare_collision()
 
 
@@ -158,6 +159,7 @@ func generate_map() -> void:
 			block_mesh.global_position.x = final_pos.x
 			block_mesh.global_position.z = final_pos.y
 			block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+			block_mesh.set_hp(block.health)
 
 			block.asset_ref = block_mesh
 
