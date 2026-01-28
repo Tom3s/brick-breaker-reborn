@@ -69,7 +69,8 @@ func hit_block(ball: Ball) -> void:
 	# broken = true
 	health -= ball.get_damage(self)
 	
-	asset_ref.set_hp(health)
+	if type == BlockType.NORMAL:
+		asset_ref.set_hp(health)
 
 	if is_broken() && asset_ref.has_method("hide"):
 		asset_ref.hide()
