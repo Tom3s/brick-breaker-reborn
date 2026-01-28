@@ -17,6 +17,7 @@ var death_barrier: LineCollider
 var blocks: Array[BreakableBlock]
 
 var broken_block_count: int = 0
+var nr_metal_blocks: int = 0
 
 func _ready() -> void:
 	# ball.randomize_velocity()
@@ -45,28 +46,29 @@ func _process(delta: float) -> void:
 
 	# handle collision
 	# check for death first
-	if ball.collide_with(death_barrier, false):
+	if ball.collide_with(death_barrier, false, false):
 		on_death()
 
 	# var collided: bool = false
 
 	for line in screen_collision:
-		ball.collide_with(line)
+		ball.collide_with(line, true)
 	
 
 	for block: BreakableBlock in blocks:
-		if block.broken:
+		if block.is_broken():
 			continue
 		
 		for line: LineCollider in block.collision:
-			if ball.collide_with(line):
-				block.hit_block()
-				broken_block_count += 1
+			if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
+				block.hit_block(ball)
 
-			if block.broken:
+			if block.is_broken():
+				broken_block_count += 1
 				break
 	
-	if broken_block_count >= blocks.size():
+	if are_breakable_blocks_remaining():
+		# TODO: change blocks to breakable if only non-breakable remain
 		on_board_clear()
 		return
 	
@@ -148,6 +150,14 @@ func generate_map() -> void:
 
 			block.pos_on_grid = Vector2i(2 + total, 2 * i + 2)
 			block.size = Vector2i(block_size, 2)
+			block.health = randi_range(1, 3)
+			if randf() < .4:
+				block.type = BreakableBlock.BlockType.ICE
+				block.health = 1
+			if randf() < .2:
+				block.type = BreakableBlock.BlockType.METAL
+				block.health = 1
+				nr_metal_blocks += 1
 			block.prepare_collision()
 
 
@@ -158,6 +168,8 @@ func generate_map() -> void:
 			block_mesh.global_position.x = final_pos.x
 			block_mesh.global_position.z = final_pos.y
 			block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+			block_mesh.set_material(block.type)
+			block_mesh.set_hp(block.health)
 
 			block.asset_ref = block_mesh
 
@@ -171,3 +183,7 @@ func on_board_clear() -> void:
 
 	broken_block_count = 0
 	generate_map()
+
+func are_breakable_blocks_remaining() -> bool:
+	print(broken_block_count, " ", blocks.size(), "-", nr_metal_blocks)
+	return broken_block_count >= blocks.size() - nr_metal_blocks

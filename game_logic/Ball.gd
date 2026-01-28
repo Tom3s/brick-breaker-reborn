@@ -41,7 +41,7 @@ func boost() -> void:
 	velocity = velocity.normalized() * target_velocity * speed_up_factor
 
 
-func collide_with(line: LineCollider, boost_on_collision: bool = true) -> bool:
+func collide_with(line: LineCollider, reflect_ball: bool = true, boost_on_collision: bool = true) -> bool:
 
 	# TODO: collider line should abstract p1 and p2, use them instead of accessing debug point coordinates
 	var p1: Vector2 = line.p1
@@ -71,6 +71,9 @@ func collide_with(line: LineCollider, boost_on_collision: bool = true) -> bool:
 		current_normal = (position - p2).normalized()
 
 	if (distance_from_line < radius):
+		if !reflect_ball:
+			return true
+		
 		var speed_along_normal: float = velocity.dot(current_normal)
 
 		if speed_along_normal <= 0:
@@ -129,3 +132,10 @@ func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> voi
 
 func set_position(new_pos: Vector2) -> void:
 	position = new_pos
+
+func get_damage(block: BreakableBlock) -> int:
+	# TODO: implement type interactions
+	if block.type == BreakableBlock.BlockType.METAL:
+		return 0
+
+	return 1
