@@ -3,6 +3,7 @@ class_name BlockMesh
 
 var normal_material: Material = preload("res://visuals/MultiLayerMaterial.material")
 var ice_material: Material = preload("res://visuals/IceMaterial.material")
+var metal_material: Material = preload("res://visuals/MetalMaterial.material")
 
 var base_size: Vector3 = Vector3.ONE * 2.0
 
@@ -23,6 +24,8 @@ func set_material(type: BreakableBlock.BlockType) -> void:
 		material_override = normal_material.duplicate()
 	elif type == BreakableBlock.BlockType.ICE:
 		material_override = ice_material.duplicate()
+	elif type == BreakableBlock.BlockType.METAL:
+		material_override = metal_material.duplicate()
 
 
 		

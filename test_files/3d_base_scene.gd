@@ -149,8 +149,11 @@ func generate_map() -> void:
 			block.pos_on_grid = Vector2i(2 + total, 2 * i + 2)
 			block.size = Vector2i(block_size, 2)
 			block.health = randi_range(1, 3)
-			if randf() < .5:
+			if randf() < .4:
 				block.type = BreakableBlock.BlockType.ICE
+				block.health = 1
+			if randf() < .2:
+				block.type = BreakableBlock.BlockType.METAL
 				block.health = 1
 			block.prepare_collision()
 

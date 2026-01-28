@@ -135,4 +135,7 @@ func set_position(new_pos: Vector2) -> void:
 
 func get_damage(block: BreakableBlock) -> int:
 	# TODO: implement type interactions
+	if block.type == BreakableBlock.BlockType.METAL:
+		return 0
+
 	return 1
