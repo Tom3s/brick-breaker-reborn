@@ -17,6 +17,7 @@ var death_barrier: LineCollider
 var blocks: Array[BreakableBlock]
 
 var broken_block_count: int = 0
+var nr_metal_blocks: int = 0
 
 func _ready() -> void:
 	# ball.randomize_velocity()
@@ -66,7 +67,8 @@ func _process(delta: float) -> void:
 				broken_block_count += 1
 				break
 	
-	if broken_block_count >= blocks.size():
+	if are_breakable_blocks_remaining():
+		# TODO: change blocks to breakable if only non-breakable remain
 		on_board_clear()
 		return
 	
@@ -155,6 +157,7 @@ func generate_map() -> void:
 			if randf() < .2:
 				block.type = BreakableBlock.BlockType.METAL
 				block.health = 1
+				nr_metal_blocks += 1
 			block.prepare_collision()
 
 
@@ -180,3 +183,7 @@ func on_board_clear() -> void:
 
 	broken_block_count = 0
 	generate_map()
+
+func are_breakable_blocks_remaining() -> bool:
+	print(broken_block_count, " ", blocks.size(), "-", nr_metal_blocks)
+	return broken_block_count >= blocks.size() - nr_metal_blocks
