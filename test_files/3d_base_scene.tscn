@@ -68,3 +68,6 @@ environment = SubResource("Environment_5hqcb")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.9514685, 0.062775366, 0.3012754, -0.30547336, 0.073897764, 0.9493287, 0.03733088, -0.9952881, 0.08948761, 0, 114.729614, 0)
+
+[node name="Debug" type="Node3D" parent="."]
+unique_name_in_owner = true
