@@ -8,6 +8,7 @@ extends Node3D
 @onready var block_parent: Node3D = %Blocks
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
 
+@onready var debug_parent: Node3D = %Debug
 
 var ball: Ball = Ball.new()
 var paddle: Paddle = Paddle.new()
@@ -18,6 +19,8 @@ var blocks: Array[BreakableBlock]
 
 var broken_block_count: int = 0
 var nr_metal_blocks: int = 0
+
+var powerups: Array[Powerup]
 
 func _ready() -> void:
 	# ball.randomize_velocity()
@@ -37,8 +40,26 @@ func _ready() -> void:
 	# paddle.collider_line.debug_set_up = false
 	paddle.set_line(ball.radius)
 
+	
 
 func _process(delta: float) -> void:
+	if Global.DEBUG:
+		if Input.is_action_just_pressed("debug_powerup"):
+			var powerup: Powerup = Powerup.new()
+			powerup.randomize_velocity()
+
+			var mesh: MeshInstance3D = MeshInstance3D.new()
+			mesh.mesh = SphereMesh.new()
+			mesh.mesh.radius = 16
+			mesh.mesh.height = 32
+			debug_parent.add_child(mesh)
+
+			powerup.asset = mesh
+
+			powerups.push_back(powerup)
+		
+
+
 	if !ball.released:
 		ball.set_position(paddle.position + Vector2.UP * ball.radius * 2)
 	else:
@@ -63,7 +84,12 @@ func _process(delta: float) -> void:
 			if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
 				block.hit_block(ball)
 
+
 			if block.is_broken():
+				if block.has_powerup:
+					block.has_powerup = false
+					spawn_powerup(block)
+				
 				broken_block_count += 1
 				break
 	
@@ -75,6 +101,26 @@ func _process(delta: float) -> void:
 	ball.collide_with_paddle(paddle)
 
 	
+	# update powerups
+	for powerup: Powerup in powerups:
+		powerup.move(delta)
+		powerup.asset.position.x = powerup.position.x
+		powerup.asset.position.z = powerup.position.y
+		powerup.asset.position.y = ball.radius * 2
+
+		collide_with_screen(powerup)
+
+		# powerup picked up logic
+		# TODO: move to its own function
+		if powerup.collide_with_paddle(paddle):
+			powerups.erase(powerup)
+			debug_parent.remove_child(powerup.asset)
+		
+		if powerup.position.y > BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE * 1.5:
+			powerups.erase(powerup)
+			debug_parent.remove_child(powerup.asset)
+
+
 
 	# if collided:
 	# 	ball.boost()
@@ -160,6 +206,9 @@ func generate_map() -> void:
 				nr_metal_blocks += 1
 			block.prepare_collision()
 
+			if randf() < .3:
+				block.has_powerup = true
+				block.powerup = Powerup.new()
 
 			var block_mesh: BlockMesh = block_mesh_scene.instantiate()
 			block_parent.add_child(block_mesh)
@@ -185,5 +234,33 @@ func on_board_clear() -> void:
 	generate_map()
 
 func are_breakable_blocks_remaining() -> bool:
-	print(broken_block_count, " ", blocks.size(), "-", nr_metal_blocks)
 	return broken_block_count >= blocks.size() - nr_metal_blocks
+
+func collide_with_screen(powerup: Powerup) -> void:
+	var grid_unit_size: Vector2 = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
+	var left: float = -grid_unit_size.x / 2
+	var right: float = grid_unit_size.x / 2
+
+	if powerup.position.x < left:
+		powerup.position.x += (left - powerup.position.x) * 2
+		powerup.velocity.x *= -1
+
+	elif powerup.position.x > right:
+		powerup.position.x -= (powerup.position.x - right) * 2
+		powerup.velocity.x *= -1
+
+func spawn_powerup(block: BreakableBlock) -> void:
+	var powerup: Powerup = block.powerup
+	powerup.position = block.get_origin()
+
+	powerup.randomize_velocity()
+
+	var mesh: MeshInstance3D = MeshInstance3D.new()
+	mesh.mesh = SphereMesh.new()
+	mesh.mesh.radius = 16
+	mesh.mesh.height = 32
+	debug_parent.add_child(mesh)
+
+	powerup.asset = mesh
+
+	powerups.push_back(powerup)

@@ -24,6 +24,9 @@ var health: int = 1
 # TODO: this is just temporary
 var asset_ref: Node
 
+var has_powerup: bool = false
+var powerup: Powerup
+
 func _process(delta: float) -> void:
 	if is_broken():
 		if asset_ref.has_method("hide"):
