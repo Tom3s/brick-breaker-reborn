@@ -83,6 +83,10 @@ func _process(delta: float) -> void:
 		for line: LineCollider in block.collision:
 			if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
 				block.hit_block(ball)
+				if block.has_powerup:
+					block.has_powerup = false
+					spawn_powerup(block)
+
 
 			if block.is_broken():
 				broken_block_count += 1
@@ -105,9 +109,16 @@ func _process(delta: float) -> void:
 
 		collide_with_screen(powerup)
 
+		# powerup picked up logic
+		# TODO: move to its own function
 		if powerup.collide_with_paddle(paddle):
 			powerups.erase(powerup)
 			debug_parent.remove_child(powerup.asset)
+		
+		if powerup.position.y > BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE * 1.5:
+			powerups.erase(powerup)
+			debug_parent.remove_child(powerup.asset)
+
 
 
 	# if collided:
@@ -194,6 +205,9 @@ func generate_map() -> void:
 				nr_metal_blocks += 1
 			block.prepare_collision()
 
+			if randf() < .3:
+				block.has_powerup = true
+				block.powerup = Powerup.new()
 
 			var block_mesh: BlockMesh = block_mesh_scene.instantiate()
 			block_parent.add_child(block_mesh)
@@ -233,4 +247,19 @@ func collide_with_screen(powerup: Powerup) -> void:
 	elif powerup.position.x > right:
 		powerup.position.x -= (powerup.position.x - right) * 2
 		powerup.velocity.x *= -1
-	
+
+func spawn_powerup(block: BreakableBlock) -> void:
+	var powerup: Powerup = block.powerup
+	powerup.position = block.get_origin()
+
+	powerup.randomize_velocity()
+
+	var mesh: MeshInstance3D = MeshInstance3D.new()
+	mesh.mesh = SphereMesh.new()
+	mesh.mesh.radius = 16
+	mesh.mesh.height = 32
+	debug_parent.add_child(mesh)
+
+	powerup.asset = mesh
+
+	powerups.push_back(powerup)
