@@ -83,12 +83,13 @@ func _process(delta: float) -> void:
 		for line: LineCollider in block.collision:
 			if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
 				block.hit_block(ball)
-				if block.has_powerup:
-					block.has_powerup = false
-					spawn_powerup(block)
 
 
 			if block.is_broken():
+				if block.has_powerup:
+					block.has_powerup = false
+					spawn_powerup(block)
+				
 				broken_block_count += 1
 				break
 	
