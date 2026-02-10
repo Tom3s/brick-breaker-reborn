@@ -1,5 +1,10 @@
 # Blocks
 
+## Powerup Block
+
+- cannot be broken / takes 10-20 hits to break
+- spawns a powerup on each hit
+
 ## later :3
 
 hits to break
