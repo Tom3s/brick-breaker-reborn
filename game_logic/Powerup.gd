@@ -3,7 +3,11 @@ class_name Powerup
 
 enum Type {
 	NONE,
+	BALL_MULTIPLY,
 }
+
+var ball_multiply_value: int = 3
+
 
 var type: Type = Type.NONE
 
@@ -40,3 +44,9 @@ func collide_with_paddle(paddle: Paddle) -> bool:
 		return true
 	
 	return false
+
+# func activate_powerup(balls: Array[Ball]) -> void:
+# 	if type == Type.NONE:
+# 		return
+	
+# 	if type == Type.BALL_MULTIPLY:

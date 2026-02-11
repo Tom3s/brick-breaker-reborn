@@ -12,22 +12,26 @@ extends Node3D
 
 @onready var debug_parent: Node3D = %Debug
 
+
+
 # var ball: Ball = Ball.new()
-var balls: Array[Ball]
-var paddle: Paddle = Paddle.new()
+# var balls: Array[Ball]
+# var paddle: Paddle = Paddle.new()
 
-var screen_collision: Array[LineCollider]
-var death_barrier: LineCollider
-var blocks: Array[BreakableBlock]
+# var screen_collision: Array[LineCollider]
+# var death_barrier: LineCollider
+# var blocks: Array[BreakableBlock]
 
-var broken_block_count: int = 0
-var nr_metal_blocks: int = 0
+# var broken_block_count: int = 0
+# var nr_metal_blocks: int = 0
 
-var powerups: Array[Powerup]
+# var powerups: Array[Powerup]
+var context: Global.GameContext
 
 func _ready() -> void:
+	context = Global.GameContext.new()
 	# ball.randomize_velocity()
-	balls.push_back(Ball.new())
+	context.balls.push_back(Ball.new())
 	ball_parent.add_child(ball_mesh_scene.instantiate())
 
 	# screen_bounds = DisplayServer.window_get_size()
@@ -43,7 +47,7 @@ func _ready() -> void:
 	handle_mouse_movement(Vector2.ZERO)
 
 	# paddle.collider_line.debug_set_up = false
-	paddle.set_line(balls[0].radius)
+	context.paddle.set_line(context.balls[0].radius)
 
 	
 
@@ -61,12 +65,12 @@ func _process(delta: float) -> void:
 
 			powerup.asset = mesh
 
-			powerups.push_back(powerup)
+			context.powerups.push_back(powerup)
 		
 		if Input.is_action_just_pressed("debug_ball"):
 			var ball: Ball = Ball.new()
 			ball.released = true
-			balls.push_back(ball)
+			context.balls.push_back(ball)
 			ball_parent.add_child(ball_mesh_scene.instantiate())
 
 			ball.randomize_velocity()
@@ -75,11 +79,11 @@ func _process(delta: float) -> void:
 
 
 	# if !ball.released:
-	if balls.size() == 1 && !balls[0].released:
-		balls[0].set_position(paddle.position + Vector2.UP * balls[0].radius * 2)
+	if context.balls.size() == 1 && !context.balls[0].released:
+		context.balls[0].set_position(context.paddle.position + Vector2.UP * context.balls[0].radius * 2)
 	else:
 		# ball.move(delta)
-		for ball: Ball in balls:
+		for ball: Ball in context.balls:
 			ball.move(delta)
 
 	# handle collision
@@ -87,14 +91,14 @@ func _process(delta: float) -> void:
 	# if ball.collide_with(death_barrier, false, false):
 	# 	on_death()
 	var index: int = 0
-	# for i in balls.size():
-	while index < balls.size():
-		var ball: Ball = balls[index]
+	# for i in context.balls.size():
+	while index < context.balls.size():
+		var ball: Ball = context.balls[index]
 		var ball_mesh: MeshInstance3D = ball_parent.get_child(index)
 
-		if ball.collide_with(death_barrier, false, false):	
-			if balls.size() > 1:
-				balls.erase(ball)
+		if ball.collide_with(context.death_barrier, false, false):	
+			if context.balls.size() > 1:
+				context.balls.erase(ball)
 				ball_parent.remove_child(ball_mesh)
 				index -= 1
 			else:
@@ -105,20 +109,20 @@ func _process(delta: float) -> void:
 
 	# var collided: bool = false
 
-	for line in screen_collision:
+	for line in context.screen_collision:
 		# ball.collide_with(line, true)
-		for ball: Ball in balls:
+		for ball: Ball in context.balls:
 			ball.collide_with(line, true)
 
 	
 
-	for block: BreakableBlock in blocks:
+	for block: BreakableBlock in context.blocks:
 		if block.is_broken():
 			continue
 		
 		for line: LineCollider in block.collision:
 
-			for ball: Ball in balls:
+			for ball: Ball in context.balls:
 				if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
 					block.hit_block(ball)
 
@@ -128,7 +132,7 @@ func _process(delta: float) -> void:
 					block.has_powerup = false
 					spawn_powerup(block)
 				
-				broken_block_count += 1
+				context.broken_block_count += 1
 				break
 	
 	if are_breakable_blocks_remaining():
@@ -136,12 +140,12 @@ func _process(delta: float) -> void:
 		on_board_clear()
 		return
 	
-	for ball: Ball in balls:
-		ball.collide_with_paddle(paddle)
+	for ball: Ball in context.balls:
+		ball.collide_with_paddle(context.paddle)
 
 	
 	# update powerups
-	for powerup: Powerup in powerups:
+	for powerup: Powerup in context.powerups:
 		powerup.move(delta)
 		powerup.asset.position.x = powerup.position.x
 		powerup.asset.position.z = powerup.position.y
@@ -151,12 +155,12 @@ func _process(delta: float) -> void:
 
 		# powerup picked up logic
 		# TODO: move to its own function
-		if powerup.collide_with_paddle(paddle):
-			powerups.erase(powerup)
+		if powerup.collide_with_paddle(context.paddle):
+			context.powerups.erase(powerup)
 			debug_parent.remove_child(powerup.asset)
 		
 		if powerup.position.y > BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE * 1.5:
-			powerups.erase(powerup)
+			context.powerups.erase(powerup)
 			debug_parent.remove_child(powerup.asset)
 
 
@@ -167,8 +171,8 @@ func _process(delta: float) -> void:
 	# ball_mesh.global_position.x = ball.position.x
 	# ball_mesh.global_position.z = ball.position.y
 	# ball_mesh.global_position.y = ball.radius
-	for i in balls.size():
-		var ball: Ball = balls[i]
+	for i in context.balls.size():
+		var ball: Ball = context.balls[i]
 		var ball_mesh: MeshInstance3D = ball_parent.get_child(i)
 
 		ball_mesh.global_position.x = ball.position.x
@@ -176,9 +180,9 @@ func _process(delta: float) -> void:
 		ball_mesh.global_position.y = ball.radius
 
 
-	paddle_mesh.global_position.x = paddle.position.x
-	paddle_mesh.global_position.z = paddle.position.y
-	paddle_mesh.global_position.y = paddle.height / 2
+	paddle_mesh.global_position.x = context.paddle.position.x
+	paddle_mesh.global_position.z = context.paddle.position.y
+	paddle_mesh.global_position.y = context.paddle.height / 2
 
 func set_up_screen_collision() -> void:
 	var screen_bounds: Vector2 = DisplayServer.window_get_size()
@@ -191,41 +195,41 @@ func set_up_screen_collision() -> void:
 
 	var line: LineCollider = LineCollider.new()
 	line.set_points(p1, p2)
-	screen_collision.push_back(line)
+	context.screen_collision.push_back(line)
 
 	line = LineCollider.new()
 	line.set_points(p2, p3)
-	screen_collision.push_back(line)
+	context.screen_collision.push_back(line)
 
 	line = LineCollider.new()
 	line.set_points(p4, p1)
-	screen_collision.push_back(line)
+	context.screen_collision.push_back(line)
 
 	# This is the death barrier
-	death_barrier = LineCollider.new()
-	death_barrier.set_points(p3, p4)
+	context.death_barrier = LineCollider.new()
+	context.death_barrier.set_points(p3, p4)
 
 
 # TODO: I dont like this being alone with a signal. 
 # might cause headache later when debugging
 func handle_mouse_movement(movement: Vector2) -> void:
-	paddle.move(movement)
+	context.paddle.move(movement)
 
 
 func release_ball() -> void:
-	balls[0].randomize_velocity()
-	balls[0].released = true
+	context.balls[0].randomize_velocity()
+	context.balls[0].released = true
 
 # Handle any logic for death
 func on_death() -> void:
-	balls[0].velocity = Vector2.ZERO
-	balls[0].released = false
+	context.balls[0].velocity = Vector2.ZERO
+	context.balls[0].released = false
 
 func generate_map() -> void:
 	for child in block_parent.get_children():
 		child.queue_free()
-	blocks.clear()
-	nr_metal_blocks = 0
+	context.blocks.clear()
+	context.nr_metal_blocks = 0
 
 	# have X rows where randomly sized (vertical scale) blocks sit next to eachother
 	# there is a margin of 2 grid cells at the sides and top
@@ -252,7 +256,7 @@ func generate_map() -> void:
 			if randf() < .2:
 				block.type = BreakableBlock.BlockType.METAL
 				block.health = 1
-				nr_metal_blocks += 1
+				context.nr_metal_blocks += 1
 			block.prepare_collision()
 
 			if randf() < .3:
@@ -271,7 +275,7 @@ func generate_map() -> void:
 
 			block.asset_ref = block_mesh
 
-			blocks.push_back(block)
+			context.blocks.push_back(block)
 
 			total += block_size
 
@@ -279,11 +283,11 @@ func on_board_clear() -> void:
 	# TODO: this resets the ball. shouldn't use death entrypoint for this tho
 	on_death()
 
-	broken_block_count = 0
+	context.broken_block_count = 0
 	generate_map()
 
 func are_breakable_blocks_remaining() -> bool:
-	return broken_block_count >= blocks.size() - nr_metal_blocks
+	return context.broken_block_count >= context.blocks.size() - context.nr_metal_blocks
 
 func collide_with_screen(powerup: Powerup) -> void:
 	var grid_unit_size: Vector2 = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
@@ -312,4 +316,4 @@ func spawn_powerup(block: BreakableBlock) -> void:
 
 	powerup.asset = mesh
 
-	powerups.push_back(powerup)
+	context.powerups.push_back(powerup)
