@@ -1,0 +1,15 @@
+[gd_scene load_steps=4 format=3 uid="uid://dh6eign1fffi"]
+
+[ext_resource type="Shader" uid="uid://cgjb8scdym0jl" path="res://visuals/BasicBallShader.res" id="1_iiwoc"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_s2g42"]
+radius = 16.0
+height = 32.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jm5qt"]
+render_priority = 0
+shader = ExtResource("1_iiwoc")
+
+[node name="BallMesh" type="MeshInstance3D"]
+mesh = SubResource("SphereMesh_s2g42")
+surface_material_override/0 = SubResource("ShaderMaterial_jm5qt")

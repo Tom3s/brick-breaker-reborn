@@ -1,16 +1,19 @@
 extends Node3D
 # class_name # not requiered for test
 
+@onready var ball_mesh_scene: PackedScene = preload("res://visuals/BallMesh.tscn")
 @onready var block_mesh_scene: PackedScene = preload("res://visuals/BlockMesh.tscn")
 
-@onready var ball_mesh: MeshInstance3D = %BallMesh
+# @onready var ball_mesh: MeshInstance3D = %BallMesh
+@onready var ball_parent: Node3D = %Balls
 @onready var paddle_mesh: MeshInstance3D = %PaddleMesh
 @onready var block_parent: Node3D = %Blocks
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
 
 @onready var debug_parent: Node3D = %Debug
 
-var ball: Ball = Ball.new()
+# var ball: Ball = Ball.new()
+var balls: Array[Ball]
 var paddle: Paddle = Paddle.new()
 
 var screen_collision: Array[LineCollider]
@@ -24,6 +27,8 @@ var powerups: Array[Powerup]
 
 func _ready() -> void:
 	# ball.randomize_velocity()
+	balls.push_back(Ball.new())
+	ball_parent.add_child(ball_mesh_scene.instantiate())
 
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
@@ -38,7 +43,7 @@ func _ready() -> void:
 	handle_mouse_movement(Vector2.ZERO)
 
 	# paddle.collider_line.debug_set_up = false
-	paddle.set_line(ball.radius)
+	paddle.set_line(balls[0].radius)
 
 	
 
@@ -58,22 +63,53 @@ func _process(delta: float) -> void:
 
 			powerups.push_back(powerup)
 		
+		if Input.is_action_just_pressed("debug_ball"):
+			var ball: Ball = Ball.new()
+			ball.released = true
+			balls.push_back(ball)
+			ball_parent.add_child(ball_mesh_scene.instantiate())
+
+			ball.randomize_velocity()
+
+		
 
 
-	if !ball.released:
-		ball.set_position(paddle.position + Vector2.UP * ball.radius * 2)
+	# if !ball.released:
+	if balls.size() == 1 && !balls[0].released:
+		balls[0].set_position(paddle.position + Vector2.UP * balls[0].radius * 2)
 	else:
-		ball.move(delta)
+		# ball.move(delta)
+		for ball: Ball in balls:
+			ball.move(delta)
 
 	# handle collision
 	# check for death first
-	if ball.collide_with(death_barrier, false, false):
-		on_death()
+	# if ball.collide_with(death_barrier, false, false):
+	# 	on_death()
+	var index: int = 0
+	# for i in balls.size():
+	while index < balls.size():
+		var ball: Ball = balls[index]
+		var ball_mesh: MeshInstance3D = ball_parent.get_child(index)
+
+		if ball.collide_with(death_barrier, false, false):	
+			if balls.size() > 1:
+				balls.erase(ball)
+				ball_parent.remove_child(ball_mesh)
+				index -= 1
+			else:
+				on_death()
+		
+		index += 1
+
 
 	# var collided: bool = false
 
 	for line in screen_collision:
-		ball.collide_with(line, true)
+		# ball.collide_with(line, true)
+		for ball: Ball in balls:
+			ball.collide_with(line, true)
+
 	
 
 	for block: BreakableBlock in blocks:
@@ -81,8 +117,10 @@ func _process(delta: float) -> void:
 			continue
 		
 		for line: LineCollider in block.collision:
-			if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
-				block.hit_block(ball)
+
+			for ball: Ball in balls:
+				if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
+					block.hit_block(ball)
 
 
 			if block.is_broken():
@@ -98,7 +136,8 @@ func _process(delta: float) -> void:
 		on_board_clear()
 		return
 	
-	ball.collide_with_paddle(paddle)
+	for ball: Ball in balls:
+		ball.collide_with_paddle(paddle)
 
 	
 	# update powerups
@@ -106,7 +145,7 @@ func _process(delta: float) -> void:
 		powerup.move(delta)
 		powerup.asset.position.x = powerup.position.x
 		powerup.asset.position.z = powerup.position.y
-		powerup.asset.position.y = ball.radius * 2
+		powerup.asset.position.y = 16.0 # TODO: remove magic number (this is ball.radius * 2)
 
 		collide_with_screen(powerup)
 
@@ -125,9 +164,18 @@ func _process(delta: float) -> void:
 	# if collided:
 	# 	ball.boost()
 
-	ball_mesh.global_position.x = ball.position.x
-	ball_mesh.global_position.z = ball.position.y
-	ball_mesh.global_position.y = ball.radius
+	# ball_mesh.global_position.x = ball.position.x
+	# ball_mesh.global_position.z = ball.position.y
+	# ball_mesh.global_position.y = ball.radius
+	for i in balls.size():
+		var ball: Ball = balls[i]
+		var ball_mesh: MeshInstance3D = ball_parent.get_child(i)
+
+		ball_mesh.global_position.x = ball.position.x
+		ball_mesh.global_position.z = ball.position.y
+		ball_mesh.global_position.y = ball.radius
+
+
 	paddle_mesh.global_position.x = paddle.position.x
 	paddle_mesh.global_position.z = paddle.position.y
 	paddle_mesh.global_position.y = paddle.height / 2
@@ -159,24 +207,25 @@ func set_up_screen_collision() -> void:
 
 
 # TODO: I dont like this being alone with a signal. 
-# might cause headache lter when debugging
+# might cause headache later when debugging
 func handle_mouse_movement(movement: Vector2) -> void:
 	paddle.move(movement)
 
 
 func release_ball() -> void:
-	ball.randomize_velocity()
-	ball.released = true
+	balls[0].randomize_velocity()
+	balls[0].released = true
 
 # Handle any logic for death
 func on_death() -> void:
-	ball.velocity = Vector2.ZERO
-	ball.released = false
+	balls[0].velocity = Vector2.ZERO
+	balls[0].released = false
 
 func generate_map() -> void:
 	for child in block_parent.get_children():
 		child.queue_free()
 	blocks.clear()
+	nr_metal_blocks = 0
 
 	# have X rows where randomly sized (vertical scale) blocks sit next to eachother
 	# there is a margin of 2 grid cells at the sides and top
