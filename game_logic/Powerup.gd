@@ -3,7 +3,11 @@ class_name Powerup
 
 enum Type {
 	NONE,
+	BALL_MULTIPLY,
 }
+
+var ball_multiply_value: int = 3
+
 
 var type: Type = Type.NONE
 
@@ -40,3 +44,31 @@ func collide_with_paddle(paddle: Paddle) -> bool:
 		return true
 	
 	return false
+
+func activate_powerup(context: Global.GameContext) -> void:
+	if type == Type.NONE:
+		return
+	
+	if type == Type.BALL_MULTIPLY:
+		var original_ball_count: int = context.balls.size()
+
+		for ball_index in original_ball_count:
+			var ball: Ball = context.balls[ball_index]
+
+			for i in ball_multiply_value:
+				if i == 0:
+					continue
+				
+				var new_ball: Ball = Ball.new()
+				new_ball.released = true
+
+				new_ball.position = ball.position
+				new_ball.velocity = ball.velocity.rotated(
+					float(i) / ball_multiply_value * 2 * PI
+				)
+
+				context.balls.push_back(new_ball)
+
+				# TODO: figure this shit out
+				# ball_parent.add_child(ball_mesh_scene.instantiate())
+
