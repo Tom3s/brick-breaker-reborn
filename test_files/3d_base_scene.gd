@@ -52,6 +52,7 @@ func _ready() -> void:
 	
 
 func _process(delta: float) -> void:
+	var safe_delta: float = min(delta, 1. / 60)
 	if Global.DEBUG:
 		if Input.is_action_just_pressed("debug_powerup"):
 			var powerup: Powerup = Powerup.new()
@@ -71,11 +72,33 @@ func _process(delta: float) -> void:
 			var ball: Ball = Ball.new()
 			ball.released = true
 			context.balls.push_back(ball)
-			ball_parent.add_child(ball_mesh_scene.instantiate())
 
 			ball.randomize_velocity()
 
+	
+	# handling blocks before balls
+	# this is bc multiball powerup might rotate the balls 
+	# velocity of out the play area
+	# TODO: this might've been bc of delta becoming too high
+	# investigate with safe_delta and move back if neccessary
+	for block: BreakableBlock in context.blocks:
+		if block.is_broken():
+			continue
 		
+		for line: LineCollider in block.collision:
+
+			for ball: Ball in context.balls:
+				if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
+					block.hit_block(ball)
+
+
+			if block.is_broken():
+				if block.has_powerup:
+					block.has_powerup = false
+					spawn_powerup(block)
+				
+				context.broken_block_count += 1
+				break	
 
 
 	# if !ball.released:
@@ -84,7 +107,7 @@ func _process(delta: float) -> void:
 	else:
 		# ball.move(delta)
 		for ball: Ball in context.balls:
-			ball.move(delta)
+			ball.move(safe_delta)
 
 	# handle collision
 	# check for death first
@@ -116,29 +139,13 @@ func _process(delta: float) -> void:
 
 	
 
-	for block: BreakableBlock in context.blocks:
-		if block.is_broken():
-			continue
-		
-		for line: LineCollider in block.collision:
-
-			for ball: Ball in context.balls:
-				if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
-					block.hit_block(ball)
-
-
-			if block.is_broken():
-				if block.has_powerup:
-					block.has_powerup = false
-					spawn_powerup(block)
-				
-				context.broken_block_count += 1
-				break
+	
 	
 	if are_breakable_blocks_remaining():
 		# TODO: change blocks to breakable if only non-breakable remain
-		on_board_clear()
-		return
+		# on_board_clear()
+		# return
+		pass
 	
 	for ball: Ball in context.balls:
 		ball.collide_with_paddle(context.paddle)
@@ -146,7 +153,7 @@ func _process(delta: float) -> void:
 	
 	# update powerups
 	for powerup: Powerup in context.powerups:
-		powerup.move(delta)
+		powerup.move(safe_delta)
 		powerup.asset.position.x = powerup.position.x
 		powerup.asset.position.z = powerup.position.y
 		powerup.asset.position.y = 16.0 # TODO: remove magic number (this is ball.radius * 2)
@@ -156,6 +163,7 @@ func _process(delta: float) -> void:
 		# powerup picked up logic
 		# TODO: move to its own function
 		if powerup.collide_with_paddle(context.paddle):
+			powerup.activate_powerup(context)
 			context.powerups.erase(powerup)
 			debug_parent.remove_child(powerup.asset)
 		
@@ -173,7 +181,15 @@ func _process(delta: float) -> void:
 	# ball_mesh.global_position.y = ball.radius
 	for i in context.balls.size():
 		var ball: Ball = context.balls[i]
-		var ball_mesh: MeshInstance3D = ball_parent.get_child(i)
+		var ball_mesh: MeshInstance3D
+		if ball_parent.get_child_count() > i: 
+			ball_mesh = ball_parent.get_child(i)
+		else:
+			# NOTE: handling mesh creation here 
+			# bc i want to separate logic from visuals
+			ball_mesh = ball_mesh_scene.instantiate()
+			ball_parent.add_child(ball_mesh)
+
 
 		ball_mesh.global_position.x = ball.position.x
 		ball_mesh.global_position.z = ball.position.y
@@ -262,6 +278,7 @@ func generate_map() -> void:
 			if randf() < .3:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
+				block.powerup.type = Powerup.Type.BALL_MULTIPLY
 
 			var block_mesh: BlockMesh = block_mesh_scene.instantiate()
 			block_parent.add_child(block_mesh)
