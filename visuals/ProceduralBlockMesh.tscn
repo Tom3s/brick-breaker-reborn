@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=4 uid="uid://cgx618w40odsy"]
+
+[ext_resource type="Script" uid="uid://bhw41qkr0crns" path="res://visuals/ProceduralBlockMesh.gd" id="1_6cu00"]
+[ext_resource type="Shader" uid="uid://cgjb8scdym0jl" path="res://visuals/BasicBallShader.res" id="1_j20ua"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_j20ua"]
+render_priority = 0
+shader = ExtResource("1_j20ua")
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_j20ua"]
+_surfaces = [{
+"aabb": AABB(-29.171574, 0, -29.171574, 58.343147, 32, 58.343147),
+"format": 34359742471,
+"index_count": 12,
+"index_data": PackedByteArray("AAABAAIAAAACAAMABAAGAAUABAAHAAYA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 8,
+"vertex_data": PackedByteArray("Yl/pwQAAAEJiX+nBYl/pQQAAAEJiX+nBYl/pQQAAAEJiX+lBYl/pwQAAAEJiX+lBYl/pwQAAAABiX+nBYl/pQQAAAABiX+nBYl/pQQAAAABiX+lBYl/pwQAAAABiX+lBnW5O91IJWrdhkU73IwgiyLCIne5KEfrDTned7qUSVbudbk73Uglat2GRTvcjCCLIsIid7koR+sNOd53upRJVuw==")
+}]
+
+[node name="Node3D" type="MeshInstance3D"]
+material_override = SubResource("ShaderMaterial_j20ua")
+mesh = SubResource("ArrayMesh_j20ua")
+script = ExtResource("1_6cu00")
