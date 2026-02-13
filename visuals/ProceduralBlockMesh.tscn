@@ -9,17 +9,18 @@ shader = ExtResource("1_j20ua")
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_j20ua"]
 _surfaces = [{
-"aabb": AABB(-29.171574, 0, -29.171574, 58.343147, 32, 58.343147),
+"aabb": AABB(-32, 0, -32, 64, 32, 64),
 "format": 34359742471,
-"index_count": 12,
-"index_data": PackedByteArray("AAABAAIAAAACAAMABAAGAAUABAAHAAYA"),
+"index_count": 36,
+"index_data": PackedByteArray("AAABAAIAAAACAAMABAAGAAUABAAHAAYACAAJAAoACAAKAAsADAANAA4ADAAOAA8AEAARABIAEAASABMAFAAVABYAFAAWABcA"),
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 8,
-"vertex_data": PackedByteArray("Yl/pwQAAAEJiX+nBYl/pQQAAAEJiX+nBYl/pQQAAAEJiX+lBYl/pwQAAAEJiX+lBYl/pwQAAAABiX+nBYl/pQQAAAABiX+nBYl/pQQAAAABiX+lBYl/pwQAAAABiX+lBnW5O91IJWrdhkU73IwgiyLCIne5KEfrDTned7qUSVbudbk73Uglat2GRTvcjCCLIsIid7koR+sNOd53upRJVuw==")
+"vertex_count": 24,
+"vertex_data": PackedByteArray("Yl/pwQAAAEJiX+nBYl/pQQAAAEJiX+nBYl/pQQAAAEJiX+lBYl/pwQAAAEJiX+lBYl/pwQAAAABiX+nBYl/pQQAAAABiX+nBYl/pQQAAAABiX+lBYl/pwQAAAABiX+lBYl/pQWJf6UEAAADCYl/pwWJf6UEAAADCYl/pwfMENUAAAADCYl/pQfMENUAAAADCAAAAQmJf6UFiX+lBAAAAQmJf6UFiX+nBAAAAQvMENUBiX+nBAAAAQvMENUBiX+lBYl/pwWJf6UEAAABCYl/pQWJf6UEAAABCYl/pQfMENUAAAABCYl/pwfMENUAAAABCAAAAwmJf6UFiX+nBAAAAwmJf6UFiX+lBAAAAwvMENUBiX+lBAAAAwvMENUBiX+nB/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v///////fwCA//////9/AID//////38AgP//////fwCA////f/9//7////9//3//v////3//f/+/////f/9//7//f/9//38AgP9//3//fwCA/3//f/9/AID/f/9//38AgAAA/3//f/+/AAD/f/9//78AAP9//3//vwAA/3//f/+/")
 }]
 
 [node name="Node3D" type="MeshInstance3D"]
 material_override = SubResource("ShaderMaterial_j20ua")
 mesh = SubResource("ArrayMesh_j20ua")
 script = ExtResource("1_6cu00")
+normal_deviation = 0.0
