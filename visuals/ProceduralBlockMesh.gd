@@ -30,6 +30,18 @@ class Vertex:
 func _ready() -> void:
 	add_mesh()
 
+# check ./docs/mesh_index_reference.png for reference
+# given N points in 2D space for a top-down polygon
+# top face: [0, 1, 2], [0, 2, 3], .. [0, N-2, N-1]
+# bottom face: [N, N+2, N+1], .. [N, N+N-2, N+N-1]
+# TODO: this currently only handles convex shapes, solve for concave
+# sides (always quads with reapeatable pattern)
+# offset(2N + 4I) [0, 1, 2], [0, 2, 3] - repeat N times I = [0..N)
+#	N: nr points = nr faces
+#	I: current face [0..N)
+# bevel (always quads with reapeatable pattern)
+# 
+
 func add_mesh() -> void:
 	var top_positions: PackedVector3Array = get_vector3_in_plane(BreakableGrid.CELL_SIZE)
 	var bottom_positions: PackedVector3Array = get_vector3_in_plane(0.0)
@@ -65,23 +77,28 @@ func add_mesh() -> void:
 		vertices.push_back(vertex.pos - bevel_size * vertex.direction)
 
 	meshData[ArrayMesh.ARRAY_VERTEX] = vertices
-	# var indices := getVertexIndexArray(
-	# 	vertices,
-	# 	widthSegments,
-	# 	lengthSegments,
-	# 	lengthMultiplier,
-	# 	clockwise
-	# )
-	var indices: PackedInt32Array = [
-		0, 1, 2,
-		0, 2, 3,
-		4, 6, 5,
-		4, 7, 6, 
-	]
 
+	var indices: PackedInt32Array = []
+
+
+	# generate top and bottom faces:
+	for i in base_vertices.size() - 2:
+		var n: int = base_vertices.size()
+		indices.append_array([0,     1 + i,     2 + i])
+		indices.append_array([n, n + 1 + i, n + 2 + i])
+
+
+	# generate side faces:
 	for i in base_vertices.size():
+		# this is always the face index pattern
+		var face_indices: Array[int] = [
+			0, 1, 2,
+			0, 2, 3,
+		]
+
+		var offset: int = 2 * base_vertices.size() + 4 * i
 		for ii in 6:
-			indices.push_back(indices[ii] + base_vertices.size() * (i + 2))
+			indices.push_back(face_indices[ii] + offset)
 		
 		
 
