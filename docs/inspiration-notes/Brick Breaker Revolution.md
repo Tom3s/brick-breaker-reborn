@@ -1,4 +1,4 @@
-# Brick Breaker Revolution
+# Brick Breaker Revolution (1 hour session)
 
 ## Powerups
 
