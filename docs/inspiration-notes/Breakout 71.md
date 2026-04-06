@@ -11,3 +11,7 @@ Annoying sound effects
 Visually very cluttered on default graphics
 
 no powerups
+
+## Levels
+
+- flags
