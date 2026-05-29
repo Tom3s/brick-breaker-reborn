@@ -2,11 +2,15 @@ extends Node
 class_name MapGenerator
 
 var color_texture: PackedVector3Array
+var rng: RNG
 
 func _init() -> void:
 	# set the base level texture size
 	color_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
 	LoggerMogyi.log(self, "Texture initialized with size: %d" % color_texture.size())
+
+	rng = RNG.new()
+	rng._seed = 9223372036854775807
 
 func set_color(x: int, y: int, new_color: Vector3) -> void:
 	if color_texture.size() == 0:
@@ -43,12 +47,17 @@ func get_color(x: int, y: int) -> Vector3:
 
 func add_random_noise() -> void:
 	for i in color_texture.size():
-		color_texture[i] = Vector3(randf(), randf(), randf())
+		color_texture[i] = Vector3(rng.get_float(), rng.get_float(), rng.get_float())
 	
 	LoggerMogyi.log(self, "Random noise added to instance %s" % self)
 
 func add_random_grayscale_noise() -> void:
 	for i in color_texture.size():
-		color_texture[i] = Vector3.ONE * randf()
+		color_texture[i] = Vector3.ONE * rng.get_float()
 	
 	LoggerMogyi.log(self, "Random grayscale noise added to instance %s" % self)
+
+
+func treshold_grayscale(treshold: float) -> void:
+	for i in color_texture.size():
+		color_texture[i] = Vector3.ONE if color_texture[i].x >= treshold else Vector3.ZERO 

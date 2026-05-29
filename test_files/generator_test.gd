@@ -14,6 +14,8 @@ func _ready() -> void:
 
 	map_generator.add_random_grayscale_noise()
 
+	map_generator.treshold_grayscale(randf())
+
 	display_texture()
 
 func display_texture() -> void:
