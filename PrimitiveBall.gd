@@ -20,7 +20,7 @@ func _ready() -> void:
 	velocity *= target_velocity
 
 	screen_bounds = DisplayServer.window_get_size()
-	print(get_script().resource_path.get_file(), " Screen resolution: ", screen_bounds)
+	LoggerMogyi.log(self, "Screen resolution: %v" % screen_bounds)
 
 func _process(delta: float) -> void:
 	if velocity.length() > target_velocity:
