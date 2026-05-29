@@ -1,15 +1,20 @@
 extends Node
 
+
 var log_to_file: bool = false
+var start_time: int
 
 enum Severity {
 	MESSAGE,
 	WARNING,
 	ERROR,
+	SUCCESS,
+	FAIL,
 }
 
 func _ready() -> void:
 	# TODO: check if logs directory exists and create it if not
+	# nvm this is handled by godot and normal print
 	self.log(self, "Logger started successfully!")
 
 func log(

@@ -1,6 +1,15 @@
-[gd_scene load_steps=2 format=3 uid="uid://b2nkjnmtpwap5"]
+[gd_scene load_steps=3 format=3 uid="uid://b2nkjnmtpwap5"]
 
 [ext_resource type="Script" uid="uid://uq2hhpnatmmp" path="res://test_files/generator_test.gd" id="1_wrxwj"]
 
+[sub_resource type="ImageTexture" id="ImageTexture_wrxwj"]
+
 [node name="Node2D" type="Node2D"]
 script = ExtResource("1_wrxwj")
+
+[node name="TestTexture" type="Sprite2D" parent="."]
+unique_name_in_owner = true
+texture = SubResource("ImageTexture_wrxwj")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(12, 12)
