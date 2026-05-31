@@ -9,6 +9,9 @@ var _init_lambda := func() -> void: initialize()
 @export_tool_button("Refresh Texture")
 var _refresh_lambda := func() -> void: display_texture()
 
+@export
+var seed: int = 0
+
 @onready var test_texture: Sprite2D = %TestTexture
 
 var map_generator: MapGenerator
@@ -18,9 +21,13 @@ func _ready() -> void:
 
 func initialize() -> void:
 	map_generator = MapGenerator.new()
+	map_generator.rng._seed = seed
 
 	# map_generator.add_random_grayscale_noise()
 	map_generator.add_voronoi_noise()
+	map_generator.invert()
+	map_generator.treshold_grayscale(0.7)
+	map_generator.slice_y(0, 20)
 
 	# map_generator.treshold_grayscale(0.1)
 

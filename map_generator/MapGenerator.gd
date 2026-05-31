@@ -71,3 +71,61 @@ func add_voronoi_noise() -> void:
 func treshold_grayscale(treshold: float) -> void:
 	for i in color_texture.size():
 		color_texture[i] = Vector3.ONE if color_texture[i].x >= treshold else Vector3.ZERO 
+
+func slice_x(from: int, to: int) -> void:
+	# TODO: add bound checks
+	for x in BreakableGrid.GRID_SIZE:
+		for y in BreakableGrid.GRID_SIZE:
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+
+			if x < from || x >= to:
+				color_texture[index] = Vector3.ZERO
+
+func slice_y(from: int, to: int) -> void:
+	# TODO: add bound checks
+	for x in BreakableGrid.GRID_SIZE:
+		for y in BreakableGrid.GRID_SIZE:
+			if y < from || y >= to:
+				var index: int = y * (BreakableGrid.GRID_SIZE) + x
+				color_texture[index] = Vector3.ZERO
+
+func invert() -> void:
+	for i in color_texture.size():
+		color_texture[i] = Vector3.ONE - color_texture[i] 
+
+func convert_with_horizontal_merge() -> Array[BreakableBlock]:
+	var result: Array[BreakableBlock]
+
+	var making_block: bool = false
+	var block_size: int = 0
+	var block_pos: Vector2i
+
+	for y in BreakableGrid.GRID_SIZE:
+		for x in BreakableGrid.GRID_SIZE:
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+			var val: float = color_texture[index].x
+
+			if val == 1:
+				if !making_block:
+					block_pos = Vector2i(x, y)
+				making_block = true
+				block_size += 1
+			
+			elif val == 0 || y == 0: # val == 0
+				if making_block:
+					var block: BreakableBlock = BreakableBlock.new()
+					block.size = Vector2i(block_size, 1)
+					block.pos_on_grid = block_pos
+					block.prepare_collision()
+					if rng.get_float() < .3:
+						block.has_powerup = true
+						block.powerup = Powerup.new()
+						block.powerup.type = Powerup.Type.BALL_MULTIPLY
+
+					result.push_back(block)
+
+
+				block_size = 0
+				making_block = false
+	
+	return result

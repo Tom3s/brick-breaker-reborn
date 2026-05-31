@@ -37,7 +37,17 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
-	generate_map()
+	# generate_map()
+	var map_generator := MapGenerator.new()
+	map_generator.rng._seed = randi()
+
+	# map_generator.add_random_grayscale_noise()
+	map_generator.add_voronoi_noise()
+	map_generator.invert()
+	map_generator.treshold_grayscale(0.7)
+	map_generator.slice_y(0, 20)
+
+	generate_map_from_array(map_generator.convert_with_horizontal_merge())
 
 
 
@@ -295,6 +305,22 @@ func generate_map() -> void:
 			context.blocks.push_back(block)
 
 			total += block_size
+
+func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
+	for block in blocks:
+		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+		block_parent.add_child(block_mesh)
+		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+		var final_pos: Vector2 = block.get_origin()
+		block_mesh.global_position.x = final_pos.x
+		block_mesh.global_position.z = final_pos.y
+		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+		block_mesh.set_material(block.type)
+		block_mesh.set_hp(block.health)
+
+		block.asset_ref = block_mesh
+
+		context.blocks.push_back(block)
 
 func on_board_clear() -> void:
 	# TODO: this resets the ball. shouldn't use death entrypoint for this tho
