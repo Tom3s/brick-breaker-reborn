@@ -1,8 +1,9 @@
 extends Node
+class_name LoggerMogyi
 
 
-var log_to_file: bool = false
-var start_time: int
+static var log_to_file: bool = false
+# var start_time: int
 
 enum Severity {
 	MESSAGE,
@@ -17,7 +18,7 @@ func _ready() -> void:
 	# nvm this is handled by godot and normal print
 	self.log(self, "Logger started successfully!")
 
-func log(
+static func log(
 	caller: Node, 
 	message: String, 
 	severity: Severity = 0, 

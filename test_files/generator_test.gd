@@ -2,6 +2,10 @@
 extends Node2D
 class_name _generator_test
 
+@export_tool_button("init")
+var _init_lambda := func() -> void: initialize()
+
+
 @export_tool_button("Refresh Texture")
 var _refresh_lambda := func() -> void: display_texture()
 
@@ -10,11 +14,17 @@ var _refresh_lambda := func() -> void: display_texture()
 var map_generator: MapGenerator
 
 func _ready() -> void:
+	initialize()
+
+func initialize() -> void:
 	map_generator = MapGenerator.new()
 
-	map_generator.add_random_grayscale_noise()
+	# map_generator.add_random_grayscale_noise()
+	map_generator.add_voronoi_noise()
 
-	map_generator.treshold_grayscale(randf())
+	# map_generator.treshold_grayscale(0.1)
+
+	LoggerMogyi.log(self, str(BreakableGrid.GRID_SIZE))
 
 	display_texture()
 

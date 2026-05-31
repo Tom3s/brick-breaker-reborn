@@ -57,6 +57,16 @@ func add_random_grayscale_noise() -> void:
 	
 	LoggerMogyi.log(self, "Random grayscale noise added to instance %s" % self)
 
+func add_voronoi_noise() -> void:
+	var voronoi: VoronoiNoise = VoronoiNoise.new()
+	voronoi.init_array()
+	voronoi.generate_points(rng)
+
+	for x in BreakableGrid.GRID_SIZE:
+		for y in BreakableGrid.GRID_SIZE:
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+
+			color_texture[index] = voronoi.sample(x, y, BreakableGrid.GRID_SIZE) * Vector3.ONE
 
 func treshold_grayscale(treshold: float) -> void:
 	for i in color_texture.size():
