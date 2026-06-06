@@ -68,6 +68,18 @@ func add_voronoi_noise() -> void:
 
 			color_texture[index] = voronoi.sample(x, y, BreakableGrid.GRID_SIZE) * Vector3.ONE
 
+func add_perlin_noise() -> void:
+	var perlin: PerlinNoise = PerlinNoise.new()
+	perlin.init_array()
+	perlin.generate_points(rng)
+
+	for x in BreakableGrid.GRID_SIZE:
+		for y in BreakableGrid.GRID_SIZE:
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+
+			color_texture[index] = perlin.sample(x, y, BreakableGrid.GRID_SIZE) * Vector3.ONE
+
+
 func treshold_grayscale(treshold: float) -> void:
 	for i in color_texture.size():
 		color_texture[i] = Vector3.ONE if color_texture[i].x >= treshold else Vector3.ZERO 

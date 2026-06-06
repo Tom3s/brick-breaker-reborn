@@ -24,10 +24,11 @@ func initialize() -> void:
 	map_generator.rng._seed = seed
 
 	# map_generator.add_random_grayscale_noise()
-	map_generator.add_voronoi_noise()
-	map_generator.invert()
-	map_generator.treshold_grayscale(0.7)
-	map_generator.slice_y(0, 20)
+	# map_generator.add_voronoi_noise()
+	map_generator.add_perlin_noise()
+	# map_generator.invert()
+	map_generator.treshold_grayscale(0.5)
+	# map_generator.slice_y(0, 20)
 
 	# map_generator.treshold_grayscale(0.1)
 
