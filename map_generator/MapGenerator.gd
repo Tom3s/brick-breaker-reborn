@@ -105,7 +105,7 @@ func invert() -> void:
 	for i in color_texture.size():
 		color_texture[i] = Vector3.ONE - color_texture[i] 
 
-func convert_with_horizontal_merge() -> Array[BreakableBlock]:
+func convert_with_horizontal_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 
 	var making_block: bool = false
@@ -123,13 +123,13 @@ func convert_with_horizontal_merge() -> Array[BreakableBlock]:
 				making_block = true
 				block_size += 1
 			
-			elif val == 0 || y == 0: # val == 0
+			if val == 0 || x == (BreakableGrid.GRID_SIZE - 1) || block_size >= max_merge:
 				if making_block:
 					var block: BreakableBlock = BreakableBlock.new()
 					block.size = Vector2i(block_size, 1)
 					block.pos_on_grid = block_pos
 					block.prepare_collision()
-					if rng.get_float() < .3:
+					if rng.get_float() < .05:
 						block.has_powerup = true
 						block.powerup = Powerup.new()
 						block.powerup.type = Powerup.Type.BALL_MULTIPLY

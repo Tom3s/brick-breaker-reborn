@@ -51,7 +51,7 @@ func sample(x: float, y: float, bounds: float) -> float:
 			offset_y
 		)
 	
-	LoggerMogyi.log(self, "Result of perlin sample at (%f, %f): %f" % [x, y, result])
+	# LoggerMogyi.log(self, "Result of perlin sample at (%f, %f): %f" % [x, y, result])
 
 	return (result + 1) / 2
 	# return result
