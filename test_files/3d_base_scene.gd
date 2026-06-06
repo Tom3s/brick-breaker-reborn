@@ -150,7 +150,8 @@ func _process(delta: float) -> void:
 		if ball.collide_with(context.death_barrier, false, false):	
 			if context.balls.size() > 1:
 				context.balls.erase(ball)
-				ball_parent.remove_child(ball_mesh)
+				# ball_parent.remove_child(ball_mesh)
+				ball_mesh.queue_free()
 				index -= 1
 			else:
 				on_death()
