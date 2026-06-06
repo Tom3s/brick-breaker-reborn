@@ -44,30 +44,42 @@ func _ready() -> void:
 
 	# map_generator.add_random_grayscale_noise()
 	# map_generator.add_voronoi_noise()
-	map_generator.add_perlin_noise()
-	map_generator.treshold_grayscale(0.7)
-	map_generator.slice_y(0, 24)
-	map_generator.slice_x(0, 10)
-	generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
 
-	map_generator.rng._seed = SEED
+	#region
 	map_generator.add_perlin_noise()
 	map_generator.treshold_grayscale(0.7)
+	# map_generator.slice_y(0, 24)
+	# map_generator.slice_x(0, 10)
+	# generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
+	map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
 	map_generator.mirror_x()
-	map_generator.slice_y(0, 24)
-	map_generator.slice_x(22, 32)
+	map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
+
+	# map_generator.copy_texture_to_final()
 	generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
 
+	# map_generator.clear_final_texture()
+	# map_generator.clear_temp_texture()
+	# map_generator.add_voronoi_noise()
+	# map_generator.invert()
+	# map_generator.treshold_grayscale(0.7)
+	# map_generator.slice_y(0, 20)
+	# map_generator.slice_x(10, 22)
+	# map_generator.copy_texture_to_final()
+
+	# generate_map_from_array(map_generator.convert_with_vertical_merge(2))
+
+	#endregion
+
+	# for i in 4:
+	# 	map_generator.add_circle(
+	# 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+	# 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE / 2,
+	# 		map_generator.rng.get_float() * 8,
+	# 	)
 	
-	map_generator.add_voronoi_noise()
-	map_generator.invert()
-	map_generator.treshold_grayscale(0.7)
-	map_generator.slice_y(0, 20)
-	map_generator.slice_x(10, 22)
-
-	generate_map_from_array(map_generator.convert_with_vertical_merge(2))
-
-
+	# generate_map_from_array(map_generator.convert_with_horizontal_merge(1))
+	
 
 	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
 	mouse_input_handler.release_ball_pressed.connect(release_ball)
@@ -150,7 +162,6 @@ func _process(delta: float) -> void:
 		if ball.collide_with(context.death_barrier, false, false):	
 			if context.balls.size() > 1:
 				context.balls.erase(ball)
-				# ball_parent.remove_child(ball_mesh)
 				ball_mesh.queue_free()
 				index -= 1
 			else:

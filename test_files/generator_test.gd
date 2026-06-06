@@ -23,18 +23,11 @@ func initialize() -> void:
 	map_generator = MapGenerator.new()
 	map_generator.rng._seed = seed
 
-	# map_generator.add_random_grayscale_noise()
-	# map_generator.add_voronoi_noise()
 	map_generator.add_perlin_noise()
-	# map_generator.invert()
 	map_generator.treshold_grayscale(0.7)
-	# map_generator.slice_y(0, 20)
-	map_generator.mirror_y()
-	# map_generator.mirror_x()
-
-	# map_generator.treshold_grayscale(0.1)
-
-	LoggerMogyi.log(self, str(BreakableGrid.GRID_SIZE))
+	map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
+	map_generator.mirror_x()
+	map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
 
 	display_texture()
 
