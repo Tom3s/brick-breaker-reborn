@@ -232,3 +232,94 @@ func convert_with_vertical_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Ar
 				making_block = false
 	
 	return result
+
+func convert_with_chance_merge(chance_x: float = 0.0, chance_y: float = 0.0) -> Array[BreakableBlock]:
+	var result: Array[BreakableBlock]
+	var used: Array[bool] 
+	used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+
+	for x in BreakableGrid.GRID_SIZE:
+		for y in BreakableGrid.GRID_SIZE:
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+
+			if used[index]:
+				continue
+			
+			var val: float = final_texture[index].x
+			if val == 0:
+				continue
+			else:
+				used[index] = true
+			
+			var block_size: Vector2 = Vector2.ONE
+
+			var expanded_x: bool = false
+			var expanded_y: bool = false
+
+			while !expanded_x || !expanded_y:
+				var can_expand_x: bool = true
+
+				# try expanding horizontally
+				# check if the expansion is possible
+				if !expanded_x && rng.get_float() <= chance_x && (x + block_size.x) < BreakableGrid.GRID_SIZE:
+					for y2 in block_size.y:
+						var check_index: int = (y + y2) * BreakableGrid.GRID_SIZE + (x + block_size.x)
+						if final_texture[check_index].x == 1 && used[check_index] == false:
+							pass
+						else:
+							can_expand_x = false
+							break
+				else:
+					expanded_x = true
+					can_expand_x = false
+				# expand if possible
+				if can_expand_x:
+					for y2 in block_size.y:
+						var change_index: int = (y + y2) * BreakableGrid.GRID_SIZE + (x + block_size.x)
+						used[change_index] = true
+					block_size.x += 1
+					print("expanded x")
+				else:
+					expanded_x = true
+
+				# try to expand vertically
+				# check if the expansion is possible
+				var can_expand_y: bool = true
+				if !expanded_y && rng.get_float() <= chance_y && (y + block_size.y) < BreakableGrid.GRID_SIZE:
+					for x2 in block_size.x:
+						var check_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE + (x + x2)
+						if final_texture[check_index].x == 1 && used[check_index] == false:
+							pass
+						else:
+							can_expand_y = false
+							break
+				else:
+					expanded_y = true
+					can_expand_y = false
+				
+				# expand if possible
+				if can_expand_y:
+					for x2 in block_size.x:
+						var change_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE + (x + x2)
+						used[change_index] = true
+					block_size.y += 1
+					print("expanded y")
+				else:
+					expanded_y = true
+			
+
+			# create block after expansion
+			var block: BreakableBlock = BreakableBlock.new()
+			print(block_size)
+			block.size = block_size
+			block.pos_on_grid = Vector2(x, y)
+			# block.health = 3 - min(block_size, 2)
+			block.prepare_collision()
+			if rng.get_float() < .05:
+				block.has_powerup = true
+				block.powerup = Powerup.new()
+				block.powerup.type = Powerup.Type.BALL_MULTIPLY
+
+			result.push_back(block)
+	
+	return result
