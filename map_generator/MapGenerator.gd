@@ -105,6 +105,27 @@ func invert() -> void:
 	for i in color_texture.size():
 		color_texture[i] = Vector3.ONE - color_texture[i] 
 
+func mirror_x() -> void:
+	for x in (BreakableGrid.GRID_SIZE / 2):
+		for y in BreakableGrid.GRID_SIZE:
+			var from: int =  y * (BreakableGrid.GRID_SIZE) + x
+			var to: int =  y * (BreakableGrid.GRID_SIZE) + (BreakableGrid.GRID_SIZE - x - 1)
+
+			var temp: Vector3 = color_texture[to]
+			color_texture[to] = color_texture[from]
+			color_texture[from] = temp
+
+func mirror_y() -> void:
+	for x in BreakableGrid.GRID_SIZE:
+		for y in (BreakableGrid.GRID_SIZE / 2):
+			var from: int =  y * (BreakableGrid.GRID_SIZE) + x
+			var to: int =  (BreakableGrid.GRID_SIZE - y - 1) * (BreakableGrid.GRID_SIZE) + x
+
+			var temp: Vector3 = color_texture[to]
+			color_texture[to] = color_texture[from]
+			color_texture[from] = temp
+
+
 func convert_with_horizontal_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 
@@ -128,6 +149,46 @@ func convert_with_horizontal_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> 
 					var block: BreakableBlock = BreakableBlock.new()
 					block.size = Vector2i(block_size, 1)
 					block.pos_on_grid = block_pos
+					block.health = 4 - min(block_size, 3)
+					block.prepare_collision()
+					if rng.get_float() < .05:
+						block.has_powerup = true
+						block.powerup = Powerup.new()
+						block.powerup.type = Powerup.Type.BALL_MULTIPLY
+
+					result.push_back(block)
+
+
+				block_size = 0
+				making_block = false
+	
+	return result
+
+# TODO: this is placeholder. Implement proper merging after the fact
+func convert_with_vertical_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Array[BreakableBlock]:
+	var result: Array[BreakableBlock]
+
+	var making_block: bool = false
+	var block_size: int = 0
+	var block_pos: Vector2i
+
+	for x in BreakableGrid.GRID_SIZE:
+		for y in BreakableGrid.GRID_SIZE:
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+			var val: float = color_texture[index].x
+
+			if val == 1:
+				if !making_block:
+					block_pos = Vector2i(x, y)
+				making_block = true
+				block_size += 1
+			
+			if val == 0 || y == (BreakableGrid.GRID_SIZE - 1) || block_size >= max_merge:
+				if making_block:
+					var block: BreakableBlock = BreakableBlock.new()
+					block.size = Vector2i(1, block_size)
+					block.pos_on_grid = block_pos
+					block.health = 3 - min(block_size, 2)
 					block.prepare_collision()
 					if rng.get_float() < .05:
 						block.has_powerup = true

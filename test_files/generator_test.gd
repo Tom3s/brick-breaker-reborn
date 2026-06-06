@@ -28,7 +28,9 @@ func initialize() -> void:
 	map_generator.add_perlin_noise()
 	# map_generator.invert()
 	map_generator.treshold_grayscale(0.7)
-	map_generator.slice_y(0, 20)
+	# map_generator.slice_y(0, 20)
+	map_generator.mirror_y()
+	# map_generator.mirror_x()
 
 	# map_generator.treshold_grayscale(0.1)
 

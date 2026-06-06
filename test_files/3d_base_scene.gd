@@ -39,25 +39,33 @@ func _ready() -> void:
 
 	# generate_map()
 	var map_generator := MapGenerator.new()
-	map_generator.rng._seed = randi()
+	var SEED: int = randi()
+	map_generator.rng._seed = SEED
 
 	# map_generator.add_random_grayscale_noise()
 	# map_generator.add_voronoi_noise()
 	map_generator.add_perlin_noise()
-	map_generator.invert()
 	map_generator.treshold_grayscale(0.7)
-	map_generator.slice_y(0, 20)
-	map_generator.slice_x(0, 16)
+	map_generator.slice_y(0, 24)
+	map_generator.slice_x(0, 10)
+	generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
 
-	generate_map_from_array(map_generator.convert_with_horizontal_merge())
+	map_generator.rng._seed = SEED
+	map_generator.add_perlin_noise()
+	map_generator.treshold_grayscale(0.7)
+	map_generator.mirror_x()
+	map_generator.slice_y(0, 24)
+	map_generator.slice_x(22, 32)
+	generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
+
 	
 	map_generator.add_voronoi_noise()
 	map_generator.invert()
 	map_generator.treshold_grayscale(0.7)
 	map_generator.slice_y(0, 20)
-	map_generator.slice_x(17, 32)
+	map_generator.slice_x(10, 22)
 
-	generate_map_from_array(map_generator.convert_with_horizontal_merge(1))
+	generate_map_from_array(map_generator.convert_with_vertical_merge(2))
 
 
 
