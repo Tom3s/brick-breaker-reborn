@@ -20,6 +20,8 @@ func _ready() -> void:
 	initialize()
 
 func initialize() -> void:
+	# print(range(5, 0, 0))
+
 	map_generator = MapGenerator.new()
 	map_generator.rng._seed = seed
 

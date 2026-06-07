@@ -99,6 +99,13 @@ func add_circle(cx: int, cy: int, radius: float) -> void:
 			if Vector2(x, y).distance_to(Vector2(cx, cy)) <= radius:
 				temp_texture[index] = Vector3.ONE
 
+# TODO: check bounds and swap if x1 > x2 (or y1 > y2)
+func add_rectangle(x1: int, y1: int, x2: int, y2: int) -> void:
+	for x in range(x1, x2, sign(x2 - x1)):
+		for y in range(y1, y2, sign(y2 - y1)):
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+			temp_texture[index] = Vector3.ONE
+
 func treshold_grayscale(treshold: float) -> void:
 	for i in temp_texture.size():
 		temp_texture[i] = Vector3.ONE if temp_texture[i].x >= treshold else Vector3.ZERO 
