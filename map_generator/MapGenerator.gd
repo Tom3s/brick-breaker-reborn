@@ -9,6 +9,7 @@ func _init() -> void:
 	# set the base level texture size
 	temp_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
 	final_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+	used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
 	LoggerMogyi.log(self, "Texture initialized with size: %d" % temp_texture.size())
 
 	rng = RNG.new()
@@ -233,6 +234,7 @@ func convert_with_vertical_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Ar
 	
 	return result
 
+var used: Array[bool] 
 func convert_with_chance_merge(
 	chance_x: float = 0.0, 
 	chance_y: float = 0.0, 
@@ -240,8 +242,7 @@ func convert_with_chance_merge(
 	max_merge_y: int = BreakableGrid.GRID_SIZE,
 ) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
-	var used: Array[bool] 
-	used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+	# used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
 
 	for x in BreakableGrid.GRID_SIZE:
 		for y in BreakableGrid.GRID_SIZE:

@@ -45,6 +45,15 @@ func _ready() -> void:
 	# map_generator.add_random_grayscale_noise()
 	# map_generator.add_voronoi_noise()
 
+	map_generator.add_circle(
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE / 2,
+		map_generator.rng.get_float() * 8,
+	)
+
+	map_generator.copy_texture_to_final()
+	generate_map_from_array(map_generator.convert_with_chance_merge(1.0, .0))
+
 	#region
 	map_generator.add_perlin_noise()
 	map_generator.treshold_grayscale(0.5)
@@ -57,7 +66,7 @@ func _ready() -> void:
 	map_generator.copy_texture_to_final_bound(0, 0, 32, 24)
 
 	# map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(.5, .0, 3))
+	generate_map_from_array(map_generator.convert_with_chance_merge(.0, 1.0))
 
 	# map_generator.clear_final_texture()
 	# map_generator.clear_temp_texture()
