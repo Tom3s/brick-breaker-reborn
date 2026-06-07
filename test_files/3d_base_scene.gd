@@ -41,6 +41,7 @@ func _ready() -> void:
 	var map_generator := MapGenerator.new()
 	var SEED: int = randi()
 	map_generator.rng._seed = SEED
+	map_generator.fill_color(Vector3(.3, .0, .9))
 
 	# map_generator.add_random_grayscale_noise()
 	# map_generator.add_voronoi_noise()
@@ -57,6 +58,7 @@ func _ready() -> void:
 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
 	)
+	map_generator.slice_y(0, 18)
 	map_generator.copy_texture_to_final()
 	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2))	
 	map_generator.mirror_x()
@@ -66,19 +68,20 @@ func _ready() -> void:
 
 
 	#region
-	# map_generator.add_perlin_noise()
+	map_generator.add_uv_to_color()
+	map_generator.add_perlin_noise()
 	# # map_generator.treshold_grayscale(0.5)
-	# map_generator.dither_grayscale()
-	# # map_generator.slice_y(0, 24)
+	map_generator.dither_grayscale()
+	# map_generator.slice_y(0, 24)
 	# # map_generator.slice_x(0, 10)
 	# # generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
 	# # map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
 	# # map_generator.mirror_x()
 	# # map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
-	# map_generator.copy_texture_to_final_bound(0, 0, 32, 24)
+	map_generator.copy_texture_to_final_bound(0, 0, 32, 22)
 
 	# # map_generator.copy_texture_to_final()
-	# generate_map_from_array(map_generator.convert_with_chance_merge(.0, .0))
+	generate_map_from_array(map_generator.convert_with_chance_merge(.5, .5))
 
 	# map_generator.clear_final_texture()
 	# map_generator.clear_temp_texture()
@@ -371,6 +374,7 @@ func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
 		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
 		block_mesh.set_material(block.type)
 		block_mesh.set_hp(block.health)
+		block_mesh.set_color(block.color)
 
 		block.asset_ref = block_mesh
 

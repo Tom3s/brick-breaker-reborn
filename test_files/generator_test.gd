@@ -24,6 +24,7 @@ func initialize() -> void:
 
 	map_generator = MapGenerator.new()
 	map_generator.rng._seed = seed
+	map_generator.add_uv_to_color()
 
 	# map_generator.add_voronoi_noise()
 	map_generator.add_perlin_noise()
