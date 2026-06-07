@@ -51,12 +51,13 @@ func _ready() -> void:
 	# map_generator.slice_y(0, 24)
 	# map_generator.slice_x(0, 10)
 	# generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
-	# map_generator.copy_texture_to_final_bound(0, 0, 31, 24)
+	# map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
 	# map_generator.mirror_x()
 	# map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
+	map_generator.copy_texture_to_final_bound(0, 0, 32, 24)
 
-	map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(.5, .5))
+	# map_generator.copy_texture_to_final()
+	generate_map_from_array(map_generator.convert_with_chance_merge(.5, .0, 3))
 
 	# map_generator.clear_final_texture()
 	# map_generator.clear_temp_texture()
@@ -67,7 +68,9 @@ func _ready() -> void:
 	# map_generator.slice_x(10, 22)
 	# map_generator.copy_texture_to_final()
 
-	# generate_map_from_array(map_generator.convert_with_vertical_merge(2))
+	# # generate_map_from_array(map_generator.convert_with_vertical_merge(2))
+	# generate_map_from_array(map_generator.convert_with_chance_merge(.0, .7))
+
 
 	#endregion
 

@@ -233,7 +233,12 @@ func convert_with_vertical_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Ar
 	
 	return result
 
-func convert_with_chance_merge(chance_x: float = 0.0, chance_y: float = 0.0) -> Array[BreakableBlock]:
+func convert_with_chance_merge(
+	chance_x: float = 0.0, 
+	chance_y: float = 0.0, 
+	max_merge_x: int = BreakableGrid.GRID_SIZE, 
+	max_merge_y: int = BreakableGrid.GRID_SIZE,
+) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 	var used: Array[bool] 
 	used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
@@ -261,7 +266,7 @@ func convert_with_chance_merge(chance_x: float = 0.0, chance_y: float = 0.0) -> 
 
 				# try expanding horizontally
 				# check if the expansion is possible
-				if !expanded_x && rng.get_float() <= chance_x && (x + block_size.x) < BreakableGrid.GRID_SIZE:
+				if !expanded_x && rng.get_float() <= chance_x && (x + block_size.x) < BreakableGrid.GRID_SIZE && block_size.x < max_merge_x:
 					for y2 in block_size.y:
 						var check_index: int = (y + y2) * BreakableGrid.GRID_SIZE + (x + block_size.x)
 						if final_texture[check_index].x == 1 && used[check_index] == false:
@@ -278,14 +283,13 @@ func convert_with_chance_merge(chance_x: float = 0.0, chance_y: float = 0.0) -> 
 						var change_index: int = (y + y2) * BreakableGrid.GRID_SIZE + (x + block_size.x)
 						used[change_index] = true
 					block_size.x += 1
-					print("expanded x")
 				else:
 					expanded_x = true
 
 				# try to expand vertically
 				# check if the expansion is possible
 				var can_expand_y: bool = true
-				if !expanded_y && rng.get_float() <= chance_y && (y + block_size.y) < BreakableGrid.GRID_SIZE:
+				if !expanded_y && rng.get_float() <= chance_y && (y + block_size.y) < BreakableGrid.GRID_SIZE && block_size.y < max_merge_y:
 					for x2 in block_size.x:
 						var check_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE + (x + x2)
 						if final_texture[check_index].x == 1 && used[check_index] == false:
@@ -303,14 +307,12 @@ func convert_with_chance_merge(chance_x: float = 0.0, chance_y: float = 0.0) -> 
 						var change_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE + (x + x2)
 						used[change_index] = true
 					block_size.y += 1
-					print("expanded y")
 				else:
 					expanded_y = true
 			
 
 			# create block after expansion
 			var block: BreakableBlock = BreakableBlock.new()
-			print(block_size)
 			block.size = block_size
 			block.pos_on_grid = Vector2(x, y)
 			# block.health = 3 - min(block_size, 2)
