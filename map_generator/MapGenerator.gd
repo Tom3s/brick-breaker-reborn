@@ -344,7 +344,7 @@ func convert_with_chance_merge(
 			var block: BreakableBlock = BreakableBlock.new()
 			block.size = block_size
 			block.pos_on_grid = Vector2(x, y)
-			# block.health = 3 - min(block_size, 2)
+			block.health = int(rng.get_float() * 9) + 1
 			block.prepare_collision()
 			if rng.get_float() < .05:
 				block.has_powerup = true

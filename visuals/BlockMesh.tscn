@@ -1,10 +1,20 @@
-[gd_scene load_steps=4 format=3 uid="uid://d1oqljrgkjxa7"]
+[gd_scene load_steps=6 format=3 uid="uid://d1oqljrgkjxa7"]
 
-[ext_resource type="Material" uid="uid://ce0mjv0f065r3" path="res://visuals/MetalMaterial.material" id="1_u6jif"]
+[ext_resource type="Material" uid="uid://dssyve32uua8m" path="res://visuals/ColoredMaterial.material" id="1_u6jif"]
 [ext_resource type="ArrayMesh" uid="uid://dedqeka3xgpvc" path="res://rounded cube.obj" id="2_mmbeh"]
 [ext_resource type="Script" uid="uid://cxlwi3loww47" path="res://visuals/BlockMesh.gd" id="3_413et"]
+[ext_resource type="Material" uid="uid://bk4nartxb51nu" path="res://visuals/HPIndicatorMaterial.material" id="4_mmbeh"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_mmbeh"]
+size = Vector2(2, 2)
 
 [node name="BlockMesh" type="MeshInstance3D"]
 material_override = ExtResource("1_u6jif")
 mesh = ExtResource("2_mmbeh")
 script = ExtResource("3_413et")
+
+[node name="HPIndicator" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 1.01, 0)
+material_override = ExtResource("4_mmbeh")
+mesh = SubResource("QuadMesh_mmbeh")
