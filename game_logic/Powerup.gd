@@ -69,6 +69,4 @@ func activate_powerup(context: Global.GameContext) -> void:
 
 				context.balls.push_back(new_ball)
 
-				# TODO: figure this shit out
-				# ball_parent.add_child(ball_mesh_scene.instantiate())
 

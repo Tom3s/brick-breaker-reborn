@@ -10,7 +10,6 @@ enum BlockType {
 
 var pos_on_grid: Vector2i = Vector2i.ZERO
 
-# TODO: implement larger blocks
 var size: Vector2i = Vector2i.ONE
 var color: Vector3 = Vector3.ONE
 

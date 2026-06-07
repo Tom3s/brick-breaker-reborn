@@ -144,10 +144,11 @@ func _process(delta: float) -> void:
 
 	
 	# handling blocks before balls
-	# this is bc multiball powerup might rotate the balls 
+	# this is bc multiball powerup might rotate the ball's 
 	# velocity of out the play area
 	# TODO: this might've been bc of delta becoming too high
 	# investigate with safe_delta and move back if neccessary
+	# blocked by: bitmap optimization
 	for block: BreakableBlock in context.blocks:
 		if block.is_broken():
 			continue
@@ -308,6 +309,8 @@ func on_death() -> void:
 	context.balls[0].velocity = Vector2.ZERO
 	context.balls[0].released = false
 
+
+# TODO: prune when map generator is ready
 func generate_map() -> void:
 	for child in block_parent.get_children():
 		child.queue_free()

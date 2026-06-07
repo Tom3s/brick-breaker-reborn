@@ -106,6 +106,7 @@ func add_circle(cx: int, cy: int, radius: float) -> void:
 				temp_texture[index] = 1.0
 
 # TODO: check bounds and swap if x1 > x2 (or y1 > y2)
+# this is now handled by thw sign(..) function, but might wanna pretty this up
 func add_rectangle(x1: int, y1: int, x2: int, y2: int) -> void:
 	for x in range(x1, x2, sign(x2 - x1)):
 		for y in range(y1, y2, sign(y2 - y1)):
@@ -190,83 +191,6 @@ func copy_texture_to_final_bound(from_x: int, from_y: int, to_x: int, to_y: int)
 			if temp_texture[i] != 0.0:
 				final_texture[i] = temp_texture[i]
 
-
-func convert_with_horizontal_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Array[BreakableBlock]:
-	var result: Array[BreakableBlock]
-
-	var making_block: bool = false
-	var block_size: int = 0
-	var block_pos: Vector2i
-
-	for y in BreakableGrid.GRID_SIZE:
-		for x in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
-			var val: float = final_texture[index]
-
-			if val == 1:
-				if !making_block:
-					block_pos = Vector2i(x, y)
-				making_block = true
-				block_size += 1
-			
-			if val == 0 || x >= (BreakableGrid.GRID_SIZE - 1) || block_size >= max_merge:
-				if making_block:
-					var block: BreakableBlock = BreakableBlock.new()
-					block.size = Vector2i(block_size, 1)
-					block.pos_on_grid = block_pos
-					block.health = 4 - min(block_size, 3)
-					block.prepare_collision()
-					if rng.get_float() < .05:
-						block.has_powerup = true
-						block.powerup = Powerup.new()
-						block.powerup.type = Powerup.Type.BALL_MULTIPLY
-
-					result.push_back(block)
-
-
-				block_size = 0
-				making_block = false
-	
-	return result
-
-# TODO: this is placeholder. Implement proper merging after the fact
-func convert_with_vertical_merge(max_merge: int = BreakableGrid.GRID_SIZE) -> Array[BreakableBlock]:
-	var result: Array[BreakableBlock]
-
-	var making_block: bool = false
-	var block_size: int = 0
-	var block_pos: Vector2i
-
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
-			var val: float = final_texture[index]
-
-			if val == 1:
-				if !making_block:
-					block_pos = Vector2i(x, y)
-				making_block = true
-				block_size += 1
-			
-			if val == 0 || y == (BreakableGrid.GRID_SIZE - 1) || block_size >= max_merge:
-				if making_block:
-					var block: BreakableBlock = BreakableBlock.new()
-					block.size = Vector2i(1, block_size)
-					block.pos_on_grid = block_pos
-					block.health = 3 - min(block_size, 2)
-					block.prepare_collision()
-					if rng.get_float() < .05:
-						block.has_powerup = true
-						block.powerup = Powerup.new()
-						block.powerup.type = Powerup.Type.BALL_MULTIPLY
-
-					result.push_back(block)
-
-
-				block_size = 0
-				making_block = false
-	
-	return result
 
 var used: Array[bool] 
 func convert_with_chance_merge(

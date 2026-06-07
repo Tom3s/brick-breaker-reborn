@@ -1,9 +1,6 @@
 extends Camera2D
 class_name IngameCamera
 
-# TODO: get this resolution from project settings
-# const BASE_CAM_RESOLUTION: Vector2 = Vector2(1280, 720)
-
 var padding: float = 32.0
 
 func _process(delta: float) -> void:

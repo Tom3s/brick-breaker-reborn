@@ -14,7 +14,6 @@ enum Severity {
 }
 
 func _ready() -> void:
-	# TODO: check if logs directory exists and create it if not
 	# nvm this is handled by godot and normal print
 	self.log(self, "Logger started successfully!")
 
@@ -47,7 +46,3 @@ static func log(
 	]
 
 	print(final_message)
-
-	if (write_to_disk):
-		# TODO: write to log file if wanted
-		pass

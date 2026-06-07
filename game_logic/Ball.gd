@@ -43,7 +43,6 @@ func boost() -> void:
 
 func collide_with(line: LineCollider, reflect_ball: bool = true, boost_on_collision: bool = true) -> bool:
 
-	# TODO: collider line should abstract p1 and p2, use them instead of accessing debug point coordinates
 	var p1: Vector2 = line.p1
 	var p2: Vector2 = line.p2
 
