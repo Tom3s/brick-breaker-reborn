@@ -25,7 +25,7 @@ func set_visual_scale(size: Vector2) -> void:
 	scale.x = size.x / base_size.x
 	scale.z = size.y / base_size.z
 
-	LoggerMogyi.log(self, "Set block scale to %v (actual scale param %v)" % [scale, size])
+	# LoggerMogyi.log(self, "Set block scale to %v (actual scale param %v)" % [scale, size])
 
 	scale.y = BreakableGrid.CELL_SIZE / base_size.y
 
@@ -33,19 +33,24 @@ func set_visual_scale(size: Vector2) -> void:
 	hp_indicator.scale.x = smaller_scale / scale.x / base_size.x
 	hp_indicator.scale.y = smaller_scale / scale.z / base_size.z
 
-	LoggerMogyi.log(self, "Set hp_indicator scale to %v (actual scale param %v)" % [hp_indicator.scale, size])
+	# LoggerMogyi.log(self, "Set hp_indicator scale to %v (actual scale param %v)" % [hp_indicator.scale, size])
 
 
 func set_hp(hp: int) -> void:
 	if hp <= 0:
 		return
-	# material_override.set_shader_parameter("health", hp)
-	# handle hp over 9
+	
+	# TODO: this should be set by an accesibility option
+	hp_indicator.visible = hp > 1
+
+	# TODO: handle hp over 9 properly
 	hp = min(hp, 9)
 	var texture_path: String = "%s/%s/%d.png" % [hp_texture_base_path, current_hp_skin, hp]
-	# var image: Image = load(texture_path)
+
 	hp_indicator.material_override.set_shader_parameter("Texture", load(texture_path))
 
+func set_color(color: Vector3) -> void:
+	material_override.set_shader_parameter("Color", color)
 
 func set_material(type: BreakableBlock.BlockType) -> void:
 	if type == BreakableBlock.BlockType.NORMAL:
