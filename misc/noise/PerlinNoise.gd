@@ -44,12 +44,19 @@ func sample(x: float, y: float, bounds: float) -> float:
 
 	# LoggerMogyi.log(self, "Dot products: %f, %f, %f, %f" % [p1, p2, p3, p4])
 
+	# var result: float = \
+	# 	lerp(
+	# 		lerp(p1, p2, smoothstep(0, 1, offset_x)),
+	# 		lerp(p3, p4, smoothstep(0, 1, offset_x)),
+	# 		smoothstep(0, 1, offset_y)
+	# 	)
 	var result: float = \
 		lerp(
 			lerp(p1, p2, offset_x),
 			lerp(p3, p4, offset_x),
 			offset_y
 		)
+
 	
 	# LoggerMogyi.log(self, "Result of perlin sample at (%f, %f): %f" % [x, y, result])
 

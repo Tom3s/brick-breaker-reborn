@@ -103,6 +103,27 @@ func treshold_grayscale(treshold: float) -> void:
 	for i in temp_texture.size():
 		temp_texture[i] = Vector3.ONE if temp_texture[i].x >= treshold else Vector3.ZERO 
 
+# var BAYER_MATRIX: Array[PackedFloat32Array] = [
+# 	[ .0,  .5],
+# 	[.75, .25],
+# ]
+
+var BAYER_MATRIX: Array[PackedFloat32Array] = [
+    [00.0/16.0, 12.0/16.0, 03.0/16.0, 15.0/16.0],
+    [08.0/16.0, 04.0/16.0, 11.0/16.0, 07.0/16.0],
+    [02.0/16.0, 14.0/16.0, 01.0/16.0, 13.0/16.0],
+    [10.0/16.0, 06.0/16.0, 09.0/16.0, 05.0/16.0]
+];
+func dither_grayscale(mult: float = 1.0) -> void:
+	for x in BreakableGrid.GRID_SIZE:
+		for y in BreakableGrid.GRID_SIZE:
+			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+			var dither_treshold: float = BAYER_MATRIX[y%4][x%4] * mult
+
+			temp_texture[index] = Vector3.ONE if temp_texture[index].x >= dither_treshold else Vector3.ZERO 
+
+
+
 func slice_x(from: int, to: int) -> void:
 	# TODO: add bound checks
 	for x in BreakableGrid.GRID_SIZE:

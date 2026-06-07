@@ -52,11 +52,13 @@ func _ready() -> void:
 	)
 
 	map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(1.0, .0))
+	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, .0, 3, 0))
+	map_generator.clear_final_texture()
 
 	#region
 	map_generator.add_perlin_noise()
-	map_generator.treshold_grayscale(0.5)
+	# map_generator.treshold_grayscale(0.5)
+	map_generator.dither_grayscale()
 	# map_generator.slice_y(0, 24)
 	# map_generator.slice_x(0, 10)
 	# generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
@@ -66,7 +68,7 @@ func _ready() -> void:
 	map_generator.copy_texture_to_final_bound(0, 0, 32, 24)
 
 	# map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(.0, 1.0))
+	generate_map_from_array(map_generator.convert_with_chance_merge(.0, .0))
 
 	# map_generator.clear_final_texture()
 	# map_generator.clear_temp_texture()
