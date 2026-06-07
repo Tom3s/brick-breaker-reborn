@@ -20,6 +20,7 @@ Global="*res://global/Global.gd"
 
 [debug]
 
+file_logging/log_path="user://logs/BBR.log"
 gdscript/warnings/untyped_declaration=2
 
 [display]

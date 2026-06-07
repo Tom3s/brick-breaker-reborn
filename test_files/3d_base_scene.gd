@@ -37,9 +37,73 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
-	generate_map()
+	# generate_map()
+	var map_generator := MapGenerator.new()
+	var SEED: int = randi()
+	map_generator.rng._seed = SEED
+
+	# map_generator.add_random_grayscale_noise()
+	# map_generator.add_voronoi_noise()
+
+	# map_generator.add_circle(
+	# 	map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+	# 	map_generator.rng.get_float() * BreakableGrid.GRID_SIZE / 2,
+	# 	map_generator.rng.get_float() * 8,
+	# )
+	# for i in 2:
+	map_generator.add_rectangle(
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+	)
+	map_generator.copy_texture_to_final()
+	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2))	
+	map_generator.mirror_x()
+	map_generator.copy_texture_to_final()
+	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2))	
+	map_generator.clear_temp_texture()
 
 
+	#region
+	# map_generator.add_perlin_noise()
+	# # map_generator.treshold_grayscale(0.5)
+	# map_generator.dither_grayscale()
+	# # map_generator.slice_y(0, 24)
+	# # map_generator.slice_x(0, 10)
+	# # generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
+	# # map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
+	# # map_generator.mirror_x()
+	# # map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
+	# map_generator.copy_texture_to_final_bound(0, 0, 32, 24)
+
+	# # map_generator.copy_texture_to_final()
+	# generate_map_from_array(map_generator.convert_with_chance_merge(.0, .0))
+
+	# map_generator.clear_final_texture()
+	# map_generator.clear_temp_texture()
+	# map_generator.add_voronoi_noise()
+	# map_generator.invert()
+	# map_generator.treshold_grayscale(0.7)
+	# map_generator.slice_y(0, 20)
+	# map_generator.slice_x(10, 22)
+	# map_generator.copy_texture_to_final()
+
+	# # generate_map_from_array(map_generator.convert_with_vertical_merge(2))
+	# generate_map_from_array(map_generator.convert_with_chance_merge(.0, .7))
+
+
+	#endregion
+
+	# for i in 4:
+	# 	map_generator.add_circle(
+	# 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+	# 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE / 2,
+	# 		map_generator.rng.get_float() * 8,
+	# 	)
+	
+	# generate_map_from_array(map_generator.convert_with_horizontal_merge(1))
+	
 
 	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
 	mouse_input_handler.release_ball_pressed.connect(release_ball)
@@ -122,7 +186,7 @@ func _process(delta: float) -> void:
 		if ball.collide_with(context.death_barrier, false, false):	
 			if context.balls.size() > 1:
 				context.balls.erase(ball)
-				ball_parent.remove_child(ball_mesh)
+				ball_mesh.queue_free()
 				index -= 1
 			else:
 				on_death()
@@ -295,6 +359,22 @@ func generate_map() -> void:
 			context.blocks.push_back(block)
 
 			total += block_size
+
+func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
+	for block in blocks:
+		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+		block_parent.add_child(block_mesh)
+		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+		var final_pos: Vector2 = block.get_origin()
+		block_mesh.global_position.x = final_pos.x
+		block_mesh.global_position.z = final_pos.y
+		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+		block_mesh.set_material(block.type)
+		block_mesh.set_hp(block.health)
+
+		block.asset_ref = block_mesh
+
+		context.blocks.push_back(block)
 
 func on_board_clear() -> void:
 	# TODO: this resets the ball. shouldn't use death entrypoint for this tho
