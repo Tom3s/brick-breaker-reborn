@@ -3,9 +3,11 @@ extends Node3D
 
 @onready var ball_mesh_scene: PackedScene = preload("res://visuals/BallMesh.tscn")
 @onready var block_mesh_scene: PackedScene = preload("res://visuals/BlockMesh.tscn")
+@onready var powerup_asset_scene: PackedScene = preload("res://visuals/PowerupAsset.tscn")
 
 # @onready var ball_mesh: MeshInstance3D = %BallMesh
 @onready var ball_parent: Node3D = %Balls
+@onready var powerup_parent: Node3D = %Powerups
 @onready var paddle_mesh: MeshInstance3D = %PaddleMesh
 @onready var block_parent: Node3D = %Blocks
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
@@ -224,7 +226,7 @@ func _process(delta: float) -> void:
 		powerup.move(safe_delta)
 		powerup.asset.position.x = powerup.position.x
 		powerup.asset.position.z = powerup.position.y
-		powerup.asset.position.y = 16.0 # TODO: remove magic number (this is ball.radius * 2)
+		powerup.asset.position.y = BreakableGrid.CELL_SIZE
 
 		collide_with_screen(powerup)
 
@@ -233,11 +235,11 @@ func _process(delta: float) -> void:
 		if powerup.collide_with_paddle(context.paddle):
 			powerup.activate_powerup(context)
 			context.powerups.erase(powerup)
-			debug_parent.remove_child(powerup.asset)
+			powerup.asset.queue_free()
 		
 		if powerup.position.y > BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE * 1.5:
 			context.powerups.erase(powerup)
-			debug_parent.remove_child(powerup.asset)
+			powerup.asset.queue_free()
 
 
 
@@ -412,12 +414,17 @@ func spawn_powerup(block: BreakableBlock) -> void:
 
 	powerup.randomize_velocity()
 
-	var mesh: MeshInstance3D = MeshInstance3D.new()
-	mesh.mesh = SphereMesh.new()
-	mesh.mesh.radius = 16
-	mesh.mesh.height = 32
-	debug_parent.add_child(mesh)
+	# var mesh: MeshInstance3D = MeshInstance3D.new()
+	# mesh.mesh = SphereMesh.new()
+	# mesh.mesh.radius = 16
+	# mesh.mesh.height = 32
+	# debug_parent.add_child(mesh)
+	var asset: PowerupAsset = powerup_asset_scene.instantiate()
+	powerup_parent.add_child(asset)
+	asset.set_visuals(powerup)
 
-	powerup.asset = mesh
+
+
+	powerup.asset = asset
 
 	context.powerups.push_back(powerup)

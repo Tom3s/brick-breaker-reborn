@@ -29,7 +29,7 @@ func initialize() -> void:
 	# map_generator.add_voronoi_noise()
 	map_generator.add_perlin_noise()
 	map_generator.dither_grayscale(1.0)
-	# map_generator.treshold_grayscale(0.7)
+	# map_generator.treshold_grayscale(0.5)
 	# map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
 	# map_generator.mirror_x()
 	# map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
