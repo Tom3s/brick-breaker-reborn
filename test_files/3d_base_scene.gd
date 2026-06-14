@@ -122,6 +122,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	var safe_delta: float = min(delta, 1. / 60)
+
+	# delta *= .1
+	# safe_delta *= .6
+
 	if Global.DEBUG:
 		if Input.is_action_just_pressed("debug_powerup"):
 			var powerup: Powerup = Powerup.new()
@@ -159,7 +163,7 @@ func _process(delta: float) -> void:
 
 			for ball: Ball in context.balls:
 				if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
-					block.hit_block(ball)
+					block.hit_block(context, ball)
 
 
 			if block.is_broken():
@@ -187,7 +191,7 @@ func _process(delta: float) -> void:
 	# for i in context.balls.size():
 	while index < context.balls.size():
 		var ball: Ball = context.balls[index]
-		var ball_mesh: MeshInstance3D = ball_parent.get_child(index)
+		var ball_mesh: BallMesh = ball_parent.get_child(index)
 
 		if ball.collide_with(context.death_barrier, false, false):	
 			if context.balls.size() > 1:
@@ -221,6 +225,21 @@ func _process(delta: float) -> void:
 		ball.collide_with_paddle(context.paddle)
 
 	
+	# update active effects
+	var has_flame: bool = false
+	var disable_effect_queue: Array[Powerup]
+	for powerup: Powerup in context.active_powerups:
+		powerup.time_left -= safe_delta
+		if powerup.time_left <= 0.0:
+			# LoggerMogyi.log(self, "Removing powerup: %s" % powerup.name)
+			disable_effect_queue.push_back(powerup)
+		# this is to skip a second for loop
+		if powerup.type == Powerup.Type.FIRE_BALL:
+			has_flame = true
+	
+	for powerup: Powerup in disable_effect_queue:
+		context.active_powerups.erase(powerup)
+
 	# update powerups
 	for powerup: Powerup in context.powerups:
 		powerup.move(safe_delta)
@@ -242,20 +261,13 @@ func _process(delta: float) -> void:
 			powerup.asset.queue_free()
 
 
-
-	# if collided:
-	# 	ball.boost()
-
-	# ball_mesh.global_position.x = ball.position.x
-	# ball_mesh.global_position.z = ball.position.y
-	# ball_mesh.global_position.y = ball.radius
 	for i in context.balls.size():
 		var ball: Ball = context.balls[i]
-		var ball_mesh: MeshInstance3D
+		var ball_mesh: BallMesh
 		if ball_parent.get_child_count() > i: 
 			ball_mesh = ball_parent.get_child(i)
 		else:
-			# NOTE: handling mesh creation here 
+			# TODO: handling mesh creation here 
 			# bc i want to separate logic from visuals
 			ball_mesh = ball_mesh_scene.instantiate()
 			ball_parent.add_child(ball_mesh)
@@ -264,6 +276,12 @@ func _process(delta: float) -> void:
 		ball_mesh.global_position.x = ball.position.x
 		ball_mesh.global_position.z = ball.position.y
 		ball_mesh.global_position.y = ball.radius
+
+		if has_flame:
+			ball_mesh.set_flame(true)
+			ball_mesh.set_flame_rotation(ball.velocity)
+		else:
+			ball_mesh.set_flame(false)
 
 
 	paddle_mesh.global_position.x = context.paddle.position.x

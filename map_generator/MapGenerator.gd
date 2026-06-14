@@ -280,8 +280,11 @@ func convert_with_chance_merge(
 			if rng.get_float() < .10:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
-				block.powerup.type = Powerup.Type.BALL_MULTIPLY
-				block.powerup.ball_multiply_value = int(rng.get_float() * 3) + 2
+				if rng.get_float() < .50:
+					block.powerup.type = Powerup.Type.BALL_MULTIPLY
+					block.powerup.ball_multiply_value = int(rng.get_float() * 3) + 2
+				else:
+					block.powerup.type = Powerup.Type.FIRE_BALL
 
 			result.push_back(block)
 	

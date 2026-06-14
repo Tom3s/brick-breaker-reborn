@@ -16,3 +16,4 @@ class GameContext:
 	var nr_metal_blocks: int = 0
 
 	var powerups: Array[Powerup]
+	var active_powerups: Array[Powerup]

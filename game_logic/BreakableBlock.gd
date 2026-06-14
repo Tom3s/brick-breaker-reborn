@@ -68,9 +68,9 @@ func get_origin() -> Vector2:
 
 	return p1.lerp(p3, 0.5)
 
-func hit_block(ball: Ball) -> void:
+func hit_block(context: Global.GameContext, ball: Ball) -> void:
 	# broken = true
-	health -= ball.get_damage(self)
+	health -= ball.get_damage(context, self)
 	
 	if type == BlockType.NORMAL:
 		asset_ref.set_hp(health)
