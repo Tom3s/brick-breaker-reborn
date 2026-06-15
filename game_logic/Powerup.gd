@@ -4,10 +4,12 @@ class_name Powerup
 enum Type {
 	NONE,
 	BALL_MULTIPLY,
+	FIRE_BALL,
 }
 
 var ball_multiply_value: int = 3
 
+var fire_ball_max_time: float = 15.0
 
 var type: Type = Type.NONE
 
@@ -21,6 +23,10 @@ var start_velocity: float = 128.0
 var asset: Node3D
 
 var grace_distance: float = 16.0
+
+var infinite: bool = true
+
+var time_left: float = 0.0
 
 func randomize_velocity() -> void:
 	velocity = Vector2(randf_range(-0.5, 0.5), -1).normalized()
@@ -68,5 +74,12 @@ func activate_powerup(context: Global.GameContext) -> void:
 				)
 
 				context.balls.push_back(new_ball)
+	
+	elif type == Type.FIRE_BALL:
+		time_left = fire_ball_max_time
+		infinite = false
+		
+		context.active_powerups.push_back(self)
+
 
 

@@ -1,15 +1,46 @@
-[gd_scene load_steps=4 format=3 uid="uid://dh6eign1fffi"]
+[gd_scene load_steps=8 format=3 uid="uid://dh6eign1fffi"]
 
 [ext_resource type="Shader" uid="uid://cgjb8scdym0jl" path="res://visuals/BasicBallShader.res" id="1_iiwoc"]
-
-[sub_resource type="SphereMesh" id="SphereMesh_s2g42"]
-radius = 16.0
-height = 32.0
+[ext_resource type="Script" uid="uid://cw0lypiwj44q" path="res://visuals/BallMesh.gd" id="2_jm5qt"]
+[ext_resource type="Material" uid="uid://qdcc3elroa3i" path="res://visuals/FlameMaterial.material" id="3_jm5qt"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jm5qt"]
 render_priority = 0
 shader = ExtResource("1_iiwoc")
+shader_parameter/Color = Color(1, 0.53533334, 0.18, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_s2g42"]
+radius = 16.0
+height = 32.0
+radial_segments = 24
+rings = 12
+
+[sub_resource type="BoxMesh" id="BoxMesh_jm5qt"]
+size = Vector3(32, 32, 32)
+
+[sub_resource type="SphereMesh" id="SphereMesh_gg35l"]
+lightmap_size_hint = Vector2i(567, 269)
+radius = 17.0
+height = 33.0
+radial_segments = 24
+rings = 12
 
 [node name="BallMesh" type="MeshInstance3D"]
+material_override = SubResource("ShaderMaterial_jm5qt")
 mesh = SubResource("SphereMesh_s2g42")
-surface_material_override/0 = SubResource("ShaderMaterial_jm5qt")
+script = ExtResource("2_jm5qt")
+
+[node name="Debug" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+visible = false
+mesh = SubResource("BoxMesh_jm5qt")
+
+[node name="Flame" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Flame2" type="MeshInstance3D" parent="Flame"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("SphereMesh_gg35l")
+skeleton = NodePath("../..")
+surface_material_override/0 = ExtResource("3_jm5qt")

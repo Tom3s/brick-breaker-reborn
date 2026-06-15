@@ -198,6 +198,7 @@ func convert_with_chance_merge(
 	chance_y: float = 0.0, 
 	max_merge_x: int = BreakableGrid.GRID_SIZE, 
 	max_merge_y: int = BreakableGrid.GRID_SIZE,
+	block_type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL,
 ) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 	# used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
@@ -274,14 +275,18 @@ func convert_with_chance_merge(
 			var block: BreakableBlock = BreakableBlock.new()
 			block.size = block_size
 			block.color = get_color(x, y)
+			block.type = block_type
 			block.pos_on_grid = Vector2(x, y)
 			block.health = int(rng.get_float() * 3) + 1
 			block.prepare_collision()
 			if rng.get_float() < .10:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
-				block.powerup.type = Powerup.Type.BALL_MULTIPLY
-				block.powerup.ball_multiply_value = int(rng.get_float() * 3) + 2
+				if rng.get_float() < .50:
+					block.powerup.type = Powerup.Type.BALL_MULTIPLY
+					block.powerup.ball_multiply_value = int(rng.get_float() * 3) + 2
+				else:
+					block.powerup.type = Powerup.Type.FIRE_BALL
 
 			result.push_back(block)
 	
