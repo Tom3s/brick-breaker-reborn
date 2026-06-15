@@ -118,6 +118,11 @@ func _ready() -> void:
 	# paddle.collider_line.debug_set_up = false
 	context.paddle.set_line(context.balls[0].radius)
 
+	# if DEBUG:
+	DebugScreen.add_debug_line(func() -> String: return "FPS: %.2f" % Performance.get_monitor(Performance.TIME_FPS))
+	DebugScreen.add_debug_line(func() -> String: return "Frametime: %.3fms" % (Performance.get_monitor(Performance.TIME_PROCESS) * 1000))
+	DebugScreen.add_debug_line(context._get_debug_string)
+
 	
 
 func _process(delta: float) -> void:

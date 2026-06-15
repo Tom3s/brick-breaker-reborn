@@ -37,3 +37,6 @@ class GameContext extends Node:
 		for powerup: Powerup in active_powerups:
 			var type: String = Powerup.Type.keys()[powerup.type].capitalize()
 			_DEBUG_ACTIVE_POWERUPS += "- %s: %.2fs \n" % [type, powerup.time_left]
+	
+	func _get_debug_string() -> String:
+		return _DEBUG_ACTIVE_POWERUPS
