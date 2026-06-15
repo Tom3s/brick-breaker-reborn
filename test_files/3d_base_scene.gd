@@ -62,10 +62,10 @@ func _ready() -> void:
 	)
 	map_generator.slice_y(0, 18)
 	map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2))	
+	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2, BreakableBlock.BlockType.ICE))	
 	map_generator.mirror_x()
 	map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2))	
+	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2, BreakableBlock.BlockType.ICE))	
 	map_generator.clear_temp_texture()
 
 
@@ -123,10 +123,13 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	var safe_delta: float = min(delta, 1. / 60)
 
+	context.set_flags()
 	# delta *= .1
 	# safe_delta *= .6
 
 	if Global.DEBUG:
+		context._set_debug_strings()
+		
 		if Input.is_action_just_pressed("debug_powerup"):
 			var powerup: Powerup = Powerup.new()
 			powerup.randomize_velocity()
@@ -162,7 +165,7 @@ func _process(delta: float) -> void:
 		for line: LineCollider in block.collision:
 
 			for ball: Ball in context.balls:
-				if ball.collide_with(line, block.type != BreakableBlock.BlockType.ICE):
+				if ball.collide_with(line, block.reflects_ball(context)):
 					block.hit_block(context, ball)
 
 
@@ -196,7 +199,8 @@ func _process(delta: float) -> void:
 		if ball.collide_with(context.death_barrier, false, false):	
 			if context.balls.size() > 1:
 				context.balls.erase(ball)
-				ball_mesh.queue_free()
+				# ball_mesh.queue_free() removes at end of frame, so indexes might get confused
+				ball_parent.remove_child(ball_mesh)
 				index -= 1
 			else:
 				on_death()
@@ -226,16 +230,13 @@ func _process(delta: float) -> void:
 
 	
 	# update active effects
-	var has_flame: bool = false
 	var disable_effect_queue: Array[Powerup]
 	for powerup: Powerup in context.active_powerups:
 		powerup.time_left -= safe_delta
 		if powerup.time_left <= 0.0:
 			# LoggerMogyi.log(self, "Removing powerup: %s" % powerup.name)
 			disable_effect_queue.push_back(powerup)
-		# this is to skip a second for loop
-		if powerup.type == Powerup.Type.FIRE_BALL:
-			has_flame = true
+
 	
 	for powerup: Powerup in disable_effect_queue:
 		context.active_powerups.erase(powerup)
@@ -277,7 +278,7 @@ func _process(delta: float) -> void:
 		ball_mesh.global_position.z = ball.position.y
 		ball_mesh.global_position.y = ball.radius
 
-		if has_flame:
+		if context.FLAG_FIREBALL_ACTIVE:
 			ball_mesh.set_flame(true)
 			ball_mesh.set_flame_rotation(ball.velocity)
 		else:

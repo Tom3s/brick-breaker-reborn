@@ -80,3 +80,6 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 
 func is_broken() -> bool:
 	return health <= 0
+
+func reflects_ball(context: Global.GameContext) -> bool:
+	return !(type == BlockType.ICE && context.FLAG_FIREBALL_ACTIVE)
