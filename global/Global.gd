@@ -31,9 +31,15 @@ class GameContext extends Node:
 
 	# debug strings
 	var _DEBUG_ACTIVE_POWERUPS: String
+	var _DEBUG_ACTIVE_NR_BALLS: String
 
 	func _set_debug_strings() -> void:
 		_DEBUG_ACTIVE_POWERUPS = "Active Effects: \n"
 		for powerup: Powerup in active_powerups:
 			var type: String = Powerup.Type.keys()[powerup.type].capitalize()
 			_DEBUG_ACTIVE_POWERUPS += "- %s: %.2fs \n" % [type, powerup.time_left]
+		
+		_DEBUG_ACTIVE_NR_BALLS = "Nr Balls: %d" % balls.size()
+	
+	func _get_debug_string() -> String:
+		return "%s\n%s" % [_DEBUG_ACTIVE_NR_BALLS, _DEBUG_ACTIVE_POWERUPS]
