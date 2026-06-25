@@ -75,8 +75,12 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 	if type == BlockType.NORMAL:
 		asset_ref.set_hp(health)
 
-	if is_broken() && asset_ref.has_method("hide"):
-		asset_ref.hide()
+	# if is_broken() && asset_ref.has_method("hide"):
+	# 	asset_ref.hide()
+	# if is_broken():
+	# 	context.remove_block(self)
+	# 	# TODO: also handling memory from here, might wanna move it
+	# 	asset_ref.queue_free()
 
 func is_broken() -> bool:
 	return health <= 0
