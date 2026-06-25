@@ -174,6 +174,9 @@ func _process(delta: float) -> void:
 
 
 	for ball: Ball in context.balls:
+		if !ball.released:
+			continue
+
 		var x_from: int = floorf((ball.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
 		var y_from: int = floorf((ball.position.y + (grid_unit_size.y / 2)) / BreakableGrid.CELL_SIZE)
 		var x_to: int = sign(ball.velocity.x)
@@ -181,14 +184,19 @@ func _process(delta: float) -> void:
 
 		x_to = x_to * 2 + x_from
 		y_to = y_to * 2 + y_from
-		x_from -= sign(ball.velocity.x)
-		y_from -= sign(ball.velocity.y)
 
-		# LoggerMogyi.log(self, "Getting blocks from (%d, %d) to (%d, %d)" % [x_from, x_to, y_from, y_to])
+		# Cheeky ordering to fix [#044]
+		# ball first checks in the direction of velocity
+		# if that fails, falls back to grazing blocks
+		var x_range: Array = range(x_from, x_to, sign(ball.velocity.x))
+		x_range.push_back(x_from - sign(ball.velocity.x))
+		var y_range: Array = range(y_from, y_to, sign(ball.velocity.y))
+		y_range.push_back(y_from - sign(ball.velocity.y))
 
-		for x in range(x_from, x_to, sign(ball.velocity.x)):
-			for y in range(y_from, y_to, sign(ball.velocity.y)):
-				var block: BreakableBlock = context.get_block_at(x, y)
+		for x: int in x_range:
+			var block: BreakableBlock
+			for y: int in y_range:
+				block = context.get_block_at(x, y)
 				if block == null:
 					continue
 
@@ -199,15 +207,18 @@ func _process(delta: float) -> void:
 
 
 				if block.is_broken():
-					if block.has_powerup:
-						block.has_powerup = false
-						spawn_powerup(block)
-					
-					context.broken_block_count += 1
+					break
 
-					block.asset_ref.queue_free()
-					context.remove_block(block)
-					break	
+			if block != null && block.is_broken():
+				if block.has_powerup:
+					block.has_powerup = false
+					spawn_powerup(block)
+				
+				context.broken_block_count += 1
+
+				block.asset_ref.queue_free()
+				context.remove_block(block)
+				break	
 
 
 	# if !ball.released:
