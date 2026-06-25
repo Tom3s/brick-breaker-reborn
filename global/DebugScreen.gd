@@ -15,6 +15,9 @@ func _enter_tree() -> void:
 
 	# process_mode = Node.PROCESS_MODE_DISABLED
 
+func _ready() -> void:
+	debug_layer.visible = Global.DEBUG
+
 func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("debug_screen"):
 		debug_layer.visible = !debug_layer.visible

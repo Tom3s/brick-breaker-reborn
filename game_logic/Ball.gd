@@ -13,6 +13,7 @@ var deceleration: float = 8.0
 @export
 var speed_up_factor: float = 2.0
 
+var asset_ref: BallMesh
 
 
 var position: Vector2
