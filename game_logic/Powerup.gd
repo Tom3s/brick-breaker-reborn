@@ -1,6 +1,8 @@
 extends Node
 class_name Powerup
 
+var ball_mesh_scene: PackedScene = load("res://visuals/BallMesh.tscn")
+
 enum Type {
 	NONE,
 	BALL_MULTIPLY,
@@ -66,6 +68,8 @@ func activate_powerup(context: Global.GameContext) -> void:
 					continue
 				
 				var new_ball: Ball = Ball.new()
+				new_ball.asset_ref = ball_mesh_scene.instantiate()
+
 				new_ball.released = true
 
 				new_ball.position = ball.position
@@ -80,6 +84,3 @@ func activate_powerup(context: Global.GameContext) -> void:
 		infinite = false
 		
 		context.active_powerups.push_back(self)
-
-
-

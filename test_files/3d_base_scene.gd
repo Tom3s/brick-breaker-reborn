@@ -33,8 +33,9 @@ var context: Global.GameContext
 func _ready() -> void:
 	context = Global.GameContext.new()
 	# ball.randomize_velocity()
-	context.balls.push_back(Ball.new())
-	ball_parent.add_child(ball_mesh_scene.instantiate())
+	var _new_ball: Ball = Ball.new()
+	_new_ball.asset_ref = ball_mesh_scene.instantiate()
+	context.balls.push_back(_new_ball)
 
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
@@ -152,6 +153,7 @@ func _process(delta: float) -> void:
 		
 		if Input.is_action_just_pressed("debug_ball"):
 			var ball: Ball = Ball.new()
+			ball.asset_ref = ball_mesh_scene.instantiate()
 			ball.released = true
 			context.balls.push_back(ball)
 
@@ -200,13 +202,11 @@ func _process(delta: float) -> void:
 	# for i in context.balls.size():
 	while index < context.balls.size():
 		var ball: Ball = context.balls[index]
-		var ball_mesh: BallMesh = ball_parent.get_child(index)
 
 		if ball.collide_with(context.death_barrier, false, false):	
 			if context.balls.size() > 1:
+				ball_parent.remove_child(ball.asset_ref)
 				context.balls.erase(ball)
-				# ball_mesh.queue_free() removes at end of frame, so indexes might get confused
-				ball_parent.remove_child(ball_mesh)
 				index -= 1
 			else:
 				on_death()
@@ -270,25 +270,20 @@ func _process(delta: float) -> void:
 
 	for i in context.balls.size():
 		var ball: Ball = context.balls[i]
-		var ball_mesh: BallMesh
-		if ball_parent.get_child_count() > i: 
-			ball_mesh = ball_parent.get_child(i)
-		else:
-			# TODO: handling mesh creation here 
-			# bc i want to separate logic from visuals
-			ball_mesh = ball_mesh_scene.instantiate()
-			ball_parent.add_child(ball_mesh)
+		
+		if ball.asset_ref.get_parent() == null:
+			ball_parent.add_child(ball.asset_ref)
 
 
-		ball_mesh.global_position.x = ball.position.x
-		ball_mesh.global_position.z = ball.position.y
-		ball_mesh.global_position.y = ball.radius
+		ball.asset_ref.global_position.x = ball.position.x
+		ball.asset_ref.global_position.z = ball.position.y
+		ball.asset_ref.global_position.y = ball.radius
 
 		if context.FLAG_FIREBALL_ACTIVE:
-			ball_mesh.set_flame(true)
-			ball_mesh.set_flame_rotation(ball.velocity)
+			ball.asset_ref.set_flame(true)
+			ball.asset_ref.set_flame_rotation(ball.velocity)
 		else:
-			ball_mesh.set_flame(false)
+			ball.asset_ref.set_flame(false)
 
 
 	paddle_mesh.global_position.x = context.paddle.position.x
