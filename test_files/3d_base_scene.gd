@@ -122,6 +122,7 @@ func _ready() -> void:
 	# if DEBUG:
 	DebugScreen.add_debug_line(func() -> String: return "FPS(d): %.2f" % _debug_fps)
 	DebugScreen.add_debug_line(func() -> String: return "Frametime: %.3fms" % (Performance.get_monitor(Performance.TIME_PROCESS) * 1000))
+	DebugScreen.add_debug_line(context.balls[0]._get_ball_pos_debug)
 	DebugScreen.add_debug_line(context._get_debug_string)
 
 	
@@ -166,24 +167,47 @@ func _process(delta: float) -> void:
 	# TODO: this might've been bc of delta becoming too high
 	# investigate with safe_delta and move back if neccessary
 	# blocked by: bitmap optimization
-	for block: BreakableBlock in context.blocks:
-		if block.is_broken():
-			continue
-		
-		for line: LineCollider in block.collision:
 
-			for ball: Ball in context.balls:
-				if ball.collide_with(line, block.reflects_ball(context)):
-					block.hit_block(context, ball)
+	## for block: BreakableBlock in context.blocks:
+	## 	if block.is_broken():
+	## 		continue
 
 
-			if block.is_broken():
-				if block.has_powerup:
-					block.has_powerup = false
-					spawn_powerup(block)
-				
-				context.broken_block_count += 1
-				break	
+	for ball: Ball in context.balls:
+		var x_from: int = floorf((ball.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
+		var y_from: int = floorf((ball.position.y + (grid_unit_size.y / 2)) / BreakableGrid.CELL_SIZE)
+		var x_to: int = sign(ball.velocity.x)
+		var y_to: int = sign(ball.velocity.y)
+
+		x_to = x_to * 2 + x_from
+		y_to = y_to * 2 + y_from
+		x_from -= sign(ball.velocity.x)
+		y_from -= sign(ball.velocity.y)
+
+		# LoggerMogyi.log(self, "Getting blocks from (%d, %d) to (%d, %d)" % [x_from, x_to, y_from, y_to])
+
+		for x in range(x_from, x_to, sign(ball.velocity.x)):
+			for y in range(y_from, y_to, sign(ball.velocity.y)):
+				var block: BreakableBlock = context.get_block_at(x, y)
+				if block == null:
+					continue
+
+				for line: LineCollider in block.collision:
+
+					if ball.collide_with(line, block.reflects_ball(context)):
+						block.hit_block(context, ball)
+
+
+				if block.is_broken():
+					if block.has_powerup:
+						block.has_powerup = false
+						spawn_powerup(block)
+					
+					context.broken_block_count += 1
+
+					block.asset_ref.queue_free()
+					context.remove_block(block)
+					break	
 
 
 	# if !ball.released:
@@ -205,7 +229,8 @@ func _process(delta: float) -> void:
 
 		if ball.collide_with(context.death_barrier, false, false):	
 			if context.balls.size() > 1:
-				ball_parent.remove_child(ball.asset_ref)
+				# ball_parent.remove_child(ball.asset_ref)
+				ball.asset_ref.queue_free()
 				context.balls.erase(ball)
 				index -= 1
 			else:
@@ -290,10 +315,11 @@ func _process(delta: float) -> void:
 	paddle_mesh.global_position.z = context.paddle.position.y
 	paddle_mesh.global_position.y = context.paddle.height / 2
 
+var grid_unit_size: Vector2
 func set_up_screen_collision() -> void:
-	var screen_bounds: Vector2 = DisplayServer.window_get_size()
+	# var screen_bounds: Vector2 = DisplayServer.window_get_size()
 
-	var grid_unit_size: Vector2 = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
+	grid_unit_size = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
 	var p1: Vector2 = Vector2(-grid_unit_size.x / 2, -grid_unit_size.y / 2)
 	var p2: Vector2 = Vector2(grid_unit_size.x / 2, -grid_unit_size.y / 2)
 	var p3: Vector2 = Vector2(grid_unit_size.x / 2, grid_unit_size.y / 2)
@@ -403,7 +429,8 @@ func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
 
 		block.asset_ref = block_mesh
 
-		context.blocks.push_back(block)
+		# context.blocks.push_back(block)
+		context.add_block(block)
 
 func on_board_clear() -> void:
 	# TODO: this resets the ball. shouldn't use death entrypoint for this tho

@@ -153,3 +153,6 @@ func get_damage(context: Global.GameContext, block: BreakableBlock) -> int:
 
 
 	return 1
+
+func _get_ball_pos_debug() -> String:
+	return "Ball position: %v" % position
