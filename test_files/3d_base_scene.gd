@@ -119,13 +119,14 @@ func _ready() -> void:
 	context.paddle.set_line(context.balls[0].radius)
 
 	# if DEBUG:
-	DebugScreen.add_debug_line(func() -> String: return "FPS: %.2f" % Performance.get_monitor(Performance.TIME_FPS))
+	DebugScreen.add_debug_line(func() -> String: return "FPS(d): %.2f" % _debug_fps)
 	DebugScreen.add_debug_line(func() -> String: return "Frametime: %.3fms" % (Performance.get_monitor(Performance.TIME_PROCESS) * 1000))
 	DebugScreen.add_debug_line(context._get_debug_string)
 
 	
-
+var _debug_fps: float = 0.0
 func _process(delta: float) -> void:
+	_debug_fps = 1.0 / delta
 	var safe_delta: float = min(delta, 1. / 60)
 
 	context.set_flags()
