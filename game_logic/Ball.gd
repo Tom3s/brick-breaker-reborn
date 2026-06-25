@@ -134,19 +134,15 @@ func set_position(new_pos: Vector2) -> void:
 	position = new_pos
 
 func get_damage(context: Global.GameContext, block: BreakableBlock) -> int:
-	var is_fire_ball: bool = false
-	for effect: Powerup in context.active_powerups:
-		if effect.type == Powerup.Type.FIRE_BALL:
-			is_fire_ball = true
 
 	# TODO: implement type interactions
 	if block.type == BreakableBlock.BlockType.METAL:
-		if is_fire_ball: 
+		if context.FLAG_FIREBALL_ACTIVE: 
 			return 1
 		else: 
 			return 0
 	elif block.type == BreakableBlock.BlockType.NORMAL:
-		if is_fire_ball: 
+		if context.FLAG_FIREBALL_ACTIVE: 
 			return 10
 		else: 
 			return 1
