@@ -4,6 +4,8 @@ var GRAVITY: float = 256.0
 
 var DEBUG: bool = true
 
+const BALL_LIMIT: int = 350
+
 class GameContext extends Node:
 
 	var balls: Array[Ball]

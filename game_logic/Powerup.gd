@@ -67,6 +67,9 @@ func activate_powerup(context: Global.GameContext) -> void:
 				if i == 0:
 					continue
 				
+				if context.balls.size() >= Global.BALL_LIMIT:
+					return
+				
 				var new_ball: Ball = Ball.new()
 				new_ball.asset_ref = ball_mesh_scene.instantiate()
 
