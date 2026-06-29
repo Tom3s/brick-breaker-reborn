@@ -7,11 +7,17 @@ enum Type {
 	NONE,
 	BALL_MULTIPLY,
 	FIRE_BALL,
+	LASER,
 }
 
 var ball_multiply_value: int = 3
 
 var fire_ball_max_time: float = 15.0
+
+var laser_max_shots: int = 3
+var laser_cooldown: float = 1.0
+var laser_shots_left: int = 0
+var laser_shot: bool = false
 
 var type: Type = Type.NONE
 
@@ -87,3 +93,20 @@ func activate_powerup(context: Global.GameContext) -> void:
 		infinite = false
 		
 		context.active_powerups.push_back(self)
+	
+	elif type == Type.LASER:
+		time_left = laser_cooldown
+		laser_shots_left = laser_max_shots
+
+		context.active_powerups.push_back(self)
+
+func update(delta: float) -> void:
+	time_left -= delta
+
+	if type == Type.LASER:
+		if time_left < 0.0 && laser_shots_left > 0:
+			time_left = laser_cooldown
+			laser_shots_left -= 1
+			laser_shot = true
+		else:
+			laser_shot = false

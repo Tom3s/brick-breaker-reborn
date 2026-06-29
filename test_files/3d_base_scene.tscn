@@ -1,7 +1,8 @@
-[gd_scene load_steps=9 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=10 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
+[ext_resource type="PackedScene" uid="uid://cj62teh4q3rvb" path="res://visuals/LaserAsset.tscn" id="2_ie54n"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bcu1a"]
 top_radius = 8.0
@@ -37,6 +38,10 @@ unique_name_in_owner = true
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
 mesh = SubResource("CylinderMesh_bcu1a")
 
+[node name="LaserAsset" parent="PaddleMesh" instance=ExtResource("2_ie54n")]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, -4.476046e-05, 1, 0, -1024, -4.371139e-08, -4, 0, 0)
+
 [node name="Playfield" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 material_override = SubResource("StandardMaterial3D_bcu1a")
@@ -44,13 +49,13 @@ mesh = SubResource("PlaneMesh_yrogh")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.49999997, 0.86602545, 0, -0.86602545, 0.49999997, 0, 380, 450)
+current = true
 fov = 90.0
 
 [node name="Camera3D2" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 500, 0)
 visible = false
 projection = 1
-current = true
 fov = 69.3
 size = 1024.0
 

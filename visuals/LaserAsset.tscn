@@ -1,0 +1,26 @@
+[gd_scene load_steps=5 format=3 uid="uid://cj62teh4q3rvb"]
+
+[ext_resource type="Script" uid="uid://img3ept218f1" path="res://visuals/LaserAsset.gd" id="1_k0ofi"]
+[ext_resource type="Shader" uid="uid://ceiaou27gkbu8" path="res://visuals/BeamShader.res" id="1_lam52"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_k0ofi"]
+render_priority = 0
+shader = ExtResource("1_lam52")
+shader_parameter/TimeLeft = 0.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_m3hmx"]
+top_radius = 8.0
+bottom_radius = 8.0
+height = 1.0
+radial_segments = 8
+cap_top = false
+
+[node name="LaserAsset" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 512, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("1_k0ofi")
+
+[node name="Beam" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+material_override = SubResource("ShaderMaterial_k0ofi")
+mesh = SubResource("CylinderMesh_m3hmx")
