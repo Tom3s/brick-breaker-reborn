@@ -82,6 +82,11 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 	# 	# TODO: also handling memory from here, might wanna move it
 	# 	asset_ref.queue_free()
 
+func hit_block_laser(context: Global.GameContext) -> void:
+	health -= Global.GameContext.get_laser_damage()
+
+	asset_ref.set_hp(health)
+
 func is_broken() -> bool:
 	return health <= 0
 
