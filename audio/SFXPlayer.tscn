@@ -1,8 +1,9 @@
-[gd_scene load_steps=7 format=3 uid="uid://6p15wimk0j4s"]
+[gd_scene load_steps=9 format=3 uid="uid://6p15wimk0j4s"]
 
 [ext_resource type="Script" uid="uid://d16foq7x8whaj" path="res://audio/SFXPlayer.gd" id="1_slksv"]
 [ext_resource type="AudioStream" uid="uid://goa4soqhbkhp" path="res://audio/sfx/ball_hit_1.wav" id="2_slksv"]
 [ext_resource type="AudioStream" uid="uid://3bpnjp011ums" path="res://audio/sfx/normal_block_hit.wav" id="3_83m1c"]
+[ext_resource type="AudioStream" uid="uid://c3hjk2mj1e8sm" path="res://audio/sfx/spinopel-fall-and-break-into-small-pieces-456374.mp3" id="4_5oyxk"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_vrmcv"]
 random_pitch = 1.2
@@ -13,6 +14,11 @@ stream_0/stream = ExtResource("2_slksv")
 random_pitch = 1.2
 streams_count = 1
 stream_0/stream = ExtResource("3_83m1c")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_c7do5"]
+random_pitch = 1.15
+streams_count = 1
+stream_0/stream = ExtResource("4_5oyxk")
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_c7do5"]
 
@@ -35,7 +41,8 @@ max_polyphony = 64
 
 [node name="IceBlock" type="AudioStreamPlayer" parent="Blocks"]
 unique_name_in_owner = true
-stream = SubResource("AudioStreamGenerator_c7do5")
+stream = SubResource("AudioStreamRandomizer_c7do5")
+pitch_scale = 0.85
 
 [node name="MetalBlock" type="AudioStreamPlayer" parent="Blocks"]
 unique_name_in_owner = true
