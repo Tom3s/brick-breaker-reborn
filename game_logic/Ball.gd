@@ -21,6 +21,8 @@ var velocity: Vector2
 
 var released: bool = false
 
+signal collided()
+
 func randomize_velocity() -> void:
 	velocity = Vector2(randf_range(-0.5, 0.5), -1).normalized()
 	velocity *= target_velocity
@@ -85,6 +87,7 @@ func collide_with(line: LineCollider, reflect_ball: bool = true, boost_on_collis
 			var angle: float = velocity.angle_to(current_normal)
 			velocity = velocity.rotated(2 * angle) # TODO: set proper speed, this relies on the collision speed up logic
 
+			collided.emit()
 			# collided = true
 			if boost_on_collision:
 				boost()

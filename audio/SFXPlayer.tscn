@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3 uid="uid://6p15wimk0j4s"]
+
+[ext_resource type="Script" uid="uid://d16foq7x8whaj" path="res://audio/SFXPlayer.gd" id="1_slksv"]
+[ext_resource type="AudioStream" uid="uid://goa4soqhbkhp" path="res://audio/sfx/ball_hit_1.wav" id="2_slksv"]
+[ext_resource type="AudioStream" uid="uid://3bpnjp011ums" path="res://audio/sfx/normal_block_hit.wav" id="3_83m1c"]
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_vrmcv"]
+random_pitch = 1.2
+streams_count = 1
+stream_0/stream = ExtResource("2_slksv")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_5oyxk"]
+random_pitch = 1.2
+streams_count = 1
+stream_0/stream = ExtResource("3_83m1c")
+
+[sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_c7do5"]
+
+[node name="SFXPlayer" type="Node"]
+script = ExtResource("1_slksv")
+
+[node name="BallHit" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamRandomizer_vrmcv")
+volume_db = -1.917
+max_polyphony = 128
+bus = &"SFX"
+
+[node name="Blocks" type="Node" parent="."]
+
+[node name="NormalBlock" type="AudioStreamPlayer" parent="Blocks"]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamRandomizer_5oyxk")
+max_polyphony = 64
+
+[node name="IceBlock" type="AudioStreamPlayer" parent="Blocks"]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamGenerator_c7do5")
+
+[node name="MetalBlock" type="AudioStreamPlayer" parent="Blocks"]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamGenerator_c7do5")
