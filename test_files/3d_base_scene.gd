@@ -5,6 +5,7 @@ extends Node3D
 @onready var block_mesh_scene: PackedScene = preload("res://visuals/BlockMesh.tscn")
 @onready var powerup_asset_scene: PackedScene = preload("res://visuals/PowerupAsset.tscn")
 
+@onready var sfx_player: SFXPlayer = %SFXPlayer
 # @onready var ball_mesh: MeshInstance3D = %BallMesh
 @onready var ball_parent: Node3D = %Balls
 @onready var powerup_parent: Node3D = %Powerups
@@ -333,6 +334,9 @@ func _process(delta: float) -> void:
 		if ball.asset_ref.get_parent() == null:
 			ball_parent.add_child(ball.asset_ref)
 
+			# TODO: hooking up sound player here
+			ball.collided.connect(sfx_player.play_ball_hit)
+
 
 		ball.asset_ref.global_position.x = ball.position.x
 		ball.asset_ref.global_position.z = ball.position.y
@@ -468,6 +472,7 @@ func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
 
 		block.asset_ref = block_mesh
 
+		block.just_broken.connect(sfx_player.play_block_hit)
 		# context.blocks.push_back(block)
 		context.add_block(block)
 
