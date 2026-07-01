@@ -60,13 +60,20 @@ class GameContext extends Node:
 
 	# flags
 	var FLAG_FIREBALL_ACTIVE: bool = false
+	var LASER_ACTIVE: bool = false
+	var LASER_COOLDOWN: float = 0.0
 
 	func set_flags() -> void:
 		FLAG_FIREBALL_ACTIVE = false
+		LASER_ACTIVE = false
+		LASER_COOLDOWN = -1.0
 
 		for powerup: Powerup in active_powerups:
 			if powerup.type == Powerup.Type.FIRE_BALL:
 				FLAG_FIREBALL_ACTIVE = true
+			elif powerup.type == Powerup.Type.LASER:
+				LASER_ACTIVE = true
+				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)
 
 	# debug strings
 	var _DEBUG_ACTIVE_POWERUPS: String
@@ -82,3 +89,7 @@ class GameContext extends Node:
 	
 	func _get_debug_string() -> String:
 		return "%s\n%s" % [_DEBUG_ACTIVE_NR_BALLS, _DEBUG_ACTIVE_POWERUPS]
+	
+	# this function only exists, so that later Skills can influence this value
+	static func get_laser_damage() -> int:
+		return 3

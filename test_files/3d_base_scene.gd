@@ -9,6 +9,7 @@ extends Node3D
 @onready var ball_parent: Node3D = %Balls
 @onready var powerup_parent: Node3D = %Powerups
 @onready var paddle_mesh: MeshInstance3D = %PaddleMesh
+@onready var laser_asset: LaserAsset = %LaserAsset
 @onready var block_parent: Node3D = %Blocks
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
 
@@ -175,7 +176,7 @@ func _process(delta: float) -> void:
 
 	for ball: Ball in context.balls:
 		if !ball.released:
-			continue
+			break # TODO: might be hacky
 
 		var x_from: int = floorf((ball.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
 		var y_from: int = floorf((ball.position.y + (grid_unit_size.y / 2)) / BreakableGrid.CELL_SIZE)
@@ -274,10 +275,32 @@ func _process(delta: float) -> void:
 	# update active effects
 	var disable_effect_queue: Array[Powerup]
 	for powerup: Powerup in context.active_powerups:
-		powerup.time_left -= safe_delta
+		# powerup.time_left -= safe_delta
+		powerup.update(safe_delta)
 		if powerup.time_left <= 0.0:
 			# LoggerMogyi.log(self, "Removing powerup: %s" % powerup.name)
 			disable_effect_queue.push_back(powerup)
+		
+		if powerup.laser_shot:
+			LoggerMogyi.log(self, "Laser is being shot!")
+			for y: int in BreakableGrid.GRID_SIZE:
+				var x: int = floorf((context.paddle.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
+				var block: BreakableBlock = context.get_block_at(x, y)
+
+				if block == null:
+					continue
+
+				block.hit_block_laser(context)
+
+				if block != null && block.is_broken():
+					if block.has_powerup:
+						block.has_powerup = false
+						spawn_powerup(block)
+					
+					context.broken_block_count += 1
+
+					block.asset_ref.queue_free()
+					context.remove_block(block)
 
 	
 	for powerup: Powerup in disable_effect_queue:
@@ -325,6 +348,11 @@ func _process(delta: float) -> void:
 	paddle_mesh.global_position.x = context.paddle.position.x
 	paddle_mesh.global_position.z = context.paddle.position.y
 	paddle_mesh.global_position.y = context.paddle.height / 2
+
+	laser_asset.visible = context.LASER_ACTIVE
+	# laser_asset.%Beam.material_override.set_shader_parameter("TimeLeft", context.LASER_COOLDOWN)
+	laser_asset.set_visual(context.LASER_COOLDOWN)
+
 
 var grid_unit_size: Vector2
 func set_up_screen_collision() -> void:
