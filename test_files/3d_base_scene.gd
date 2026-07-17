@@ -121,6 +121,9 @@ func _ready() -> void:
 	# paddle.collider_line.debug_set_up = false
 	context.paddle.set_line(context.balls[0].radius)
 
+	context.fireball_activated.connect(sfx_player.play_flame_ignite)
+	context.fireball_deactivated.connect(sfx_player.play_flame_extinguish)
+
 	# if DEBUG:
 	DebugScreen.add_debug_line(func() -> String: return "FPS(d): %.2f" % _debug_fps)
 	DebugScreen.add_debug_line(func() -> String: return "Frametime: %.3fms" % (Performance.get_monitor(Performance.TIME_PROCESS) * 1000))
@@ -302,6 +305,8 @@ func _process(delta: float) -> void:
 
 					block.asset_ref.queue_free()
 					context.remove_block(block)
+			
+			sfx_player.play_laser_shot()
 
 	
 	for powerup: Powerup in disable_effect_queue:

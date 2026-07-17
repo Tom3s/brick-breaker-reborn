@@ -87,7 +87,7 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 	# 	asset_ref.queue_free()
 
 func hit_block_laser(context: Global.GameContext) -> void:
-	health -= Global.GameContext.get_laser_damage()
+	health -= context.get_laser_damage()
 
 	asset_ref.set_hp(health)
 

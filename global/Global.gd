@@ -8,6 +8,9 @@ const BALL_LIMIT: int = 350
 
 class GameContext extends Node:
 
+	signal fireball_activated()
+	signal fireball_deactivated()
+
 	var balls: Array[Ball]
 	var paddle: Paddle = Paddle.new()
 
@@ -59,6 +62,7 @@ class GameContext extends Node:
 		return block_bitmap[y * BreakableGrid.GRID_SIZE + x]
 
 	# flags
+	var FLAG_FIREBALL_WAS_ACTIVE: bool = false
 	var FLAG_FIREBALL_ACTIVE: bool = false
 	var LASER_ACTIVE: bool = false
 	var LASER_COOLDOWN: float = 0.0
@@ -74,6 +78,14 @@ class GameContext extends Node:
 			elif powerup.type == Powerup.Type.LASER:
 				LASER_ACTIVE = true
 				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)
+		
+		if FLAG_FIREBALL_ACTIVE != FLAG_FIREBALL_WAS_ACTIVE:
+			if FLAG_FIREBALL_ACTIVE:
+				fireball_activated.emit()
+			else:
+				fireball_deactivated.emit()
+
+		FLAG_FIREBALL_WAS_ACTIVE = FLAG_FIREBALL_ACTIVE
 
 	# debug strings
 	var _DEBUG_ACTIVE_POWERUPS: String

@@ -1,9 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://6p15wimk0j4s"]
+[gd_scene load_steps=15 format=3 uid="uid://6p15wimk0j4s"]
 
 [ext_resource type="Script" uid="uid://d16foq7x8whaj" path="res://audio/SFXPlayer.gd" id="1_slksv"]
 [ext_resource type="AudioStream" uid="uid://goa4soqhbkhp" path="res://audio/sfx/ball_hit_1.wav" id="2_slksv"]
 [ext_resource type="AudioStream" uid="uid://3bpnjp011ums" path="res://audio/sfx/normal_block_hit.wav" id="3_83m1c"]
 [ext_resource type="AudioStream" uid="uid://c3hjk2mj1e8sm" path="res://audio/sfx/spinopel-fall-and-break-into-small-pieces-456374.mp3" id="4_5oyxk"]
+[ext_resource type="AudioStream" uid="uid://dxtvinq4ogb8" path="res://audio/sfx/laser_shot2.mp3" id="5_c7do5"]
+[ext_resource type="AudioStream" uid="uid://lkkdbc0igvb7" path="res://audio/sfx/flame_ignite.mp3" id="6_gocb7"]
+[ext_resource type="AudioStream" uid="uid://b2lopdlhn7etr" path="res://audio/sfx/flame_extinguish.mp3" id="7_ttirh"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_vrmcv"]
 random_pitch = 1.2
@@ -11,7 +14,7 @@ streams_count = 1
 stream_0/stream = ExtResource("2_slksv")
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_5oyxk"]
-random_pitch = 1.2
+random_pitch = 1.1
 streams_count = 1
 stream_0/stream = ExtResource("3_83m1c")
 
@@ -22,13 +25,28 @@ stream_0/stream = ExtResource("4_5oyxk")
 
 [sub_resource type="AudioStreamGenerator" id="AudioStreamGenerator_c7do5"]
 
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_vof56"]
+random_pitch = 1.05
+streams_count = 1
+stream_0/stream = ExtResource("5_c7do5")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_tvqt0"]
+random_pitch = 1.05
+streams_count = 1
+stream_0/stream = ExtResource("6_gocb7")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_3wk75"]
+random_pitch = 1.05
+streams_count = 1
+stream_0/stream = ExtResource("7_ttirh")
+
 [node name="SFXPlayer" type="Node"]
 script = ExtResource("1_slksv")
 
 [node name="BallHit" type="AudioStreamPlayer" parent="."]
 unique_name_in_owner = true
 stream = SubResource("AudioStreamRandomizer_vrmcv")
-volume_db = -1.917
+volume_db = -7.343
 max_polyphony = 128
 bus = &"SFX"
 
@@ -47,3 +65,20 @@ pitch_scale = 0.85
 [node name="MetalBlock" type="AudioStreamPlayer" parent="Blocks"]
 unique_name_in_owner = true
 stream = SubResource("AudioStreamGenerator_c7do5")
+
+[node name="Powerups" type="Node" parent="."]
+
+[node name="LaserShot" type="AudioStreamPlayer" parent="Powerups"]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamRandomizer_vof56")
+max_polyphony = 64
+
+[node name="FlameIgnite" type="AudioStreamPlayer" parent="Powerups"]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamRandomizer_tvqt0")
+max_polyphony = 64
+
+[node name="FlameExtinguish" type="AudioStreamPlayer" parent="Powerups"]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamRandomizer_3wk75")
+max_polyphony = 64
