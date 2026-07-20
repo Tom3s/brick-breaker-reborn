@@ -26,7 +26,7 @@ class GameContext extends Node:
 	var active_powerups: Array[Powerup]
 
 	func _init() -> void:
-		block_bitmap.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+		block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 
 	func add_block(block: BreakableBlock) -> void:
 		blocks.push_back(block)
@@ -36,7 +36,7 @@ class GameContext extends Node:
 				var actual_x: int = block.pos_on_grid.x + x
 				var actual_y: int = block.pos_on_grid.y + y
 
-				block_bitmap[actual_x + BreakableGrid.GRID_SIZE * actual_y] = block
+				block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = block
 
 
 	func remove_block(block: BreakableBlock) -> void:
@@ -48,18 +48,18 @@ class GameContext extends Node:
 				var actual_x: int = block.pos_on_grid.x + x
 				var actual_y: int = block.pos_on_grid.y + y
 
-				block_bitmap[actual_x + BreakableGrid.GRID_SIZE * actual_y] = null
+				block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = null
 	
 	func get_block_at(x: int, y: int) -> BreakableBlock:
 		# LoggerMogyi.log(self, "Getting block at (%.3f, %.3f)" % [x, y])
 
-		if y < 0 || y >= BreakableGrid.GRID_SIZE:
+		if y < 0 || y >= BreakableGrid.GRID_SIZE.y:
 			return null
 
-		if x < 0 || x >= BreakableGrid.GRID_SIZE:
+		if x < 0 || x >= BreakableGrid.GRID_SIZE.x:
 			return null
 		
-		return block_bitmap[y * BreakableGrid.GRID_SIZE + x]
+		return block_bitmap[y * BreakableGrid.GRID_SIZE.x + x]
 
 	# flags
 	var FLAG_FIREBALL_WAS_ACTIVE: bool = false
