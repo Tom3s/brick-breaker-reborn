@@ -130,6 +130,7 @@ func _ready() -> void:
 	DebugScreen.add_debug_line(context.balls[0]._get_ball_pos_debug)
 	DebugScreen.add_debug_line(context._get_debug_string)
 
+	%Playfield.mesh.size = 1024 / 32.0 * BreakableGrid.GRID_SIZE
 	
 var _debug_fps: float = 0.0
 func _process(delta: float) -> void:
