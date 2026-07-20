@@ -273,7 +273,8 @@ func _process(delta: float) -> void:
 		pass
 	
 	for ball: Ball in context.balls:
-		ball.collide_with_paddle(context.paddle)
+		if ball.collide_with_paddle(context.paddle):
+			sfx_player.play_paddle_hit()
 
 	
 	# update active effects

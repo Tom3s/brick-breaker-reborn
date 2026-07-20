@@ -2,6 +2,7 @@ extends Node
 class_name SFXPlayer
 
 @onready var ball_hit: AudioStreamPlayer = %BallHit
+@onready var paddle_hit: AudioStreamPlayer = %PaddleHit
 
 @onready var normal_block_hit: AudioStreamPlayer = %NormalBlock
 @onready var ice_block_hit: AudioStreamPlayer = %IceBlock
@@ -13,6 +14,9 @@ class_name SFXPlayer
 
 func play_ball_hit() -> void:
 	ball_hit.play()
+
+func play_paddle_hit() -> void:
+	paddle_hit.play()
 
 func play_block_hit(type: BreakableBlock.BlockType) -> void:
 	if type == BreakableBlock.BlockType.NORMAL:
