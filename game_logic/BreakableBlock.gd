@@ -27,6 +27,8 @@ var asset_ref: Node
 var has_powerup: bool = false
 var powerup: Powerup
 
+signal just_broken(type: BlockType)
+
 func _process(delta: float) -> void:
 	if is_broken():
 		if asset_ref.has_method("hide"):
@@ -72,6 +74,8 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 	# broken = true
 	health -= ball.get_damage(context, self)
 	
+	if is_broken(): just_broken.emit(type)
+
 	if type == BlockType.NORMAL:
 		asset_ref.set_hp(health)
 
@@ -83,7 +87,7 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 	# 	asset_ref.queue_free()
 
 func hit_block_laser(context: Global.GameContext) -> void:
-	health -= Global.GameContext.get_laser_damage()
+	health -= context.get_laser_damage()
 
 	asset_ref.set_hp(health)
 

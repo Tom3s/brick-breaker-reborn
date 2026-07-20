@@ -21,6 +21,8 @@ var velocity: Vector2
 
 var released: bool = false
 
+signal collided()
+
 func randomize_velocity() -> void:
 	velocity = Vector2(randf_range(-0.5, 0.5), -1).normalized()
 	velocity *= target_velocity
@@ -85,6 +87,7 @@ func collide_with(line: LineCollider, reflect_ball: bool = true, boost_on_collis
 			var angle: float = velocity.angle_to(current_normal)
 			velocity = velocity.rotated(2 * angle) # TODO: set proper speed, this relies on the collision speed up logic
 
+			collided.emit()
 			# collided = true
 			if boost_on_collision:
 				boost()
@@ -93,7 +96,7 @@ func collide_with(line: LineCollider, reflect_ball: bool = true, boost_on_collis
 	return false
 
 
-func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> void:
+func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> bool:
 	var line: LineCollider = paddle.line
 
 	var p1: Vector2 = line.p1 + paddle.position
@@ -101,16 +104,16 @@ func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> voi
 
 	var moving_towards_line: bool = velocity.dot(line.normal) < 0
 	if !moving_towards_line:
-		return 
+		return false 
 
 	var distance_from_line: float = (position - p1).dot(line.normal)
 	if distance_from_line < 0:
-		return 
+		return false 
 
 	var case: float = (position - p1).dot(line.tangent)
 
 	if case < 0 || case > (p1 - p2).length():
-		return 
+		return false 
 
 	var t: float = case / (p1 - p2).length()
 
@@ -127,8 +130,9 @@ func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> voi
 
 			if boost_on_collision:
 				boost()
+			return true
 	
-	return 
+	return false
 
 func set_position(new_pos: Vector2) -> void:
 	position = new_pos

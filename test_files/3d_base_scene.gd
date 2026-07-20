@@ -5,6 +5,7 @@ extends Node3D
 @onready var block_mesh_scene: PackedScene = preload("res://visuals/BlockMesh.tscn")
 @onready var powerup_asset_scene: PackedScene = preload("res://visuals/PowerupAsset.tscn")
 
+@onready var sfx_player: SFXPlayer = %SFXPlayer
 # @onready var ball_mesh: MeshInstance3D = %BallMesh
 @onready var ball_parent: Node3D = %Balls
 @onready var powerup_parent: Node3D = %Powerups
@@ -119,6 +120,9 @@ func _ready() -> void:
 
 	# paddle.collider_line.debug_set_up = false
 	context.paddle.set_line(context.balls[0].radius)
+
+	context.fireball_activated.connect(sfx_player.play_flame_ignite)
+	context.fireball_deactivated.connect(sfx_player.play_flame_extinguish)
 
 	# if DEBUG:
 	DebugScreen.add_debug_line(func() -> String: return "FPS(d): %.2f" % _debug_fps)
@@ -269,7 +273,8 @@ func _process(delta: float) -> void:
 		pass
 	
 	for ball: Ball in context.balls:
-		ball.collide_with_paddle(context.paddle)
+		if ball.collide_with_paddle(context.paddle):
+			sfx_player.play_paddle_hit()
 
 	
 	# update active effects
@@ -301,6 +306,8 @@ func _process(delta: float) -> void:
 
 					block.asset_ref.queue_free()
 					context.remove_block(block)
+			
+			sfx_player.play_laser_shot()
 
 	
 	for powerup: Powerup in disable_effect_queue:
@@ -332,6 +339,9 @@ func _process(delta: float) -> void:
 		
 		if ball.asset_ref.get_parent() == null:
 			ball_parent.add_child(ball.asset_ref)
+
+			# TODO: hooking up sound player here
+			ball.collided.connect(sfx_player.play_ball_hit)
 
 
 		ball.asset_ref.global_position.x = ball.position.x
@@ -468,6 +478,7 @@ func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
 
 		block.asset_ref = block_mesh
 
+		block.just_broken.connect(sfx_player.play_block_hit)
 		# context.blocks.push_back(block)
 		context.add_block(block)
 
