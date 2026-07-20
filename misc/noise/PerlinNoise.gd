@@ -17,9 +17,9 @@ func generate_points(rng: RNG) -> void:
 
 			points[index] = point
 
-func sample(x: float, y: float, bounds: float) -> float:
-	var actual_x: float = remap(x + 0.5, 0, bounds, 0, grid_size - 1)
-	var actual_y: float = remap(y + 0.5, 0, bounds, 0, grid_size - 1)
+func sample(x: float, y: float, bounds: Vector2) -> float:
+	var actual_x: float = remap(x + 0.5, 0, bounds.x, 0, grid_size - 1)
+	var actual_y: float = remap(y + 0.5, 0, bounds.y, 0, grid_size - 1)
 
 	# LoggerMogyi.log(self, "Converted (%f, %f) to (%f, %f)" % [x, y, actual_x, actual_y])
 

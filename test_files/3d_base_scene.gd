@@ -58,10 +58,10 @@ func _ready() -> void:
 	# )
 	# for i in 2:
 	map_generator.add_rectangle(
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.x,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.y,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.x,
+		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.y,
 	)
 	map_generator.slice_y(0, 18)
 	map_generator.copy_texture_to_final()
@@ -288,7 +288,7 @@ func _process(delta: float) -> void:
 		
 		if powerup.laser_shot:
 			LoggerMogyi.log(self, "Laser is being shot!")
-			for y: int in BreakableGrid.GRID_SIZE:
+			for y: int in BreakableGrid.GRID_SIZE.y:
 				var x: int = floorf((context.paddle.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
 				var block: BreakableBlock = context.get_block_at(x, y)
 
@@ -329,7 +329,7 @@ func _process(delta: float) -> void:
 			context.powerups.erase(powerup)
 			powerup.asset.queue_free()
 		
-		if powerup.position.y > BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE * 1.5:
+		if powerup.position.y > BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE * 1.5:
 			context.powerups.erase(powerup)
 			powerup.asset.queue_free()
 
@@ -368,7 +368,7 @@ var grid_unit_size: Vector2
 func set_up_screen_collision() -> void:
 	# var screen_bounds: Vector2 = DisplayServer.window_get_size()
 
-	grid_unit_size = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
+	grid_unit_size = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
 	var p1: Vector2 = Vector2(-grid_unit_size.x / 2, -grid_unit_size.y / 2)
 	var p2: Vector2 = Vector2(grid_unit_size.x / 2, -grid_unit_size.y / 2)
 	var p3: Vector2 = Vector2(grid_unit_size.x / 2, grid_unit_size.y / 2)
@@ -418,7 +418,7 @@ func generate_map() -> void:
 	# there is a margin of 2 grid cells at the sides and top
 	# TODO: no thorough documentation needed, as this is just a placeholder for now
 	var nr_rows: int = 6
-	var nr_cols: int = BreakableGrid.GRID_SIZE - 4
+	var nr_cols: int = BreakableGrid.GRID_SIZE.x - 4
 
 	for i in nr_rows:
 		var total: int = 0
@@ -493,7 +493,7 @@ func are_breakable_blocks_remaining() -> bool:
 	return context.broken_block_count >= context.blocks.size() - context.nr_metal_blocks
 
 func collide_with_screen(powerup: Powerup) -> void:
-	var grid_unit_size: Vector2 = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
+	var grid_unit_size: Vector2 = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
 	var left: float = -grid_unit_size.x / 2
 	var right: float = grid_unit_size.x / 2
 

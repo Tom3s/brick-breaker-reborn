@@ -26,11 +26,11 @@ func set_line(radius: float = 0.0) -> void:
 func move(movement: Vector2) -> void:
 	position.x += movement.x
 
-	var limits: float = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2 - (size / 2)
+	var limits: float = BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2 - (size / 2)
 
 	if position.x > limits:
 		position.x = limits
 	elif position.x < - limits:
 		position.x = - limits
 
-	position.y = (BreakableGrid.GRID_SIZE / 2 - 1) * BreakableGrid.CELL_SIZE
+	position.y = (BreakableGrid.GRID_SIZE.y / 2 - 1) * BreakableGrid.CELL_SIZE

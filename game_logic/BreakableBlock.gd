@@ -58,7 +58,7 @@ func prepare_collision() -> void:
 
 func _get_collision_vertex_position(local_vertex_pos: Vector2) -> Vector2:
 
-	var grid_unit_size: Vector2 = Vector2.ONE * BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
+	var grid_unit_size: Vector2 = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
 
 	var vertex_pos: Vector2 = Vector2(pos_on_grid) * BreakableGrid.CELL_SIZE + local_vertex_pos - (grid_unit_size / 2)
 

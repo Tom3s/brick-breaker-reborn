@@ -9,8 +9,8 @@ func _process(delta: float) -> void:
 	# var min_square_size: Vector2 = Vector2(min(current_resolution.x, current_resolution.y), min(current_resolution.x, current_resolution.y))
 
 	if current_resolution.x < current_resolution.y:
-		zoom = Vector2.ONE * (current_resolution.x / (BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE + padding))
+		zoom = Vector2.ONE * (current_resolution.x / (BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE + padding))
 	else:
-		zoom = Vector2.ONE * (current_resolution.y / (BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE + padding))
+		zoom = Vector2.ONE * (current_resolution.y / (BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE + padding))
 
 

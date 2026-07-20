@@ -26,9 +26,10 @@ func initialize() -> void:
 	map_generator.rng._seed = seed
 	map_generator.add_uv_to_color()
 
-	# map_generator.add_voronoi_noise()
-	map_generator.add_perlin_noise()
-	map_generator.dither_grayscale(1.0)
+	map_generator.add_voronoi_noise()
+	# map_generator.add_perlin_noise()
+	# map_generator.add_random_grayscale_noise()
+	# map_generator.dither_grayscale(1.0)
 	# map_generator.treshold_grayscale(0.5)
 	# map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
 	# map_generator.mirror_x()
@@ -39,9 +40,9 @@ func initialize() -> void:
 
 func display_texture() -> void:
 	# test_texture.texture = Texture
-	var image: Image = Image.create_empty(BreakableGrid.GRID_SIZE, BreakableGrid.GRID_SIZE, false, Image.FORMAT_RGBF)
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
+	var image: Image = Image.create_empty(BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y, false, Image.FORMAT_RGBF)
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
 			image.set_pixel(x, y, create_color((map_generator.get_color(x, y))))
 	
 	# image.

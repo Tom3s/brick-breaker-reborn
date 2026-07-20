@@ -8,10 +8,10 @@ var rng: RNG
 
 func _init() -> void:
 	# set the base level texture size
-	temp_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
-	final_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
-	color_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
-	used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+	temp_texture.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
+	final_texture.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
+	color_texture.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
+	used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 	LoggerMogyi.log(self, "Texture initialized with size: %d" % temp_texture.size())
 
 	rng = RNG.new()
@@ -19,15 +19,15 @@ func _init() -> void:
 
 func clear_temp_texture() -> void:
 	temp_texture.clear()
-	temp_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+	temp_texture.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 
 func clear_final_texture() -> void:
 	final_texture.clear()
-	final_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+	final_texture.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 
 func clear_color_texture() -> void:
 	color_texture.clear()
-	color_texture.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+	color_texture.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 
 func set_color(x: int, y: int, new_color: float) -> void:
 	if temp_texture.size() == 0:
@@ -35,11 +35,11 @@ func set_color(x: int, y: int, new_color: float) -> void:
 		return
 
 	# bound check
-	if (x < 0 || x >= BreakableGrid.GRID_SIZE):
+	if (x < 0 || x >= BreakableGrid.GRID_SIZE.x):
 		LoggerMogyi.log(self, "Trying to set invalid x texture index: %d" % x, LoggerMogyi.Severity.WARNING)
 		return
 
-	if (y < 0 || y >= BreakableGrid.GRID_SIZE):
+	if (y < 0 || y >= BreakableGrid.GRID_SIZE.y):
 		LoggerMogyi.log(self, "Trying to set invalid y texture index: %d" % y, LoggerMogyi.Severity.WARNING)
 		return
 	
@@ -48,7 +48,7 @@ func set_color(x: int, y: int, new_color: float) -> void:
 		LoggerMogyi.log(self, "Trying to set invalid new_color: %v" % new_color, LoggerMogyi.Severity.WARNING)
 		return
 
-	var index: int = BreakableGrid.GRID_SIZE * y + x
+	var index: int = BreakableGrid.GRID_SIZE.x * y + x
 
 	temp_texture[index] = new_color
 
@@ -59,7 +59,7 @@ func get_color(x: int, y: int) -> Vector3:
 		LoggerMogyi.log(self, "Trying to get map_generator color when the texture is not yet initalized! Returing 0", LoggerMogyi.Severity.ERROR)
 		return Vector3.ZERO
 
-	var index: int = BreakableGrid.GRID_SIZE * y + x
+	var index: int = BreakableGrid.GRID_SIZE.x * y + x
 	return final_texture[index] * color_texture[index]
 
 # func add_random_noise() -> void:
@@ -79,9 +79,9 @@ func add_voronoi_noise() -> void:
 	voronoi.init_array()
 	voronoi.generate_points(rng)
 
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
+			var index: int = y * BreakableGrid.GRID_SIZE.x + x
 
 			temp_texture[index] = voronoi.sample(x, y, BreakableGrid.GRID_SIZE)
 
@@ -90,17 +90,17 @@ func add_perlin_noise() -> void:
 	perlin.init_array()
 	perlin.generate_points(rng)
 
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
 
 			temp_texture[index] = perlin.sample(x, y, BreakableGrid.GRID_SIZE)
 
 
 func add_circle(cx: int, cy: int, radius: float) -> void:
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
 
 			if Vector2(x, y).distance_to(Vector2(cx, cy)) <= radius:
 				temp_texture[index] = 1.0
@@ -110,7 +110,7 @@ func add_circle(cx: int, cy: int, radius: float) -> void:
 func add_rectangle(x1: int, y1: int, x2: int, y2: int) -> void:
 	for x in range(x1, x2, sign(x2 - x1)):
 		for y in range(y1, y2, sign(y2 - y1)):
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
 			temp_texture[index] = 1.0
 
 func treshold_grayscale(treshold: float) -> void:
@@ -129,9 +129,9 @@ var BAYER_MATRIX: Array[PackedFloat32Array] = [
     [10.0/16.0, 06.0/16.0, 09.0/16.0, 05.0/16.0]
 ];
 func dither_grayscale(mult: float = 1.0) -> void:
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
 			var dither_treshold: float = BAYER_MATRIX[y%4][x%4] * mult
 
 			temp_texture[index] = 1.0 if temp_texture[index] >= dither_treshold else 0.0 
@@ -140,19 +140,19 @@ func dither_grayscale(mult: float = 1.0) -> void:
 
 func slice_x(from: int, to: int) -> void:
 	# TODO: add bound checks
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
 
 			if x < from || x >= to:
 				temp_texture[index] = 0.0
 
 func slice_y(from: int, to: int) -> void:
 	# TODO: add bound checks
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
 			if y < from || y >= to:
-				var index: int = y * (BreakableGrid.GRID_SIZE) + x
+				var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
 				temp_texture[index] = 0.0
 
 func invert() -> void:
@@ -160,20 +160,20 @@ func invert() -> void:
 		temp_texture[i] = 1.0 - temp_texture[i] 
 
 func mirror_x() -> void:
-	for x in (BreakableGrid.GRID_SIZE / 2):
-		for y in BreakableGrid.GRID_SIZE:
-			var from: int =  y * (BreakableGrid.GRID_SIZE) + x
-			var to: int =  y * (BreakableGrid.GRID_SIZE) + (BreakableGrid.GRID_SIZE - x - 1)
+	for x in (BreakableGrid.GRID_SIZE.x / 2):
+		for y in BreakableGrid.GRID_SIZE.y:
+			var from: int =  y * (BreakableGrid.GRID_SIZE.x) + x
+			var to: int =  y * (BreakableGrid.GRID_SIZE.x) + (BreakableGrid.GRID_SIZE.x - x - 1)
 
 			var temp: float = temp_texture[to]
 			temp_texture[to] = temp_texture[from]
 			temp_texture[from] = temp
 
 func mirror_y() -> void:
-	for x in BreakableGrid.GRID_SIZE:
-		for y in (BreakableGrid.GRID_SIZE / 2):
-			var from: int =  y * (BreakableGrid.GRID_SIZE) + x
-			var to: int =  (BreakableGrid.GRID_SIZE - y - 1) * (BreakableGrid.GRID_SIZE) + x
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in (BreakableGrid.GRID_SIZE.y / 2):
+			var from: int =  y * (BreakableGrid.GRID_SIZE.x) + x
+			var to: int =  (BreakableGrid.GRID_SIZE.y - y - 1) * (BreakableGrid.GRID_SIZE.x) + x
 
 			var temp: float = temp_texture[to]
 			temp_texture[to] = temp_texture[from]
@@ -187,7 +187,7 @@ func copy_texture_to_final() -> void:
 func copy_texture_to_final_bound(from_x: int, from_y: int, to_x: int, to_y: int) -> void:
 	for y in range(from_y, to_y):
 		for x in range(from_x, to_x):
-			var i: int = y * BreakableGrid.GRID_SIZE + x
+			var i: int = y * BreakableGrid.GRID_SIZE.x + x
 			if temp_texture[i] != 0.0:
 				final_texture[i] = temp_texture[i]
 
@@ -196,16 +196,16 @@ var used: Array[bool]
 func convert_with_chance_merge(
 	chance_x: float = 0.0, 
 	chance_y: float = 0.0, 
-	max_merge_x: int = BreakableGrid.GRID_SIZE, 
-	max_merge_y: int = BreakableGrid.GRID_SIZE,
+	max_merge_x: int = BreakableGrid.GRID_SIZE.x, 
+	max_merge_y: int = BreakableGrid.GRID_SIZE.y,
 	block_type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL,
 ) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
-	# used.resize(BreakableGrid.GRID_SIZE * BreakableGrid.GRID_SIZE)
+	# used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 
-	for x in BreakableGrid.GRID_SIZE:
-		for y in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
+	for x in BreakableGrid.GRID_SIZE.x:
+		for y in BreakableGrid.GRID_SIZE.y:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
 
 			if used[index]:
 				continue
@@ -226,9 +226,9 @@ func convert_with_chance_merge(
 
 				# try expanding horizontally
 				# check if the expansion is possible
-				if !expanded_x && rng.get_float() <= chance_x && (x + block_size.x) < BreakableGrid.GRID_SIZE && block_size.x < max_merge_x:
+				if !expanded_x && rng.get_float() <= chance_x && (x + block_size.x) < BreakableGrid.GRID_SIZE.x && block_size.x < max_merge_x:
 					for y2 in block_size.y:
-						var check_index: int = (y + y2) * BreakableGrid.GRID_SIZE + (x + block_size.x)
+						var check_index: int = (y + y2) * BreakableGrid.GRID_SIZE.x + (x + block_size.x)
 						if final_texture[check_index] == 1 && used[check_index] == false:
 							pass
 						else:
@@ -240,7 +240,7 @@ func convert_with_chance_merge(
 				# expand if possible
 				if can_expand_x:
 					for y2 in block_size.y:
-						var change_index: int = (y + y2) * BreakableGrid.GRID_SIZE + (x + block_size.x)
+						var change_index: int = (y + y2) * BreakableGrid.GRID_SIZE.x + (x + block_size.x)
 						used[change_index] = true
 					block_size.x += 1
 				else:
@@ -249,9 +249,9 @@ func convert_with_chance_merge(
 				# try to expand vertically
 				# check if the expansion is possible
 				var can_expand_y: bool = true
-				if !expanded_y && rng.get_float() <= chance_y && (y + block_size.y) < BreakableGrid.GRID_SIZE && block_size.y < max_merge_y:
+				if !expanded_y && rng.get_float() <= chance_y && (y + block_size.y) < BreakableGrid.GRID_SIZE.y && block_size.y < max_merge_y:
 					for x2 in block_size.x:
-						var check_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE + (x + x2)
+						var check_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE.x + (x + x2)
 						if final_texture[check_index] == 1 && used[check_index] == false:
 							pass
 						else:
@@ -264,7 +264,7 @@ func convert_with_chance_merge(
 				# expand if possible
 				if can_expand_y:
 					for x2 in block_size.x:
-						var change_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE + (x + x2)
+						var change_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE.x + (x + x2)
 						used[change_index] = true
 					block_size.y += 1
 				else:
@@ -295,11 +295,11 @@ func convert_with_chance_merge(
 	return result
 
 func add_uv_to_color() -> void:
-	for y in BreakableGrid.GRID_SIZE:
-		for x in BreakableGrid.GRID_SIZE:
-			var index: int = y * (BreakableGrid.GRID_SIZE) + x
-			color_texture[index].x = float(x) / BreakableGrid.GRID_SIZE
-			color_texture[index].y = float(y) / BreakableGrid.GRID_SIZE
+	for y in BreakableGrid.GRID_SIZE.y:
+		for x in BreakableGrid.GRID_SIZE.x:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
+			color_texture[index].x = float(x) / BreakableGrid.GRID_SIZE.x
+			color_texture[index].y = float(y) / BreakableGrid.GRID_SIZE.y
 			color_texture[index].z = 0.0
 	
 	color_texture[0] = 0.001 * Vector3.ONE
