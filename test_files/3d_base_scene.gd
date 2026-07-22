@@ -83,7 +83,7 @@ func _ready() -> void:
 	# # map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
 	# # map_generator.mirror_x()
 	# # map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
-	map_generator.copy_texture_to_final_bound(0, 0, 32, 22)
+	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
 
 	# # map_generator.copy_texture_to_final()
 	generate_map_from_array(map_generator.convert_with_chance_merge(.5, .5))

@@ -185,6 +185,14 @@ func copy_texture_to_final() -> void:
 			final_texture[i] = temp_texture[i]
 
 func copy_texture_to_final_bound(from_x: int, from_y: int, to_x: int, to_y: int) -> void:
+	if from_x < 0 || to_x > BreakableGrid.GRID_SIZE.x:
+		LoggerMogyi.log(self, "X index %d, %d is out of bounds for GRID_SIZE %v" % [from_x, to_x, BreakableGrid.GRID_SIZE])
+		return
+
+	if from_x < 0 || to_x > BreakableGrid.GRID_SIZE.x:
+		LoggerMogyi.log(self, "Y index %d, %d is out of bounds for GRID_SIZE %v" % [from_y, to_y, BreakableGrid.GRID_SIZE])
+		return
+
 	for y in range(from_y, to_y):
 		for x in range(from_x, to_x):
 			var i: int = y * BreakableGrid.GRID_SIZE.x + x
