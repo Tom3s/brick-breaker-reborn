@@ -25,6 +25,8 @@ class GameContext extends Node:
 	var powerups: Array[Powerup]
 	var active_powerups: Array[Powerup]
 
+	var projectiles: Array[Projectile]
+
 	func _init() -> void:
 		block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 
@@ -66,11 +68,13 @@ class GameContext extends Node:
 	var FLAG_FIREBALL_ACTIVE: bool = false
 	var LASER_ACTIVE: bool = false
 	var LASER_COOLDOWN: float = 0.0
+	var GUN_ACTIVE: bool = false
 
 	func set_flags() -> void:
 		FLAG_FIREBALL_ACTIVE = false
 		LASER_ACTIVE = false
 		LASER_COOLDOWN = -1.0
+		GUN_ACTIVE = false
 
 		for powerup: Powerup in active_powerups:
 			if powerup.type == Powerup.Type.FIRE_BALL:
@@ -78,6 +82,8 @@ class GameContext extends Node:
 			elif powerup.type == Powerup.Type.LASER:
 				LASER_ACTIVE = true
 				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)
+			elif powerup.type == Powerup.Type.GUN:
+				GUN_ACTIVE = true
 		
 		if FLAG_FIREBALL_ACTIVE != FLAG_FIREBALL_WAS_ACTIVE:
 			if FLAG_FIREBALL_ACTIVE:
@@ -105,3 +111,6 @@ class GameContext extends Node:
 	# this function only exists, so that later Skills can influence this value
 	static func get_laser_damage() -> int:
 		return 3
+
+	static func get_gun_damage() -> int:
+		return 100

@@ -4,6 +4,7 @@ extends Node3D
 @onready var ball_mesh_scene: PackedScene = preload("res://visuals/BallMesh.tscn")
 @onready var block_mesh_scene: PackedScene = preload("res://visuals/BlockMesh.tscn")
 @onready var powerup_asset_scene: PackedScene = preload("res://visuals/PowerupAsset.tscn")
+@onready var gun_bullet_asset_scene: PackedScene = preload("res://visuals/GunBullet.tscn")
 
 @onready var sfx_player: SFXPlayer = %SFXPlayer
 # @onready var ball_mesh: MeshInstance3D = %BallMesh
@@ -12,6 +13,7 @@ extends Node3D
 @onready var paddle_mesh: MeshInstance3D = %PaddleMesh
 @onready var laser_asset: LaserAsset = %LaserAsset
 @onready var block_parent: Node3D = %Blocks
+@onready var projectile_parent: Node3D = %Projectiles
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
 
 @onready var debug_parent: Node3D = %Debug
@@ -75,8 +77,8 @@ func _ready() -> void:
 	#region
 	map_generator.add_uv_to_color()
 	map_generator.add_perlin_noise()
-	# # map_generator.treshold_grayscale(0.5)
-	map_generator.dither_grayscale()
+	map_generator.treshold_grayscale(0.5)
+	# map_generator.dither_grayscale()
 	# map_generator.slice_y(0, 24)
 	# # map_generator.slice_x(0, 10)
 	# # generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
@@ -216,7 +218,7 @@ func _process(delta: float) -> void:
 
 				if block.is_broken():
 					break
-
+			# TODO: use damage_block_and_clear()
 			if block != null && block.is_broken():
 				if block.has_powerup:
 					block.has_powerup = false
@@ -295,28 +297,55 @@ func _process(delta: float) -> void:
 				var x: int = floorf((context.paddle.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
 				var block: BreakableBlock = context.get_block_at(x, y)
 
-				if block == null:
-					continue
-
-				block.hit_block_laser(context)
-
-				if block != null && block.is_broken():
-					if block.has_powerup:
-						block.has_powerup = false
-						spawn_powerup(block)
-					
-					context.broken_block_count += 1
-
-					block.asset_ref.queue_free()
-					context.remove_block(block)
+				damage_block_and_clear(block, context.get_laser_damage())
 			
 			sfx_player.play_laser_shot()
-
 	
 	for powerup: Powerup in disable_effect_queue:
 		context.active_powerups.erase(powerup)
+	
+	if context.GUN_ACTIVE && mouse_input_handler.action_just_pressed:
+		LoggerMogyi.log(self, "Shooting with active GUN powerup")
+		spawn_gun_projectiles()
 
-	# update powerups
+	# update projectiles
+	#
+	# oooooooooo oooooooooo    ooooooo  ooooo ooooooooooo  oooooooo8 ooooooooooo ooooo ooooo       ooooooooooo  oooooooo8  
+	#  888    888 888    888 o888   888o 888   888    88 o888     88 88  888  88  888   888         888    88  888         
+	#  888oooo88  888oooo88  888     888 888   888ooo8   888             888      888   888         888ooo8     888oooooo  
+	#  888        888  88o   888o   o888 888   888    oo 888o     oo     888      888   888      o  888    oo          888 
+	# o888o      o888o  88o8   88ooo88   888  o888ooo8888 888oooo88     o888o    o888o o888ooooo88 o888ooo8888 o88oooo888  
+	#                                 8o888                                                                                
+
+	var proj_marked_for_remove: Array[Projectile] = []																					
+	for projectile: Projectile in context.projectiles:
+		projectile.move(safe_delta)
+
+		if projectile.type == Projectile.Type.GUN_BULLET:
+			# TODO: could make a function that turns {game world space} -> {grid index}
+			var idx2: Vector2 = ((projectile.position + (grid_unit_size / 2)) / BreakableGrid.CELL_SIZE).floor()
+			var block: BreakableBlock = context.get_block_at(idx2.x, idx2.y)
+
+			if damage_block_and_clear(block, context.get_gun_damage()):
+				proj_marked_for_remove.push_back(projectile)
+	
+	for projectile: Projectile in proj_marked_for_remove:
+		projectile.asset_ref.queue_free()
+		context.projectiles.erase(projectile)
+
+
+
+	# https://patorjk.com/software/taag/#p=display&f=O8
+	#
+	# ooooo  oooo ooooo  oooooooo8 ooooo  oooo    o      ooooo        oooooooo8  
+	#  888    88   888  888         888    88    888      888        888         
+	#   888  88    888   888oooooo  888    88   8  88     888         888oooooo  
+	#    88888     888          888 888    88  8oooo88    888      o         888 
+	#     888     o888o o88oooo888   888oo88 o88o  o888o o888ooooo88 o88oooo888  
+																			
+                                                     
+
+	# update powerup pickups
 	for powerup: Powerup in context.powerups:
 		powerup.move(safe_delta)
 		powerup.asset.position.x = powerup.position.x
@@ -357,6 +386,10 @@ func _process(delta: float) -> void:
 		else:
 			ball.asset_ref.set_flame(false)
 
+	for projectile: Projectile in context.projectiles:
+		projectile.asset_ref.global_position.x = projectile.position.x
+		projectile.asset_ref.global_position.z = projectile.position.y
+		projectile.asset_ref.global_position.y = BreakableGrid.CELL_SIZE / 2.0
 
 	paddle_mesh.global_position.x = context.paddle.position.x
 	paddle_mesh.global_position.z = context.paddle.position.y
@@ -528,3 +561,40 @@ func spawn_powerup(block: BreakableBlock) -> void:
 	powerup.asset = asset
 
 	context.powerups.push_back(powerup)
+
+func spawn_gun_projectiles() -> void:
+	var p: Projectile = Projectile.new()
+	p.init_type(Projectile.Type.GUN_BULLET)
+	p.position = context.paddle.get_left_side()
+	var asset: Node3D = gun_bullet_asset_scene.instantiate()
+	projectile_parent.add_child(asset)
+	p.asset_ref = asset
+	context.projectiles.push_back(p)
+
+	p = Projectile.new()
+	p.init_type(Projectile.Type.GUN_BULLET)
+	p.position = context.paddle.get_right_side()
+	asset = gun_bullet_asset_scene.instantiate()
+	projectile_parent.add_child(asset)
+	p.asset_ref = asset
+	context.projectiles.push_back(p)
+
+func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
+	if block == null:
+		return false
+
+	block.hit_block_dmg(damage)
+
+	if block != null && block.is_broken():
+		if block.has_powerup:
+			block.has_powerup = false
+			spawn_powerup(block)
+		
+		context.broken_block_count += 1
+
+		block.asset_ref.queue_free()
+		context.remove_block(block)
+
+		return true
+	
+	return false

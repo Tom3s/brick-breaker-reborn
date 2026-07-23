@@ -36,7 +36,12 @@ static func log(
 	var severity_str: String = Severity.keys()[severity].capitalize()
 
 	# add script name
-	var caller_script_str: String = caller.get_script().resource_path.get_file()
+	var caller_script_str: String
+	if caller != null:
+		caller_script_str = caller.get_script().resource_path.get_file()
+	else:
+		# TODO: resolve static func calls
+		caller_script_str = "static call"
 
 	var final_message: String = "[%s][%s][%s] %s" % [
 		timestamp_str,

@@ -11,6 +11,14 @@ enum Type {
 	GUN,
 }
 
+static var weights: PackedInt32Array = [
+	0,
+	2,
+	2,
+	1,
+	2,
+]
+
 var ball_multiply_value: int = 3
 
 var fire_ball_max_time: float = 15.0
@@ -118,3 +126,24 @@ func update(delta: float) -> void:
 			laser_shot = true
 		else:
 			laser_shot = false
+
+static func get_weighted_powerup(n: float) -> Type:
+	var total_weight: int
+	for w in weights:
+		total_weight += w
+	
+	var partial_weight: float = n * total_weight
+	var current_weight: int = 0
+
+	for i in weights.size():
+		current_weight += weights[i]
+		if current_weight > partial_weight:
+			LoggerMogyi.log(null, "Selected %s with (%d/%d) for %.3f" % [
+				Type.keys()[i].capitalize(),
+				partial_weight,
+				total_weight,
+				n
+			])
+			return i as Type
+	
+	return Type.NONE

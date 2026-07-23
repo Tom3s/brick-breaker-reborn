@@ -91,6 +91,11 @@ func hit_block_laser(context: Global.GameContext) -> void:
 
 	asset_ref.set_hp(health)
 
+func hit_block_dmg(damage: int) -> void:
+	health -= damage
+
+	asset_ref.set_hp(health)
+
 func is_broken() -> bool:
 	return health <= 0
 
