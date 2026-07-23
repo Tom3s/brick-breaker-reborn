@@ -13,6 +13,7 @@ class Level:
 	var block_bitmap: Array[BreakableBlock]
 	
 	var completed: bool = false
+	var unlocked: bool = false
 
 class GameContext extends Node:
 
@@ -23,6 +24,7 @@ class GameContext extends Node:
 	var paddle: Paddle = Paddle.new()
 
 	var screen_collision: Array[LineCollider]
+	var top_barrier: LineCollider
 	var death_barrier: LineCollider
 	# var blocks: Array[BreakableBlock]
 	# var block_bitmap: Array[BreakableBlock]
@@ -94,6 +96,15 @@ class GameContext extends Node:
 			return
 		
 		# TODO: move balls and powerups up
+		balls = balls.filter(func(b: Ball) -> bool:
+			if b.velocity.y > 0:
+				b.asset_ref.queue_free()
+				return false
+			return true
+		)
+		for ball: Ball in balls:
+			ball.position.y += BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE
+		
 		pass
 
 	# flags
@@ -130,6 +141,7 @@ class GameContext extends Node:
 	var _DEBUG_ACTIVE_POWERUPS: String
 	var _DEBUG_ACTIVE_NR_BALLS: String
 	var _DEBUG_CURRENT_LEVEL: String
+	var _DEBUG_CURRENT_LEVEL_UNLOCKED: String
 	var _DEBUG_CURRENT_LEVEL_COMPLETE: String
 
 	func _set_debug_strings() -> void:
@@ -140,13 +152,16 @@ class GameContext extends Node:
 		
 		_DEBUG_ACTIVE_NR_BALLS = "Nr Balls: %d" % balls.size()
 		_DEBUG_CURRENT_LEVEL = "Current Level: %d" % current_level
+		_DEBUG_CURRENT_LEVEL_UNLOCKED = "Picked Up KEY: %s" % str(levels[current_level].unlocked)
+		
 		_DEBUG_CURRENT_LEVEL_COMPLETE = "Current Level Complete: %s" % str(levels[current_level].completed)
 	
 	func _get_debug_string() -> String:
-		return "%s\n%s\n%s\n%s" % [
+		return "%s\n%s\n%s\n%s\n%s" % [
 			_DEBUG_ACTIVE_NR_BALLS, 
 			_DEBUG_CURRENT_LEVEL,
 			_DEBUG_CURRENT_LEVEL_COMPLETE,
+			_DEBUG_CURRENT_LEVEL_UNLOCKED,
 			_DEBUG_ACTIVE_POWERUPS,
 		]
 	

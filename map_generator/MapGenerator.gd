@@ -292,7 +292,8 @@ func convert_with_chance_merge(
 				block.has_powerup = true
 				block.powerup = Powerup.new()
 
-				block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
+				block.powerup.type = Powerup.Type.KEY
+				# block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
 
 			result.push_back(block)
 	

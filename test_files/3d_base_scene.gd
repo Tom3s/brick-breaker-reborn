@@ -176,11 +176,8 @@ func _process(delta: float) -> void:
 			ball.move(safe_delta)
 
 	# handle collision
-	# check for death first
-	# if ball.collide_with(death_barrier, false, false):
-	# 	on_death()
+	# check for death barrier first
 	var index: int = 0
-	# for i in context.balls.size():
 	while index < context.balls.size():
 		var ball: Ball = context.balls[index]
 
@@ -194,6 +191,16 @@ func _process(delta: float) -> void:
 				on_death()
 		
 		index += 1
+	
+	var level_unlocked: bool = context.levels[context.current_level].unlocked
+	for ball: Ball in context.balls:
+		if ball.collide_with(context.top_barrier, !level_unlocked, !level_unlocked):
+			LoggerMogyi.log(self, "Magic ball velocity: %v" % ball.velocity)
+			if level_unlocked:
+				context.next_level()
+				display_blocks(context.levels[context.current_level].blocks)
+				break
+
 
 
 	# var collided: bool = false
@@ -349,8 +356,19 @@ func set_up_screen_collision() -> void:
 	var p4: Vector2 = Vector2(-grid_unit_size.x / 2, grid_unit_size.y / 2)
 
 	var line: LineCollider = LineCollider.new()
-	line.set_points(p1, p2)
-	context.screen_collision.push_back(line)
+	# line.set_points(p1, p2)
+	# context.screen_collision.push_back(line)
+
+	# This is the top barrier
+	context.top_barrier = LineCollider.new()
+	context.top_barrier.set_points(p1, p2)
+
+	# This is the death barrier
+	context.death_barrier = LineCollider.new()
+	context.death_barrier.set_points(p3, p4)
+
+	p3.y += grid_unit_size.y
+	p4.y += grid_unit_size.y
 
 	line = LineCollider.new()
 	line.set_points(p2, p3)
@@ -360,9 +378,6 @@ func set_up_screen_collision() -> void:
 	line.set_points(p4, p1)
 	context.screen_collision.push_back(line)
 
-	# This is the death barrier
-	context.death_barrier = LineCollider.new()
-	context.death_barrier.set_points(p3, p4)
 
 
 # TODO: I dont like this being alone with a signal. 
@@ -379,6 +394,7 @@ func release_ball() -> void:
 func on_death() -> void:
 	context.balls[0].velocity = Vector2.ZERO
 	context.balls[0].released = false
+	LoggerMogyi.log(self, "Died")
 
 
 # TODO: prune when map generator is ready

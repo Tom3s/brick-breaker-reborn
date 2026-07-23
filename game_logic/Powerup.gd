@@ -9,6 +9,7 @@ enum Type {
 	FIRE_BALL,
 	LASER,
 	GUN,
+	KEY,
 }
 
 static var weights: PackedInt32Array = [
@@ -115,6 +116,9 @@ func activate_powerup(context: Global.GameContext) -> void:
 		time_left = gun_max_time
 
 		context.active_powerups.push_back(self)
+	
+	elif type == Type.KEY:
+		context.levels[context.current_level].unlocked = true
 
 func update(delta: float) -> void:
 	time_left -= delta
