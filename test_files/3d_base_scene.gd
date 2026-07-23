@@ -113,9 +113,6 @@ func _ready() -> void:
 	# generate_map_from_array(map_generator.convert_with_horizontal_merge(1))
 	
 
-	mouse_input_handler.mouse_moved.connect(handle_mouse_movement)
-	mouse_input_handler.release_ball_pressed.connect(release_ball)
-
 	handle_mouse_movement(Vector2.ZERO)
 
 	# paddle.collider_line.debug_set_up = false
@@ -166,7 +163,12 @@ func _process(delta: float) -> void:
 
 			ball.randomize_velocity()
 
+	handle_mouse_movement(mouse_input_handler.accumulated_mouse_movement)
+	mouse_input_handler.accumulated_mouse_movement = Vector2.ZERO
 	
+	if !context.balls[0].released && mouse_input_handler.action_just_pressed:
+		release_ball()
+
 	# handling blocks before balls
 	# this is bc multiball powerup might rotate the ball's 
 	# velocity of out the play area

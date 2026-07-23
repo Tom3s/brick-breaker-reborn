@@ -4,7 +4,7 @@
 [ext_resource type="Material" uid="uid://dssyve32uua8m" path="res://visuals/ColoredMaterial.material" id="2_sdce5"]
 [ext_resource type="Script" uid="uid://dk1w8owocfip" path="res://visuals/PowerupAsset.gd" id="3_r3lpo"]
 [ext_resource type="Texture2D" uid="uid://blcqiwqelbax8" path="res://visuals/textures/powerups/BALL_MULTIPLY.png" id="4_wscj7"]
-[ext_resource type="Texture2D" uid="uid://y1qo5a314yxw" path="res://visuals/textures/powerups/LASER.png" id="5_sdce5"]
+[ext_resource type="Texture2D" uid="uid://cmus6rhlaxgs" path="res://visuals/textures/powerups/GUN.png" id="5_sdce5"]
 
 [sub_resource type="VisualShaderNodeStep" id="VisualShaderNodeStep_x6co4"]
 default_input_values = [0, 0.0, 1, 0.25]
