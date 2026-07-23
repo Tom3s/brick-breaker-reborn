@@ -207,9 +207,12 @@ func convert_with_chance_merge(
 	max_merge_x: int = BreakableGrid.GRID_SIZE.x, 
 	max_merge_y: int = BreakableGrid.GRID_SIZE.y,
 	block_type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL,
+	block_max_hp: int = 1,
 ) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 	# used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
+
+	
 
 	for x in BreakableGrid.GRID_SIZE.x:
 		for y in BreakableGrid.GRID_SIZE.y:
@@ -285,16 +288,23 @@ func convert_with_chance_merge(
 			block.color = get_color(x, y)
 			block.type = block_type
 			block.pos_on_grid = Vector2(x, y)
-			block.health = int(rng.get_float() * 3) + 1
+			block.health = int(rng.get_float() * block_max_hp) + 1
 			block.prepare_collision()
-			if rng.get_float() < .05:
+			if rng.get_float() < .1:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
 
+				# block.powerup.type = Powerup.Type.KEY
 				block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
 
 			result.push_back(block)
 	
+	var key_block_index: int = floorf(result.size() * sqrt(rng.get_float()))
+	var key_block: BreakableBlock = result[key_block_index]
+	key_block.has_powerup = true
+	key_block.powerup = Powerup.new()
+	key_block.powerup.type = Powerup.Type.KEY
+
 	return result
 
 func add_uv_to_color() -> void:
@@ -306,6 +316,39 @@ func add_uv_to_color() -> void:
 			color_texture[index].z = 0.0
 	
 	color_texture[0] = 0.001 * Vector3.ONE
+
+func add_random_gradient_to_color() -> void:
+	var c1: Vector3 = Vector3(
+		rng.get_float(),
+		rng.get_float(),
+		rng.get_float(),
+	)
+	var c2: Vector3 = Vector3(
+		rng.get_float(),
+		rng.get_float(),
+		rng.get_float(),
+	)
+	var angle: float = rng.get_float() * PI * 2
+
+	add_gradient_to_color(c1, c2, angle)
+
+func add_gradient_to_color(color1: Vector3, color2: Vector3, angle: float) -> void:
+	# angle = fmod(angle, PI)
+
+	for y in BreakableGrid.GRID_SIZE.y:
+		for x in BreakableGrid.GRID_SIZE.x:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
+
+			var coords: Vector2 = Vector2(x, y) / Vector2(BreakableGrid.GRID_SIZE)
+			coords -= Vector2.ONE / 2
+			coords = coords.rotated(angle)
+			coords += Vector2.ONE / 2
+			var t: float = abs(coords.x)
+			color_texture[index] = lerp(color1, color2, clampf(t, 0, 1))
+
+
+
+
 
 func fill_color(new_color: Vector3) -> void:
 	for i in color_texture.size():

@@ -19,14 +19,18 @@ var map_generator: MapGenerator
 func _ready() -> void:
 	initialize()
 
+# var current_angle: float = 0.0
 func initialize() -> void:
 	# print(range(5, 0, 0))
 
 	map_generator = MapGenerator.new()
 	map_generator.rng._seed = seed
-	map_generator.add_uv_to_color()
+	# map_generator.add_uv_to_color()
+	map_generator.add_rectangle(0, 0, BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y)
+	map_generator.add_gradient_to_color(Vector3.ZERO, Vector3.ONE, 1)
 
-	map_generator.add_voronoi_noise()
+
+	# map_generator.add_voronoi_noise()
 	# map_generator.add_perlin_noise()
 	# map_generator.add_random_grayscale_noise()
 	# map_generator.dither_grayscale(1.0)
@@ -38,8 +42,14 @@ func initialize() -> void:
 
 	display_texture()
 
+# func _process(delta: float) -> void:
+# 	current_angle += delta
+
+# 	initialize()
+
 func display_texture() -> void:
 	# test_texture.texture = Texture
+	# var image: Image = Image.create_empty(BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y, false, Image.FORMAT_RGBF)
 	var image: Image = Image.create_empty(BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y, false, Image.FORMAT_RGBF)
 	for x in BreakableGrid.GRID_SIZE.x:
 		for y in BreakableGrid.GRID_SIZE.y:

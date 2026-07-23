@@ -49,6 +49,11 @@ func set_hp(hp: int) -> void:
 
 	hp_indicator.material_override.set_shader_parameter("Texture", load(texture_path))
 
+func set_key_block() -> void:
+	# hp_indicator.material_override.set_shader_parameter("Texture", load("res://visuals/textures/powerups/KEY.png"))
+	material_override.set_shader_parameter("Color", Vector3.ONE)
+
+
 func set_color(color: Vector3) -> void:
 	material_override.set_shader_parameter("Color", color)
 

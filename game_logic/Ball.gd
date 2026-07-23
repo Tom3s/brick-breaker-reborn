@@ -73,12 +73,13 @@ func collide_with(line: LineCollider, reflect_ball: bool = true, boost_on_collis
 		current_normal = (position - p2).normalized()
 
 	if (distance_from_line < radius):
-		if !reflect_ball:
-			return true
 		
 		var speed_along_normal: float = velocity.dot(current_normal)
 
 		if speed_along_normal <= 0:
+			if !reflect_ball:
+				# LoggerMogyi.log(self, "Not reflecting, but colliding")
+				return true
 			var correction: float = radius - distance_from_line
 
 			position += current_normal * correction * 2
