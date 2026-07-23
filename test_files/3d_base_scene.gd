@@ -226,7 +226,9 @@ func _process(delta: float) -> void:
 		display_blocks(context.levels[context.current_level].blocks)
 
 		if context.balls.size() == 0:
-			context.balls.push_back(Ball.new())
+			var _new_ball: Ball = Ball.new()
+			_new_ball.asset_ref = ball_mesh_scene.instantiate()
+			context.balls.push_back(_new_ball)
 			on_death()
 
 	for ball: Ball in context.balls:
@@ -466,7 +468,8 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 	var SEED: int = randi()
 	map_generator.rng._seed = SEED
 
-	map_generator.add_uv_to_color()
+	# map_generator.add_uv_to_color()
+	map_generator.add_random_gradient_to_color()
 	map_generator.add_perlin_noise()
 	map_generator.treshold_grayscale(0.75)
 

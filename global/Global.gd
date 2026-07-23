@@ -100,7 +100,7 @@ class GameContext extends Node:
 			return
 		
 		balls = balls.filter(func(b: Ball) -> bool:
-			if b.velocity.y > 0:
+			if b.velocity.y > 0 || b.position.y > BreakableGrid.GRID_SIZE.y * 2:
 				b.asset_ref.queue_free()
 				return false
 			return true
@@ -120,7 +120,7 @@ class GameContext extends Node:
 			current_level = 0
 			return
 		
-		# TODO: move balls and powerups up
+		# TODO: not needed, as backtracking only happens on your last ball
 		# balls = balls.filter(func(b: Ball) -> bool:
 		# 	if b.velocity.y < 0:
 		# 		b.asset_ref.queue_free()
@@ -132,6 +132,8 @@ class GameContext extends Node:
 		
 		# powerups don't need clearing, as player can still catch them in the previous level
 		# powerups.clear()
+		for powerup: Powerup in powerups:
+			powerup.position.y -= BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE
 
 
 	# flags

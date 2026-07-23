@@ -299,7 +299,7 @@ func convert_with_chance_merge(
 
 			result.push_back(block)
 	
-	var key_block_index: int = floorf(result.size() * rng.get_float())
+	var key_block_index: int = floorf(result.size() * sqrt(rng.get_float()))
 	var key_block: BreakableBlock = result[key_block_index]
 	key_block.has_powerup = true
 	key_block.powerup = Powerup.new()
@@ -316,6 +316,39 @@ func add_uv_to_color() -> void:
 			color_texture[index].z = 0.0
 	
 	color_texture[0] = 0.001 * Vector3.ONE
+
+func add_random_gradient_to_color() -> void:
+	var c1: Vector3 = Vector3(
+		rng.get_float(),
+		rng.get_float(),
+		rng.get_float(),
+	)
+	var c2: Vector3 = Vector3(
+		rng.get_float(),
+		rng.get_float(),
+		rng.get_float(),
+	)
+	var angle: float = rng.get_float() * PI * 2
+
+	add_gradient_to_color(c1, c2, angle)
+
+func add_gradient_to_color(color1: Vector3, color2: Vector3, angle: float) -> void:
+	# angle = fmod(angle, PI)
+
+	for y in BreakableGrid.GRID_SIZE.y:
+		for x in BreakableGrid.GRID_SIZE.x:
+			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
+
+			var coords: Vector2 = Vector2(x, y) / Vector2(BreakableGrid.GRID_SIZE)
+			coords -= Vector2.ONE / 2
+			coords = coords.rotated(angle)
+			coords += Vector2.ONE / 2
+			var t: float = abs(coords.x)
+			color_texture[index] = lerp(color1, color2, clampf(t, 0, 1))
+
+
+
+
 
 func fill_color(new_color: Vector3) -> void:
 	for i in color_texture.size():
