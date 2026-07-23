@@ -307,6 +307,7 @@ func _process(delta: float) -> void:
 	if context.GUN_ACTIVE && mouse_input_handler.action_just_pressed:
 		LoggerMogyi.log(self, "Shooting with active GUN powerup")
 		spawn_gun_projectiles()
+		sfx_player.play_gun_shot()
 
 	# update projectiles
 	#
@@ -574,6 +575,7 @@ func spawn_gun_projectiles() -> void:
 	p = Projectile.new()
 	p.init_type(Projectile.Type.GUN_BULLET)
 	p.position = context.paddle.get_right_side()
+	p.position -= Vector2(0.001, 0) # otherwie it perfectly misses the blocks on the right sides
 	asset = gun_bullet_asset_scene.instantiate()
 	projectile_parent.add_child(asset)
 	p.asset_ref = asset

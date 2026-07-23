@@ -8,6 +8,7 @@ class_name SFXPlayer
 @onready var ice_block_hit: AudioStreamPlayer = %IceBlock
 
 @onready var laser_shot: AudioStreamPlayer = %LaserShot
+@onready var gun_shot: AudioStreamPlayer = %GunShot
 
 @onready var flame_ignite: AudioStreamPlayer = %FlameIgnite
 @onready var flame_extinguish: AudioStreamPlayer = %FlameExtinguish
@@ -26,6 +27,9 @@ func play_block_hit(type: BreakableBlock.BlockType) -> void:
 	
 func play_laser_shot() -> void:
 	laser_shot.play()
+
+func play_gun_shot() -> void:
+	gun_shot.play()
 
 func play_flame_ignite() -> void:
 	flame_ignite.play()

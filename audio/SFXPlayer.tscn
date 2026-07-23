@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://6p15wimk0j4s"]
+[gd_scene load_steps=21 format=3 uid="uid://6p15wimk0j4s"]
 
 [ext_resource type="Script" uid="uid://d16foq7x8whaj" path="res://audio/SFXPlayer.gd" id="1_slksv"]
 [ext_resource type="AudioStream" uid="uid://chdso0f63ysj" path="res://audio/sfx/ball_hit2_fixed.mp3" id="2_3wk75"]
@@ -10,6 +10,7 @@
 [ext_resource type="AudioStream" uid="uid://cbut07ahg3m27" path="res://audio/sfx/normal_block_hit3.mp3" id="6_3wk75"]
 [ext_resource type="AudioStream" uid="uid://lkkdbc0igvb7" path="res://audio/sfx/flame_ignite.mp3" id="6_gocb7"]
 [ext_resource type="AudioStream" uid="uid://b2lopdlhn7etr" path="res://audio/sfx/flame_extinguish.mp3" id="7_ttirh"]
+[ext_resource type="AudioStream" uid="uid://dai31v52xwrnr" path="res://audio/sfx/gun_shot.mp3" id="9_bl1ui"]
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_vrmcv"]
 random_pitch = 1.1
@@ -39,6 +40,11 @@ stream_0/stream = ExtResource("4_5oyxk")
 random_pitch = 1.05
 streams_count = 1
 stream_0/stream = ExtResource("5_c7do5")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_kpr28"]
+random_pitch = 1.2
+streams_count = 1
+stream_0/stream = ExtResource("9_bl1ui")
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_tvqt0"]
 random_pitch = 1.05
@@ -91,7 +97,12 @@ bus = &"SFX"
 [node name="LaserShot" type="AudioStreamPlayer" parent="Powerups"]
 unique_name_in_owner = true
 stream = SubResource("AudioStreamRandomizer_vof56")
-max_polyphony = 64
+bus = &"SFX"
+
+[node name="GunShot" type="AudioStreamPlayer" parent="Powerups"]
+unique_name_in_owner = true
+stream = SubResource("AudioStreamRandomizer_kpr28")
+max_polyphony = 16
 bus = &"SFX"
 
 [node name="FlameIgnite" type="AudioStreamPlayer" parent="Powerups"]
