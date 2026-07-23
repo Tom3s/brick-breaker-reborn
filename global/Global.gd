@@ -86,6 +86,16 @@ class GameContext extends Node:
 	func is_current_level_complete() -> bool:
 		return levels[current_level].completed
 
+	func next_level() -> void:
+		current_level += 1
+		if current_level >= LEVEL_COUNT:
+			LoggerMogyi.log(self, "Completed All Levels!!")
+			current_level = LEVEL_COUNT - 1
+			return
+		
+		# TODO: move balls and powerups up
+		pass
+
 	# flags
 	var FLAG_FIREBALL_WAS_ACTIVE: bool = false
 	var FLAG_FIREBALL_ACTIVE: bool = false

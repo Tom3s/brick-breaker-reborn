@@ -211,8 +211,9 @@ func _process(delta: float) -> void:
 		# TODO: change blocks to breakable if only non-breakable remain
 		# on_board_clear()
 		# return
-		pass
-	
+		context.next_level()
+		display_blocks(context.levels[context.current_level].blocks)
+
 	for ball: Ball in context.balls:
 		if ball.collide_with_paddle(context.paddle):
 			sfx_player.play_paddle_hit()
