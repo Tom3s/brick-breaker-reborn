@@ -88,14 +88,17 @@ class GameContext extends Node:
 	func is_current_level_complete() -> bool:
 		return levels[current_level].completed
 
+	func is_death_barrier_active() -> bool:
+		return current_level == 0 || levels[current_level - 1].completed
+
 	func next_level() -> void:
 		current_level += 1
+		LoggerMogyi.log(self, "Changed level to %d" % current_level)
 		if current_level >= LEVEL_COUNT:
 			LoggerMogyi.log(self, "Completed All Levels!!")
 			current_level = LEVEL_COUNT - 1
 			return
 		
-		# TODO: move balls and powerups up
 		balls = balls.filter(func(b: Ball) -> bool:
 			if b.velocity.y > 0:
 				b.asset_ref.queue_free()
@@ -105,7 +108,29 @@ class GameContext extends Node:
 		for ball: Ball in balls:
 			ball.position.y += BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE
 		
-		pass
+		powerups.clear()
+	
+	func prev_level() -> void:
+		current_level -= 1
+		LoggerMogyi.log(self, "Changed level to %d" % current_level)
+		if current_level < 0:
+			LoggerMogyi.log(self, "Can't go back on first level")
+			current_level = 0
+			return
+		
+		# TODO: move balls and powerups up
+		balls = balls.filter(func(b: Ball) -> bool:
+			if b.velocity.y < 0:
+				b.asset_ref.queue_free()
+				return false
+			return true
+		)
+		for ball: Ball in balls:
+			ball.position.y -= BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE
+		
+		# powerups don't need clearing, as player can still catch them in the previous level
+		# powerups.clear()
+
 
 	# flags
 	var FLAG_FIREBALL_WAS_ACTIVE: bool = false

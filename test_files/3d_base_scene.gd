@@ -182,20 +182,24 @@ func _process(delta: float) -> void:
 		var ball: Ball = context.balls[index]
 
 		if ball.collide_with(context.death_barrier, false, false):	
-			if context.balls.size() > 1:
-				# ball_parent.remove_child(ball.asset_ref)
-				ball.asset_ref.queue_free()
-				context.balls.erase(ball)
-				index -= 1
+			if context.is_death_barrier_active():
+				if context.balls.size() > 1:
+					# ball_parent.remove_child(ball.asset_ref)
+					ball.asset_ref.queue_free()
+					context.balls.erase(ball)
+					index -= 1
+				else:
+					on_death()
 			else:
-				on_death()
+				context.prev_level()
+				display_blocks(context.levels[context.current_level].blocks)
+				break
 		
 		index += 1
 	
 	var level_unlocked: bool = context.levels[context.current_level].unlocked
 	for ball: Ball in context.balls:
 		if ball.collide_with(context.top_barrier, !level_unlocked, !level_unlocked):
-			LoggerMogyi.log(self, "Magic ball velocity: %v" % ball.velocity)
 			if level_unlocked:
 				context.next_level()
 				display_blocks(context.levels[context.current_level].blocks)
