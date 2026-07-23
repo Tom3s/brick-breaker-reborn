@@ -34,3 +34,9 @@ func move(movement: Vector2) -> void:
 		position.x = - limits
 
 	position.y = (BreakableGrid.GRID_SIZE.y / 2 - 1) * BreakableGrid.CELL_SIZE
+
+func get_left_side() -> Vector2:
+	return position - Vector2(size / 2, 0)
+
+func get_right_side() -> Vector2:
+	return position + Vector2(size / 2, 0)

@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://bpv23r0yyvo13"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_h7sj2"]
+radius = 8.0
+height = 64.0
+
+[node name="GunBullet" type="Node3D"]
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 26)
+mesh = SubResource("CapsuleMesh_h7sj2")

@@ -34,6 +34,12 @@ unique_name_in_owner = true
 [node name="Powerups" type="Node3D" parent="."]
 unique_name_in_owner = true
 
+[node name="Projectiles" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="Blocks" type="Node3D" parent="."]
+unique_name_in_owner = true
+
 [node name="PaddleMesh" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(-4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
@@ -60,9 +66,6 @@ visible = false
 projection = 1
 fov = 69.3
 size = 1024.0
-
-[node name="Blocks" type="Node3D" parent="."]
-unique_name_in_owner = true
 
 [node name="MouseInputHandler" type="Node" parent="."]
 unique_name_in_owner = true

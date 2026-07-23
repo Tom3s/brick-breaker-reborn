@@ -287,16 +287,11 @@ func convert_with_chance_merge(
 			block.pos_on_grid = Vector2(x, y)
 			block.health = int(rng.get_float() * 3) + 1
 			block.prepare_collision()
-			if rng.get_float() < .10:
+			if rng.get_float() < .05:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
-				if rng.get_float() < .25:
-					block.powerup.type = Powerup.Type.BALL_MULTIPLY
-					block.powerup.ball_multiply_value = int(rng.get_float() * 3) + 2
-				elif rng.get_float() < .5:
-					block.powerup.type = Powerup.Type.LASER
-				else:
-					block.powerup.type = Powerup.Type.FIRE_BALL
+
+				block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
 
 			result.push_back(block)
 	
