@@ -44,75 +44,11 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
-	# generate_map()
-	var map_generator := MapGenerator.new()
-	var SEED: int = randi()
-	map_generator.rng._seed = SEED
-	map_generator.fill_color(Vector3(.3, .0, .9))
-
-	# map_generator.add_random_grayscale_noise()
-	# map_generator.add_voronoi_noise()
-
-	# map_generator.add_circle(
-	# 	map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
-	# 	map_generator.rng.get_float() * BreakableGrid.GRID_SIZE / 2,
-	# 	map_generator.rng.get_float() * 8,
-	# )
-	# for i in 2:
-	map_generator.add_rectangle(
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.x,
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.y,
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.x,
-		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE.y,
-	)
-	map_generator.slice_y(0, 18)
-	map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2, BreakableBlock.BlockType.ICE))	
-	map_generator.mirror_x()
-	map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(0.5, 1.0, 3, 2, BreakableBlock.BlockType.ICE))	
-	map_generator.clear_temp_texture()
-
-
-	#region
-	map_generator.add_uv_to_color()
-	map_generator.add_perlin_noise()
-	map_generator.treshold_grayscale(0.5)
-	# map_generator.dither_grayscale()
-	# map_generator.slice_y(0, 24)
-	# # map_generator.slice_x(0, 10)
-	# # generate_map_from_array(map_generator.convert_with_horizontal_merge(3))
-	# # map_generator.copy_texture_to_final_bound(0, 0, 10, 24)
-	# # map_generator.mirror_x()
-	# # map_generator.copy_texture_to_final_bound(22, 0, 32, 24)
-	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
-
-	# # map_generator.copy_texture_to_final()
-	generate_map_from_array(map_generator.convert_with_chance_merge(.5, .5))
-
-	# map_generator.clear_final_texture()
-	# map_generator.clear_temp_texture()
-	# map_generator.add_voronoi_noise()
-	# map_generator.invert()
-	# map_generator.treshold_grayscale(0.7)
-	# map_generator.slice_y(0, 20)
-	# map_generator.slice_x(10, 22)
-	# map_generator.copy_texture_to_final()
-
-	# # generate_map_from_array(map_generator.convert_with_vertical_merge(2))
-	# generate_map_from_array(map_generator.convert_with_chance_merge(.0, .7))
-
-
-	#endregion
-
-	# for i in 4:
-	# 	map_generator.add_circle(
-	# 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE,
-	# 		map_generator.rng.get_float() * BreakableGrid.GRID_SIZE / 2,
-	# 		map_generator.rng.get_float() * 8,
-	# 	)
+	for i in Global.LEVEL_COUNT:
+		context.add_block_array(generate_sparse_map(), i)
+		generate_block_assets(context.levels[i].blocks)
 	
-	# generate_map_from_array(map_generator.convert_with_horizontal_merge(1))
+	display_blocks(context.levels[context.current_level].blocks)
 	
 
 	handle_mouse_movement(Vector2.ZERO)
@@ -271,7 +207,7 @@ func _process(delta: float) -> void:
 
 	
 	
-	if are_breakable_blocks_remaining():
+	if context.is_current_level_complete():
 		# TODO: change blocks to breakable if only non-breakable remain
 		# on_board_clear()
 		# return
@@ -344,7 +280,7 @@ func _process(delta: float) -> void:
 	#    88888     888          888 888    88  8oooo88    888      o         888 
 	#     888     o888o o88oooo888   888oo88 o88o  o888o o888ooooo88 o88oooo888  
 																			
-                                                     
+													 
 
 	# update powerup pickups
 	for powerup: Powerup in context.powerups:
@@ -500,8 +436,41 @@ func generate_map() -> void:
 
 			total += block_size
 
-func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
-	for block in blocks:
+func generate_sparse_map() -> Array[BreakableBlock]:
+	var map_generator := MapGenerator.new()
+	var SEED: int = randi()
+	map_generator.rng._seed = SEED
+
+	map_generator.add_uv_to_color()
+	map_generator.add_perlin_noise()
+	map_generator.treshold_grayscale(0.75)
+
+	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
+
+	return map_generator.convert_with_chance_merge(.5, .5)
+
+
+# func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
+# 	for block in blocks:
+# 		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+# 		block_parent.add_child(block_mesh)
+# 		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+# 		var final_pos: Vector2 = block.get_origin()
+# 		block_mesh.global_position.x = final_pos.x
+# 		block_mesh.global_position.z = final_pos.y
+# 		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+# 		block_mesh.set_material(block.type)
+# 		block_mesh.set_hp(block.health)
+# 		block_mesh.set_color(block.color)
+
+# 		block.asset_ref = block_mesh
+
+# 		block.just_broken.connect(sfx_player.play_block_hit)
+# 		# context.blocks.push_back(block)
+# 		context.add_block(block)
+
+func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
+	for block: BreakableBlock in blocks:
 		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
 		block_parent.add_child(block_mesh)
 		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
@@ -516,8 +485,15 @@ func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
 		block.asset_ref = block_mesh
 
 		block.just_broken.connect(sfx_player.play_block_hit)
-		# context.blocks.push_back(block)
-		context.add_block(block)
+
+		block_parent.remove_child(block_mesh)
+
+func display_blocks(blocks: Array[BreakableBlock]) -> void:
+	for child in block_parent.get_children():
+		block_parent.remove_child(child)
+	
+	for block: BreakableBlock in blocks:
+		block_parent.add_child(block.asset_ref)
 
 func on_board_clear() -> void:
 	# TODO: this resets the ball. shouldn't use death entrypoint for this tho
@@ -526,8 +502,8 @@ func on_board_clear() -> void:
 	context.broken_block_count = 0
 	generate_map()
 
-func are_breakable_blocks_remaining() -> bool:
-	return context.broken_block_count >= context.blocks.size() - context.nr_metal_blocks
+# func are_breakable_blocks_remaining() -> bool:
+# 	return context.broken_block_count >= context.blocks.size() - context.nr_metal_blocks
 
 func collide_with_screen(powerup: Powerup) -> void:
 	var grid_unit_size: Vector2 = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE
