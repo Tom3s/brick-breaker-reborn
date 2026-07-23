@@ -182,18 +182,18 @@ func _process(delta: float) -> void:
 		var ball: Ball = context.balls[index]
 
 		if ball.collide_with(context.death_barrier, false, false):	
-			if context.is_death_barrier_active():
-				if context.balls.size() > 1:
-					# ball_parent.remove_child(ball.asset_ref)
-					ball.asset_ref.queue_free()
-					context.balls.erase(ball)
-					index -= 1
-				else:
-					on_death()
+			if context.balls.size() > 1:
+				# ball_parent.remove_child(ball.asset_ref)
+				ball.asset_ref.queue_free()
+				context.balls.erase(ball)
+				index -= 1
 			else:
-				context.prev_level()
-				display_blocks(context.levels[context.current_level].blocks)
-				break
+				if context.is_death_barrier_active():
+					on_death()
+				else:
+					context.prev_level()
+					display_blocks(context.levels[context.current_level].blocks)
+					break
 		
 		index += 1
 	
@@ -224,6 +224,10 @@ func _process(delta: float) -> void:
 		# return
 		context.next_level()
 		display_blocks(context.levels[context.current_level].blocks)
+
+		if context.balls.size() == 0:
+			context.balls.push_back(Ball.new())
+			on_death()
 
 	for ball: Ball in context.balls:
 		if ball.collide_with_paddle(context.paddle):
@@ -500,8 +504,12 @@ func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 		block_mesh.global_position.z = final_pos.y
 		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
 		block_mesh.set_material(block.type)
-		block_mesh.set_hp(block.health)
-		block_mesh.set_color(block.color)
+		if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
+			block_mesh.set_key_block()
+		else:
+			block_mesh.set_hp(block.health)
+			block_mesh.set_color(block.color)
+
 
 		block.asset_ref = block_mesh
 

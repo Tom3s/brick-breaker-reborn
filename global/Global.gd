@@ -108,6 +108,8 @@ class GameContext extends Node:
 		for ball: Ball in balls:
 			ball.position.y += BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE
 		
+		for powerup: Powerup in powerups:
+			powerup.asset.queue_free()
 		powerups.clear()
 	
 	func prev_level() -> void:
@@ -119,12 +121,12 @@ class GameContext extends Node:
 			return
 		
 		# TODO: move balls and powerups up
-		balls = balls.filter(func(b: Ball) -> bool:
-			if b.velocity.y < 0:
-				b.asset_ref.queue_free()
-				return false
-			return true
-		)
+		# balls = balls.filter(func(b: Ball) -> bool:
+		# 	if b.velocity.y < 0:
+		# 		b.asset_ref.queue_free()
+		# 		return false
+		# 	return true
+		# )
 		for ball: Ball in balls:
 			ball.position.y -= BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE
 		

@@ -14,6 +14,7 @@ func set_visuals(powerup: Powerup) -> void:
 		return
 	
 	if powerup.type == Powerup.Type.KEY:
+		set_surface_override_material(0, get_surface_override_material(0).duplicate())
 		get_surface_override_material(0).set_shader_parameter("Color", Color.from_string("b700e0", Color.PURPLE))
 	
 	# elif powerup.type == Powerup.Type.FIRE_BALL:

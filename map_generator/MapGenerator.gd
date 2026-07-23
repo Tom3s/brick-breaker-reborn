@@ -212,6 +212,8 @@ func convert_with_chance_merge(
 	var result: Array[BreakableBlock]
 	# used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 
+	
+
 	for x in BreakableGrid.GRID_SIZE.x:
 		for y in BreakableGrid.GRID_SIZE.y:
 			var index: int = y * (BreakableGrid.GRID_SIZE.x) + x
@@ -288,15 +290,21 @@ func convert_with_chance_merge(
 			block.pos_on_grid = Vector2(x, y)
 			block.health = int(rng.get_float() * block_max_hp) + 1
 			block.prepare_collision()
-			if rng.get_float() < .05:
+			if rng.get_float() < .1:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
 
-				block.powerup.type = Powerup.Type.KEY
-				# block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
+				# block.powerup.type = Powerup.Type.KEY
+				block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
 
 			result.push_back(block)
 	
+	var key_block_index: int = floorf(result.size() * rng.get_float())
+	var key_block: BreakableBlock = result[key_block_index]
+	key_block.has_powerup = true
+	key_block.powerup = Powerup.new()
+	key_block.powerup.type = Powerup.Type.KEY
+
 	return result
 
 func add_uv_to_color() -> void:
