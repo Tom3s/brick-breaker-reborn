@@ -19,6 +19,7 @@ extends Node3D
 @onready var debug_parent: Node3D = %Debug
 
 
+var wall_material: ShaderMaterial
 
 # var ball: Ball = Ball.new()
 # var balls: Array[Ball]
@@ -66,6 +67,12 @@ func _ready() -> void:
 	DebugScreen.add_debug_line(context._get_debug_string)
 
 	%Playfield.mesh.size = 1024 / 32.0 * BreakableGrid.GRID_SIZE
+	%LeftWall.mesh.size.x = 1024 / 32.0 * BreakableGrid.GRID_SIZE.y
+	%RightWall.mesh.size.x = 1024 / 32.0 * BreakableGrid.GRID_SIZE.y
+	%LeftWall.position.x = -(BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2)
+	%RightWall.position.x = (BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2)
+
+	wall_material = %LeftWall.get_surface_override_material(0)
 	
 var _debug_fps: float = 0.0
 func _process(delta: float) -> void:
@@ -320,6 +327,9 @@ func _process(delta: float) -> void:
 			context.powerups.erase(powerup)
 			powerup.asset.queue_free()
 
+	var wall_sdf_balls: PackedVector3Array
+	wall_sdf_balls.resize(32) # TODO: MAX_BALL_COUNT
+	wall_sdf_balls.fill(Vector3.INF)
 
 	for i in context.balls.size():
 		var ball: Ball = context.balls[i]
@@ -335,11 +345,17 @@ func _process(delta: float) -> void:
 		ball.asset_ref.global_position.z = ball.position.y
 		ball.asset_ref.global_position.y = ball.radius
 
+		if i < 32: # TODO: MAX_BALL_COUNT
+			wall_sdf_balls[i] = ball.asset_ref.global_position
+
 		if context.FLAG_FIREBALL_ACTIVE:
 			ball.asset_ref.set_flame(true)
 			ball.asset_ref.set_flame_rotation(ball.velocity)
 		else:
 			ball.asset_ref.set_flame(false)
+
+	wall_material.set_shader_parameter("balls", wall_sdf_balls)
+
 
 	for projectile: Projectile in context.projectiles:
 		projectile.asset_ref.global_position.x = projectile.position.x
