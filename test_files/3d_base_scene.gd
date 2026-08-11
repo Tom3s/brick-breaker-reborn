@@ -55,7 +55,7 @@ func _ready() -> void:
 	handle_mouse_movement(Vector2.ZERO)
 
 	# paddle.collider_line.debug_set_up = false
-	context.paddle.set_line(context.balls[0].radius)
+	context.paddle.set_line()
 
 	context.fireball_activated.connect(sfx_player.play_flame_ignite)
 	context.fireball_deactivated.connect(sfx_player.play_flame_extinguish)
@@ -65,6 +65,7 @@ func _ready() -> void:
 	DebugScreen.add_debug_line(func() -> String: return "Frametime: %.3fms" % (Performance.get_monitor(Performance.TIME_PROCESS) * 1000))
 	DebugScreen.add_debug_line(context.balls[0]._get_ball_pos_debug)
 	DebugScreen.add_debug_line(context._get_debug_string)
+
 
 	%Playfield.mesh.size = 1024 / 32.0 * BreakableGrid.GRID_SIZE
 	%LeftWall.mesh.size.x = 1024 / 32.0 * BreakableGrid.GRID_SIZE.y
@@ -107,6 +108,12 @@ func _process(delta: float) -> void:
 			context.balls.push_back(ball)
 
 			ball.randomize_velocity()
+		
+		# SET DEBUG VISUALS
+		DebugScreen.debug_visuals.clear()
+		if DebugScreen.VISUAL_DEBUG:
+			DebugScreen.debug_visuals.push_back(context.paddle.line.debug_visual)
+
 
 	handle_mouse_movement(mouse_input_handler.accumulated_mouse_movement)
 	mouse_input_handler.accumulated_mouse_movement = Vector2.ZERO
@@ -370,6 +377,20 @@ func _process(delta: float) -> void:
 	# laser_asset.%Beam.material_override.set_shader_parameter("TimeLeft", context.LASER_COOLDOWN)
 	laser_asset.set_visual(context.LASER_COOLDOWN)
 
+	# DRAW DEBUG
+	if Global.DEBUG && DebugScreen.VISUAL_DEBUG:
+		for block: BreakableBlock in context.get_current_blocks():
+			for line: LineCollider in block.collision:
+				DebugScreen.debug_visuals.push_back(line.debug_visual)
+				
+	if DebugScreen.VISUAL_DEBUG:
+		DebugScreen.draw_debug_visuals()
+	# DebugDraw3D.draw_line(
+	# 	Vector3.ZERO,
+	# 	Vector3.ONE * 100,
+	# 	Color.PINK
+	# )
+
 
 var grid_unit_size: Vector2
 func set_up_screen_collision() -> void:
@@ -406,11 +427,8 @@ func set_up_screen_collision() -> void:
 
 
 
-# TODO: I dont like this being alone with a signal. 
-# might cause headache later when debugging
 func handle_mouse_movement(movement: Vector2) -> void:
 	context.paddle.move(movement)
-
 
 func release_ball() -> void:
 	context.balls[0].randomize_velocity()
@@ -542,6 +560,9 @@ func display_blocks(blocks: Array[BreakableBlock]) -> void:
 	
 	for block: BreakableBlock in blocks:
 		block_parent.add_child(block.asset_ref)
+
+		
+		
 
 func on_board_clear() -> void:
 	# TODO: this resets the ball. shouldn't use death entrypoint for this tho

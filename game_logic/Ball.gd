@@ -100,8 +100,8 @@ func collide_with(line: LineCollider, reflect_ball: bool = true, boost_on_collis
 func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> bool:
 	var line: LineCollider = paddle.line
 
-	var p1: Vector2 = line.p1 + paddle.position
-	var p2: Vector2 = line.p2 + paddle.position
+	var p1: Vector2 = line.p1
+	var p2: Vector2 = line.p2
 
 	var moving_towards_line: bool = velocity.dot(line.normal) < 0
 	if !moving_towards_line:

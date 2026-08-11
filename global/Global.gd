@@ -4,9 +4,13 @@ var GRAVITY: float = 256.0
 
 var DEBUG: bool = true
 
+var DEBUG_DRAW_VISIBLE: bool = true
+
 const BALL_LIMIT: int = 350
 
 const LEVEL_COUNT: int = 10
+
+const DEFAULT_BALL_RADIUS: int = 8.0
 
 class Level:
 	var blocks: Array[BreakableBlock]
@@ -21,7 +25,7 @@ class GameContext extends Node:
 	signal fireball_deactivated()
 
 	var balls: Array[Ball]
-	var paddle: Paddle = Paddle.new()
+	var paddle: Paddle
 
 	var screen_collision: Array[LineCollider]
 	var top_barrier: LineCollider
@@ -45,6 +49,8 @@ class GameContext extends Node:
 			var level: Level = Level.new()
 			level.block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 			levels.push_back(level)
+		
+		paddle = Paddle.new()
 
 	func add_block_array(blocks: Array[BreakableBlock], level_index: int = current_level) -> void:
 		for block in blocks:
@@ -135,6 +141,8 @@ class GameContext extends Node:
 		for powerup: Powerup in powerups:
 			powerup.position.y -= BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE
 
+	func get_current_blocks() -> Array[BreakableBlock]:
+		return levels[current_level].blocks
 
 	# flags
 	var FLAG_FIREBALL_WAS_ACTIVE: bool = false

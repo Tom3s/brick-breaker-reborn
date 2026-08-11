@@ -17,10 +17,10 @@ var line: LineCollider = LineCollider.new()
 func _ready() -> void:
 	set_line()
 
-func set_line(radius: float = 0.0) -> void:
+func set_line() -> void:
 	line.set_points(
-		Vector2(+size / 2 + radius, -height / 2),
-		Vector2(-size / 2 - radius, -height / 2),
+		position + Vector2(+size / 2 + Global.DEFAULT_BALL_RADIUS, -height / 2),
+		position + Vector2(-size / 2 - Global.DEFAULT_BALL_RADIUS, -height / 2),
 	)
 
 func move(movement: Vector2) -> void:
@@ -34,6 +34,8 @@ func move(movement: Vector2) -> void:
 		position.x = - limits
 
 	position.y = (BreakableGrid.GRID_SIZE.y / 2 - 1) * BreakableGrid.CELL_SIZE
+
+	set_line()
 
 func get_left_side() -> Vector2:
 	return position - Vector2(size / 2, 0)
