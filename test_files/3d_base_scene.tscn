@@ -1,9 +1,10 @@
-[gd_scene load_steps=11 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=14 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
 [ext_resource type="PackedScene" path="res://visuals/LaserAsset.tscn" id="2_ie54n"]
 [ext_resource type="PackedScene" uid="uid://6p15wimk0j4s" path="res://audio/SFXPlayer.tscn" id="3_ie54n"]
+[ext_resource type="Material" uid="uid://b40wmht83lmdh" path="res://visuals/WallSDFMaterial.material" id="3_tvajp"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bcu1a"]
 top_radius = 8.0
@@ -15,6 +16,15 @@ albedo_color = Color(0.0885599, 0.0885599, 0.0885599, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yrogh"]
 size = Vector2(1024, 1024)
+
+[sub_resource type="QuadMesh" id="QuadMesh_5hqcb"]
+size = Vector2(1024, 256)
+orientation = 0
+
+[sub_resource type="QuadMesh" id="QuadMesh_tvajp"]
+flip_faces = true
+size = Vector2(1024, 256)
+orientation = 0
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_bcu1a"]
 
@@ -49,11 +59,26 @@ mesh = SubResource("CylinderMesh_bcu1a")
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, -4.476046e-05, 1, 0, -1024, -4.371139e-08, -4, 0, 0)
 
-[node name="Playfield" type="MeshInstance3D" parent="."]
+[node name="Arena" type="Node3D" parent="."]
+
+[node name="Playfield" type="MeshInstance3D" parent="Arena"]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.05, 0)
 material_override = SubResource("StandardMaterial3D_bcu1a")
 mesh = SubResource("PlaneMesh_yrogh")
+skeleton = NodePath("../..")
+
+[node name="LeftWall" type="MeshInstance3D" parent="Arena"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -512, 128, 0)
+mesh = SubResource("QuadMesh_5hqcb")
+surface_material_override/0 = ExtResource("3_tvajp")
+
+[node name="RightWall" type="MeshInstance3D" parent="Arena"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512, 128, 0)
+mesh = SubResource("QuadMesh_tvajp")
+surface_material_override/0 = ExtResource("3_tvajp")
 
 [node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 0.34202015, 0.9396926, 0, -0.9396926, 0.34202015, 0, 576, 368)
