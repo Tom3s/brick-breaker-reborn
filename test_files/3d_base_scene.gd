@@ -35,6 +35,8 @@ var wall_material: ShaderMaterial
 # var powerups: Array[Powerup]
 var context: Global.GameContext
 
+var quad: QuadTree.TreeNode
+
 func _ready() -> void:
 	context = Global.GameContext.new()
 	# ball.randomize_velocity()
@@ -49,6 +51,11 @@ func _ready() -> void:
 		context.add_block_array(generate_sparse_map(), i)
 		generate_block_assets(context.levels[i].blocks)
 	
+	quad = QuadTree.TreeNode.create_node(
+		Vector2(-grid_unit_size.x / 2, -grid_unit_size.y / 2),
+		Vector2(grid_unit_size.x / 2, grid_unit_size.y / 2),
+	)
+
 	display_blocks(context.levels[context.current_level].blocks)
 	
 
@@ -74,6 +81,16 @@ func _ready() -> void:
 	%RightWall.position.x = (BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2)
 
 	wall_material = %LeftWall.get_surface_override_material(0)
+
+
+	# debug
+
+	# quad._split()
+	# quad.nodes[0]._split()
+	# quad.nodes[0].nodes[3]._split()
+
+	# quad.draw_debug()
+
 	
 var _debug_fps: float = 0.0
 func _process(delta: float) -> void:
@@ -382,14 +399,16 @@ func _process(delta: float) -> void:
 		for block: BreakableBlock in context.get_current_blocks():
 			for line: LineCollider in block.collision:
 				DebugScreen.debug_visuals.push_back(line.debug_visual)
-				
+
 	if DebugScreen.VISUAL_DEBUG:
 		DebugScreen.draw_debug_visuals()
-	# DebugDraw3D.draw_line(
-	# 	Vector3.ZERO,
-	# 	Vector3.ONE * 100,
-	# 	Color.PINK
+	
+	# DebugDraw3D.draw_aabb_ab(
+	# 	Vector3(100, 100, 100),
+	# 	Vector3(-100, 80, -100),
 	# )
+	quad.draw_ball_collision(context.balls[0])
+	quad.draw_debug()
 
 
 var grid_unit_size: Vector2
@@ -558,8 +577,15 @@ func display_blocks(blocks: Array[BreakableBlock]) -> void:
 	for child in block_parent.get_children():
 		block_parent.remove_child(child)
 	
+	# TODO: make sure memory is freed
+	quad = QuadTree.TreeNode.create_node(
+		Vector2(-grid_unit_size.x / 2, -grid_unit_size.y / 2),
+		Vector2(grid_unit_size.x / 2, grid_unit_size.y / 2),
+	)
+
 	for block: BreakableBlock in blocks:
 		block_parent.add_child(block.asset_ref)
+		quad.add_block(block)
 
 		
 		

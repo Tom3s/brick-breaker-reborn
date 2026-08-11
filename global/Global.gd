@@ -10,7 +10,7 @@ const BALL_LIMIT: int = 350
 
 const LEVEL_COUNT: int = 10
 
-const DEFAULT_BALL_RADIUS: int = 8.0
+const DEFAULT_BALL_RADIUS: int = 16.0
 
 class Level:
 	var blocks: Array[BreakableBlock]
