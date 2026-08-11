@@ -7,9 +7,16 @@ var p2: Vector2
 var tangent: Vector2
 var normal: Vector2
 
-func _ready() -> void:
-	calculate_normals()
+var debug_visual: DebugVisual
 
+# func _ready() -> void:
+# 	calculate_normals()
+func _init() -> void:
+	calculate_normals()
+	debug_visual = DebugVisual.new(
+		DebugVisual.Type.LINE_2D,
+		self,
+	)
 
 func calculate_normals() -> void:
 	tangent = (p2 - p1).normalized()
@@ -20,3 +27,6 @@ func set_points(p1_new: Vector2, p2_new: Vector2) -> void:
 	p2 = p2_new
 
 	calculate_normals()
+
+# func get_debug_visual(offset: Vector2) -> DebugVisual:
+	

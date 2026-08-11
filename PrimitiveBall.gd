@@ -2,7 +2,7 @@ extends Sprite2D
 class_name PrimitiveBall
 
 @export
-var radius: float = 8.0
+var radius: float = Global.DEFAULT_BALL_RADIUS
 var pos: Vector2
 var velocity: Vector2
 @export

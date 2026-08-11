@@ -60,8 +60,8 @@ func move(delta: float) -> void:
 func collide_with_paddle(paddle: Paddle) -> bool:
 	var line: LineCollider = paddle.line
 
-	var p1: Vector2 = line.p1 + paddle.position
-	var p2: Vector2 = line.p2 + paddle.position
+	var p1: Vector2 = line.p1
+	var p2: Vector2 = line.p2
 
 	if p1.x < position.x || p2.x > position.x:
 		return false
