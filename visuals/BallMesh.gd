@@ -19,4 +19,8 @@ func set_flame(new_flame: bool) -> void:
 
 
 func set_flame_rotation(velocity: Vector2) -> void:
+	if velocity == Vector2.ZERO:
+		flame.look_at(global_position + Vector3.FORWARD)
+		return
+		
 	flame.look_at(global_position + Vector3(velocity.x, 1, velocity.y) / 10)

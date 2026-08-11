@@ -14,7 +14,8 @@ var size: Vector2i = Vector2i.ONE
 var color: Vector3 = Vector3.ONE
 
 var collision: Array[LineCollider]
-
+var a: Vector2
+var b: Vector2
 
 var type: BlockType = BlockType.NORMAL
 
@@ -39,6 +40,9 @@ func prepare_collision() -> void:
 	var p2: Vector2 = _get_collision_vertex_position(Vector2(0, BreakableGrid.CELL_SIZE * size.y))
 	var p3: Vector2 = _get_collision_vertex_position(Vector2(BreakableGrid.CELL_SIZE * size.x, BreakableGrid.CELL_SIZE * size.y))
 	var p4: Vector2 = _get_collision_vertex_position(Vector2(BreakableGrid.CELL_SIZE * size.x, 0))
+
+	a = p1
+	b = p3
 
 	var line: LineCollider = LineCollider.new()
 	line.set_points(p1, p2)
@@ -98,3 +102,11 @@ func is_broken() -> bool:
 
 func reflects_ball(context: Global.GameContext) -> bool:
 	return !(type == BlockType.ICE && context.FLAG_FIREBALL_ACTIVE)
+
+func is_pos_inside(pos: Vector2) -> bool:
+	if pos.x < a.x: return false
+	if pos.x > b.x: return false
+	if pos.y < a.y: return false
+	if pos.y > b.y: return false
+
+	return true

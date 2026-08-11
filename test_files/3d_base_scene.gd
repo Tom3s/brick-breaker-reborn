@@ -35,6 +35,8 @@ var wall_material: ShaderMaterial
 # var powerups: Array[Powerup]
 var context: Global.GameContext
 
+# var quad: QuadTree.TreeNode
+
 func _ready() -> void:
 	context = Global.GameContext.new()
 	# ball.randomize_velocity()
@@ -45,10 +47,17 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
+	# context.levels[0].quad_tree._force_split()
+
 	for i in Global.LEVEL_COUNT:
 		context.add_block_array(generate_sparse_map(), i)
 		generate_block_assets(context.levels[i].blocks)
 	
+	# quad = QuadTree.TreeNode.create_node(
+	# 	Vector2(-grid_unit_size.x / 2, -grid_unit_size.y / 2),
+	# 	Vector2(grid_unit_size.x / 2, grid_unit_size.y / 2),
+	# )
+
 	display_blocks(context.levels[context.current_level].blocks)
 	
 
@@ -74,6 +83,16 @@ func _ready() -> void:
 	%RightWall.position.x = (BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2)
 
 	wall_material = %LeftWall.get_surface_override_material(0)
+
+
+	# debug
+
+	# quad._split()
+	# quad.nodes[0]._split()
+	# quad.nodes[0].nodes[3]._split()
+
+	# quad.draw_debug()
+
 	
 var _debug_fps: float = 0.0
 func _process(delta: float) -> void:
@@ -137,46 +156,63 @@ func _process(delta: float) -> void:
 		if !ball.released:
 			break # TODO: might be hacky
 
-		var x_from: int = floorf((ball.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
-		var y_from: int = floorf((ball.position.y + (grid_unit_size.y / 2)) / BreakableGrid.CELL_SIZE)
-		var x_to: int = sign(ball.velocity.x)
-		var y_to: int = sign(ball.velocity.y)
+		# var x_from: int = floorf((ball.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
+		# var y_from: int = floorf((ball.position.y + (grid_unit_size.y / 2)) / BreakableGrid.CELL_SIZE)
+		# var x_to: int = sign(ball.velocity.x)
+		# var y_to: int = sign(ball.velocity.y)
 
-		x_to = x_to * 2 + x_from
-		y_to = y_to * 2 + y_from
+		# x_to = x_to * 2 + x_from
+		# y_to = y_to * 2 + y_from
 
-		# Cheeky ordering to fix [#044]
-		# ball first checks in the direction of velocity
-		# if that fails, falls back to grazing blocks
-		var x_range: Array = range(x_from, x_to, sign(ball.velocity.x))
-		x_range.push_back(x_from - sign(ball.velocity.x))
-		var y_range: Array = range(y_from, y_to, sign(ball.velocity.y))
-		y_range.push_back(y_from - sign(ball.velocity.y))
+		# # Cheeky ordering to fix [#044]
+		# # ball first checks in the direction of velocity
+		# # if that fails, falls back to grazing blocks
+		# var x_range: Array = range(x_from, x_to, sign(ball.velocity.x))
+		# x_range.push_back(x_from - sign(ball.velocity.x))
+		# var y_range: Array = range(y_from, y_to, sign(ball.velocity.y))
+		# y_range.push_back(y_from - sign(ball.velocity.y))
 
-		for x: int in x_range:
-			var block: BreakableBlock
-			for y: int in y_range:
-				block = context.get_block_at(x, y)
-				if block == null:
-					continue
+		# for x: int in x_range:
+		# 	var block: BreakableBlock
+		# 	for y: int in y_range:
+		# 		block = context.get_block_at(x, y)
+		# 		if block == null:
+		# 			continue
 
-				for line: LineCollider in block.collision:
+		# 		for line: LineCollider in block.collision:
 
-					if ball.collide_with(line, block.reflects_ball(context)):
-						block.hit_block(context, ball)
+		# 			if ball.collide_with(line, block.reflects_ball(context)):
+		# 				block.hit_block(context, ball)
 
 
-				if block.is_broken():
-					break
-			# TODO: use damage_block_and_clear()
-			if block != null && block.is_broken():
+		# 		if block.is_broken():
+		# 			break
+		for block: BreakableBlock in context.get_blocks_for_ball(ball):
+			# if block == null:
+			# 	LoggerMogyi.log(self, "PANIC smth aint right")
+			# TODO: remove later
+			if DebugScreen.VISUAL_DEBUG:
+				DebugVisual.draw_rectangle(
+					block.a, block.b, Color.BLUE
+				)
+			for line: LineCollider in block.collision:
+				if ball.collide_with(line, block.reflects_ball(context)):
+					block.hit_block(context, ball)
+
+
+			if block.is_broken():
+				# debugging
+				block.asset_ref.set_color(Vector3.ZERO)
+
 				if block.has_powerup:
 					block.has_powerup = false
 					spawn_powerup(block)
 				
 				context.broken_block_count += 1
 
+				# testing?
 				block.asset_ref.queue_free()
+				# LoggerMogyi.log(self, "Removed asset ref for block")
 				context.remove_block(block)
 				break	
 
@@ -260,12 +296,23 @@ func _process(delta: float) -> void:
 			disable_effect_queue.push_back(powerup)
 		
 		if powerup.laser_shot:
-			LoggerMogyi.log(self, "Laser is being shot!")
-			for y: int in BreakableGrid.GRID_SIZE.y:
-				var x: int = floorf((context.paddle.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
-				var block: BreakableBlock = context.get_block_at(x, y)
+			LoggerMogyi.log(self, "Laser is being shot! NOT IMPLEMENTED FOR QUAD TREE", LoggerMogyi.Severity.ERROR)
+			# for y: int in BreakableGrid.GRID_SIZE.y:
+			# 	var x: int = floorf((context.paddle.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
+			# 	var block: BreakableBlock = context.get_block_at(x, y)
 
-				damage_block_and_clear(block, context.get_laser_damage())
+			# 	damage_block_and_clear(block, context.get_laser_damage())
+			for block: BreakableBlock in context.get_blocks_for_aabb(
+				context.paddle.position + Vector2.UP * grid_unit_size.y,
+				context.paddle.position,
+			):
+				# print(block)
+				if DebugScreen.VISUAL_DEBUG:
+					DebugVisual.draw_rectangle_timed(
+						block.a, block.b, Color.ORANGE, 0.75
+					)
+				if block.a.x <= context.paddle.position.x && block.b.x >= context.paddle.position.x:
+					damage_block_and_clear(block, context.get_laser_damage())
 			
 			sfx_player.play_laser_shot()
 	
@@ -292,11 +339,18 @@ func _process(delta: float) -> void:
 
 		if projectile.type == Projectile.Type.GUN_BULLET:
 			# TODO: could make a function that turns {game world space} -> {grid index}
-			var idx2: Vector2 = ((projectile.position + (grid_unit_size / 2)) / BreakableGrid.CELL_SIZE).floor()
-			var block: BreakableBlock = context.get_block_at(idx2.x, idx2.y)
+			# var idx2: Vector2 = ((projectile.position + (grid_unit_size / 2)) / BreakableGrid.CELL_SIZE).floor()
+			# LoggerMogyi.log(self, "Checking projectile collision for bullet! NOT IMPLEMENTED FOR QUAD TREE", LoggerMogyi.Severity.ERROR)
+			# var block: BreakableBlock = context.get_block_at(idx2.x, idx2.y)
+			for block: BreakableBlock in context.get_blocks_for_pos(projectile.position):
+				if DebugScreen.VISUAL_DEBUG:
+					DebugVisual.draw_rectangle_timed(
+						block.a, block.b, Color.CYAN, 0.1
+					)
+				if block.is_pos_inside(projectile.position):
+					if damage_block_and_clear(block, context.get_gun_damage()) || projectile.position.y < -grid_unit_size.y:
+						proj_marked_for_remove.push_back(projectile)
 
-			if damage_block_and_clear(block, context.get_gun_damage()):
-				proj_marked_for_remove.push_back(projectile)
 	
 	for projectile: Projectile in proj_marked_for_remove:
 		projectile.asset_ref.queue_free()
@@ -382,13 +436,15 @@ func _process(delta: float) -> void:
 		for block: BreakableBlock in context.get_current_blocks():
 			for line: LineCollider in block.collision:
 				DebugScreen.debug_visuals.push_back(line.debug_visual)
-				
+
 	if DebugScreen.VISUAL_DEBUG:
 		DebugScreen.draw_debug_visuals()
-	# DebugDraw3D.draw_line(
-	# 	Vector3.ZERO,
-	# 	Vector3.ONE * 100,
-	# 	Color.PINK
+		context.levels[context.current_level].quad_tree.draw_ball_collision(context.balls[0])
+		context.levels[context.current_level].quad_tree.draw_debug()
+	
+	# DebugDraw3D.draw_aabb_ab(
+	# 	Vector3(100, 100, 100),
+	# 	Vector3(-100, 80, -100),
 	# )
 
 
@@ -510,6 +566,7 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
 
 	return map_generator.convert_with_chance_merge(.5, .5)
+	# return map_generator.convert_with_chance_merge(.0, .0)
 
 
 # func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
@@ -557,7 +614,7 @@ func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 func display_blocks(blocks: Array[BreakableBlock]) -> void:
 	for child in block_parent.get_children():
 		block_parent.remove_child(child)
-	
+
 	for block: BreakableBlock in blocks:
 		block_parent.add_child(block.asset_ref)
 

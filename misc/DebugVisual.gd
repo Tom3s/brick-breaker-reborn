@@ -43,3 +43,40 @@ func draw_debug() -> void:
 			((p1 + p2) / 2) + normal * 10.0,
 			Color.GREEN_YELLOW
 		)
+
+static func draw_rectangle(p1: Vector2, p2: Vector2, color: Color = Color.LIGHT_YELLOW) -> void:
+	var d1: Vector3 = Vector3(
+		p1.x,
+		0,
+		p1.y,
+	)
+	var d2: Vector3 = Vector3(
+		p2.x,
+		BreakableGrid.CELL_SIZE / 2.0,
+		p2.y,
+	)
+
+	DebugDraw3D.draw_aabb_ab(
+		d1, d2,
+		color
+	)
+
+static func draw_rectangle_timed(p1: Vector2, p2: Vector2, color: Color = Color.LIGHT_YELLOW, time: float = 0) -> void:
+	var d1: Vector3 = Vector3(
+		p1.x,
+		0,
+		p1.y,
+	)
+	var d2: Vector3 = Vector3(
+		p2.x,
+		BreakableGrid.CELL_SIZE / 2.0,
+		p2.y,
+	)
+
+	DebugDraw3D.draw_aabb_ab(
+		d1, d2,
+		color,
+		time
+	)
+
+	# LoggerMogyi.log(null, "Drawing Rectangle at %v - %v" % [d1, d2])

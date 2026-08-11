@@ -10,11 +10,12 @@ const BALL_LIMIT: int = 350
 
 const LEVEL_COUNT: int = 10
 
-const DEFAULT_BALL_RADIUS: int = 8.0
+const DEFAULT_BALL_RADIUS: int = 16.0
 
 class Level:
 	var blocks: Array[BreakableBlock]
-	var block_bitmap: Array[BreakableBlock]
+	# var block_bitmap: Array[BreakableBlock]
+	var quad_tree: QuadTree
 	
 	var completed: bool = false
 	var unlocked: bool = false
@@ -30,8 +31,7 @@ class GameContext extends Node:
 	var screen_collision: Array[LineCollider]
 	var top_barrier: LineCollider
 	var death_barrier: LineCollider
-	# var blocks: Array[BreakableBlock]
-	# var block_bitmap: Array[BreakableBlock]
+
 	var levels: Array[Level]
 	var current_level: int = 0
 
@@ -47,7 +47,11 @@ class GameContext extends Node:
 		# block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 		for i in LEVEL_COUNT:
 			var level: Level = Level.new()
-			level.block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
+			# level.block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
+			level.quad_tree = QuadTree.create_node(
+				-(BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE) / 2,
+				(BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE) / 2,
+			)
 			levels.push_back(level)
 		
 		paddle = Paddle.new()
@@ -58,38 +62,50 @@ class GameContext extends Node:
 
 	func add_block(block: BreakableBlock, level_index: int) -> void:
 		levels[level_index].blocks.push_back(block)
+		levels[level_index].quad_tree.add_block(block)
 
-		for x in block.size.x:
-			for y in block.size.y:
-				var actual_x: int = block.pos_on_grid.x + x
-				var actual_y: int = block.pos_on_grid.y + y
+		# for x in block.size.x:
+		# 	for y in block.size.y:
+		# 		var actual_x: int = block.pos_on_grid.x + x
+		# 		var actual_y: int = block.pos_on_grid.y + y
 
-				levels[level_index].block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = block
+		# 		levels[level_index].block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = block
 
 
 	func remove_block(block: BreakableBlock, level_index: int = current_level) -> void:
 		# TODO: handling memory from here, might wanna move it
 		levels[level_index].blocks.erase(block)
+		levels[level_index].quad_tree.remove_block(block)
 
-		for x in block.size.x:
-			for y in block.size.y:
-				var actual_x: int = block.pos_on_grid.x + x
-				var actual_y: int = block.pos_on_grid.y + y
 
-				levels[level_index].block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = null
+		# for x in block.size.x:
+		# 	for y in block.size.y:
+		# 		var actual_x: int = block.pos_on_grid.x + x
+		# 		var actual_y: int = block.pos_on_grid.y + y
+
+		# 		levels[level_index].block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = null
 		
 		levels[level_index].completed = levels[level_index].blocks.is_empty()
 	
-	func get_block_at(x: int, y: int) -> BreakableBlock:
-		# LoggerMogyi.log(self, "Getting block at (%.3f, %.3f)" % [x, y])
+	# func get_block_at(x: int, y: int) -> BreakableBlock:
+	# 	# LoggerMogyi.log(self, "Getting block at (%.3f, %.3f)" % [x, y])
 
-		if y < 0 || y >= BreakableGrid.GRID_SIZE.y:
-			return null
+	# 	if y < 0 || y >= BreakableGrid.GRID_SIZE.y:
+	# 		return null
 
-		if x < 0 || x >= BreakableGrid.GRID_SIZE.x:
-			return null
+	# 	if x < 0 || x >= BreakableGrid.GRID_SIZE.x:
+	# 		return null
 		
-		return levels[current_level].block_bitmap[y * BreakableGrid.GRID_SIZE.x + x]
+	# 	return levels[current_level].block_bitmap[y * BreakableGrid.GRID_SIZE.x + x]
+	func get_blocks_for_ball(ball: Ball) -> Array[BreakableBlock]:
+		return levels[current_level].quad_tree.get_blocks_for_ball(ball)
+	
+	func get_blocks_for_pos(pos: Vector2) -> Array[BreakableBlock]:
+		return levels[current_level].quad_tree.get_blocks_for_pos(pos)
+
+	func get_blocks_for_aabb(a: Vector2, b: Vector2) -> Array[BreakableBlock]:
+		return levels[current_level].quad_tree.get_blocks_for_aabb(a, b)
+	
 
 	func is_current_level_complete() -> bool:
 		return levels[current_level].completed
