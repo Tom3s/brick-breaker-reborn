@@ -71,12 +71,48 @@ func get_blocks_for_ball(ball: Ball) -> Array[BreakableBlock]:
 		
 	return result
 
+func get_blocks_for_pos(pos: Vector2) -> Array[BreakableBlock]:
+	var result: Array[BreakableBlock] = []
+	if !pos_collides_aabb(pos):
+		return result
+
+	result.append_array(data)
+	if nodes[0] == null:
+		return result
+	
+	for node: QuadTree in nodes:
+		result.append_array(node.get_blocks_for_pos(pos))
+		
+	return result
+
+func get_blocks_for_aabb(a: Vector2, b: Vector2) -> Array[BreakableBlock]:
+	var result: Array[BreakableBlock] = []
+	if !aabb_collides_aabb(a, b):
+		return result
+
+	result.append_array(data)
+	if nodes[0] == null:
+		return result
+	
+	for node: QuadTree in nodes:
+		result.append_array(node.get_blocks_for_aabb(a, b))
+		
+	return result
+
 
 func ball_collides_aabb(ball: Ball) -> bool:
 	if ball.position.x - ball.radius > p2.x: return false
-	if ball.position.x + ball.radius <= p1.x: return false
+	if ball.position.x + ball.radius < p1.x: return false
 	if ball.position.y - ball.radius > p2.y: return false
-	if ball.position.y + ball.radius <= p1.y: return false
+	if ball.position.y + ball.radius < p1.y: return false
+
+	return true
+
+func pos_collides_aabb(pos: Vector2) -> bool:
+	if pos.x > p2.x: return false
+	if pos.x < p1.x: return false
+	if pos.y > p2.y: return false
+	if pos.y < p1.y: return false
 
 	return true
 
@@ -85,6 +121,14 @@ func block_collides_aabb(block: BreakableBlock) -> bool:
 	if block.b.x < p1.x: return false
 	if block.a.y > p2.y: return false
 	if block.b.y < p1.y: return false
+
+	return true
+
+func aabb_collides_aabb(a: Vector2, b: Vector2) -> bool:
+	if a.x > p2.x: return false
+	if b.x < p1.x: return false
+	if a.y > p2.y: return false
+	if b.y < p1.y: return false
 
 	return true
 	
@@ -125,6 +169,15 @@ func _split() -> void:
 			p2,
 		),
 	]
+
+func _force_split() -> void:
+	if abs(p1.x - p2.x) <= BreakableGrid.CELL_SIZE:
+		return
+	
+	_split()
+
+	for node: QuadTree in nodes:
+		node._force_split()
 
 var draw_color: Color = Color.LIGHT_YELLOW
 func draw_debug(color: Color = Color.LIGHT_YELLOW) -> void:

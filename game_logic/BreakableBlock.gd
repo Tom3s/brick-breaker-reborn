@@ -102,3 +102,11 @@ func is_broken() -> bool:
 
 func reflects_ball(context: Global.GameContext) -> bool:
 	return !(type == BlockType.ICE && context.FLAG_FIREBALL_ACTIVE)
+
+func is_pos_inside(pos: Vector2) -> bool:
+	if pos.x < a.x: return false
+	if pos.x > b.x: return false
+	if pos.y < a.y: return false
+	if pos.y > b.y: return false
+
+	return true

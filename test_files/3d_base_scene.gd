@@ -47,6 +47,8 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
+	# context.levels[0].quad_tree._force_split()
+
 	for i in Global.LEVEL_COUNT:
 		context.add_block_array(generate_sparse_map(), i)
 		generate_block_assets(context.levels[i].blocks)
@@ -189,9 +191,10 @@ func _process(delta: float) -> void:
 			# if block == null:
 			# 	LoggerMogyi.log(self, "PANIC smth aint right")
 			# TODO: remove later
-			DebugVisual.draw_rectangle(
-				block.a, block.b, Color.BLUE
-			)
+			if DebugScreen.VISUAL_DEBUG:
+				DebugVisual.draw_rectangle(
+					block.a, block.b, Color.BLUE
+				)
 			for line: LineCollider in block.collision:
 				if ball.collide_with(line, block.reflects_ball(context)):
 					block.hit_block(context, ball)
@@ -299,6 +302,17 @@ func _process(delta: float) -> void:
 			# 	var block: BreakableBlock = context.get_block_at(x, y)
 
 			# 	damage_block_and_clear(block, context.get_laser_damage())
+			for block: BreakableBlock in context.get_blocks_for_aabb(
+				context.paddle.position + Vector2.UP * grid_unit_size.y,
+				context.paddle.position,
+			):
+				# print(block)
+				if DebugScreen.VISUAL_DEBUG:
+					DebugVisual.draw_rectangle_timed(
+						block.a, block.b, Color.ORANGE, 0.75
+					)
+				if block.a.x <= context.paddle.position.x && block.b.x >= context.paddle.position.x:
+					damage_block_and_clear(block, context.get_laser_damage())
 			
 			sfx_player.play_laser_shot()
 	
@@ -325,12 +339,18 @@ func _process(delta: float) -> void:
 
 		if projectile.type == Projectile.Type.GUN_BULLET:
 			# TODO: could make a function that turns {game world space} -> {grid index}
-			var idx2: Vector2 = ((projectile.position + (grid_unit_size / 2)) / BreakableGrid.CELL_SIZE).floor()
-			LoggerMogyi.log(self, "Checking projectile collision for bullet! NOT IMPLEMENTED FOR QUAD TREE", LoggerMogyi.Severity.ERROR)
+			# var idx2: Vector2 = ((projectile.position + (grid_unit_size / 2)) / BreakableGrid.CELL_SIZE).floor()
+			# LoggerMogyi.log(self, "Checking projectile collision for bullet! NOT IMPLEMENTED FOR QUAD TREE", LoggerMogyi.Severity.ERROR)
 			# var block: BreakableBlock = context.get_block_at(idx2.x, idx2.y)
+			for block: BreakableBlock in context.get_blocks_for_pos(projectile.position):
+				if DebugScreen.VISUAL_DEBUG:
+					DebugVisual.draw_rectangle_timed(
+						block.a, block.b, Color.CYAN, 0.1
+					)
+				if block.is_pos_inside(projectile.position):
+					if damage_block_and_clear(block, context.get_gun_damage()) || projectile.position.y < -grid_unit_size.y:
+						proj_marked_for_remove.push_back(projectile)
 
-			# if damage_block_and_clear(block, context.get_gun_damage()):
-			# 	proj_marked_for_remove.push_back(projectile)
 	
 	for projectile: Projectile in proj_marked_for_remove:
 		projectile.asset_ref.queue_free()
@@ -419,13 +439,13 @@ func _process(delta: float) -> void:
 
 	if DebugScreen.VISUAL_DEBUG:
 		DebugScreen.draw_debug_visuals()
+		context.levels[context.current_level].quad_tree.draw_ball_collision(context.balls[0])
+		context.levels[context.current_level].quad_tree.draw_debug()
 	
 	# DebugDraw3D.draw_aabb_ab(
 	# 	Vector3(100, 100, 100),
 	# 	Vector3(-100, 80, -100),
 	# )
-	context.levels[context.current_level].quad_tree.draw_ball_collision(context.balls[0])
-	context.levels[context.current_level].quad_tree.draw_debug()
 
 
 var grid_unit_size: Vector2
@@ -545,8 +565,8 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 
 	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
 
-	# return map_generator.convert_with_chance_merge(.5, .5)
-	return map_generator.convert_with_chance_merge(.0, .0)
+	return map_generator.convert_with_chance_merge(.5, .5)
+	# return map_generator.convert_with_chance_merge(.0, .0)
 
 
 # func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:

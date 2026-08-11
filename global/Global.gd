@@ -99,6 +99,13 @@ class GameContext extends Node:
 	# 	return levels[current_level].block_bitmap[y * BreakableGrid.GRID_SIZE.x + x]
 	func get_blocks_for_ball(ball: Ball) -> Array[BreakableBlock]:
 		return levels[current_level].quad_tree.get_blocks_for_ball(ball)
+	
+	func get_blocks_for_pos(pos: Vector2) -> Array[BreakableBlock]:
+		return levels[current_level].quad_tree.get_blocks_for_pos(pos)
+
+	func get_blocks_for_aabb(a: Vector2, b: Vector2) -> Array[BreakableBlock]:
+		return levels[current_level].quad_tree.get_blocks_for_aabb(a, b)
+	
 
 	func is_current_level_complete() -> bool:
 		return levels[current_level].completed
