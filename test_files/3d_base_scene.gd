@@ -413,10 +413,13 @@ func _process(delta: float) -> void:
 			wall_sdf_balls[i] = ball.asset_ref.global_position
 
 		if context.FLAG_FIREBALL_ACTIVE:
-			ball.asset_ref.set_flame(true)
-			ball.asset_ref.set_flame_rotation(ball.velocity)
+			ball.asset_ref.set_visual(Ball.Type.FIRE)
+			ball.asset_ref.set_effect_rotation(ball.velocity)
+		if context.FLAG_ICE_BALL_ACTIVE:
+			ball.asset_ref.set_visual(Ball.Type.ICE)
+			ball.asset_ref.set_effect_rotation(ball.velocity)
 		else:
-			ball.asset_ref.set_flame(false)
+			ball.asset_ref.set_visual(Ball.Type.NORMAL)
 
 	wall_material.set_shader_parameter("balls", wall_sdf_balls)
 
