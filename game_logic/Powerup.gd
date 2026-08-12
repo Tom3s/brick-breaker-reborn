@@ -10,6 +10,7 @@ enum Type {
 	LASER,
 	GUN,
 	KEY,
+	ICE_BALL,
 }
 
 static var weights: PackedInt32Array = [
@@ -18,11 +19,15 @@ static var weights: PackedInt32Array = [
 	2,
 	1,
 	2,
+	3,
 ]
 
 var ball_multiply_value: int = 3
 
 var fire_ball_max_time: float = 15.0
+
+var ice_ball_max_time: float = 15.0
+static var ice_ball_radius: float = BreakableGrid.CELL_SIZE * 4
 
 var laser_max_shots: int = 3
 var laser_cooldown: float = 1.0
@@ -102,6 +107,12 @@ func activate_powerup(context: Global.GameContext) -> void:
 	
 	elif type == Type.FIRE_BALL:
 		time_left = fire_ball_max_time
+		infinite = false
+		
+		context.active_powerups.push_back(self)
+	
+	elif type == Type.ICE_BALL:
+		time_left = ice_ball_max_time
 		infinite = false
 		
 		context.active_powerups.push_back(self)

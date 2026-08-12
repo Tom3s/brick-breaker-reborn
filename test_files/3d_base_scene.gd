@@ -187,7 +187,7 @@ func _process(delta: float) -> void:
 
 		# 		if block.is_broken():
 		# 			break
-		for block: BreakableBlock in context.get_blocks_for_ball(ball):
+		for block: BreakableBlock in context.get_blocks_for_circle(ball.position, ball.radius):
 			# if block == null:
 			# 	LoggerMogyi.log(self, "PANIC smth aint right")
 			# TODO: remove later
@@ -198,6 +198,9 @@ func _process(delta: float) -> void:
 			for line: LineCollider in block.collision:
 				if ball.collide_with(line, block.reflects_ball(context)):
 					block.hit_block(context, ball)
+
+					if context.FLAG_ICE_BALL_ACTIVE:
+						convert_blocks_to_ice(ball.position)
 
 
 			if block.is_broken():
@@ -561,12 +564,13 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 	# map_generator.add_uv_to_color()
 	map_generator.add_random_gradient_to_color()
 	map_generator.add_perlin_noise()
-	map_generator.treshold_grayscale(0.75)
+	# map_generator.treshold_grayscale(0.65)
+	map_generator.treshold_grayscale(0.3)
 
 	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
 
-	return map_generator.convert_with_chance_merge(.5, .5)
-	# return map_generator.convert_with_chance_merge(.0, .0)
+	# return map_generator.convert_with_chance_merge(.5, .5)
+	return map_generator.convert_with_chance_merge(.0, .0)
 
 
 # func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
@@ -702,3 +706,10 @@ func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
 		return true
 	
 	return false
+
+func convert_blocks_to_ice(pos: Vector2) -> void:
+	for block: BreakableBlock in context.get_blocks_for_circle(pos, Powerup.ice_ball_radius):
+		# check if block actually collides
+		if block.collides_with_circle(pos, Powerup.ice_ball_radius):
+			block.type = BreakableBlock.BlockType.ICE
+			block.set_visuals()
