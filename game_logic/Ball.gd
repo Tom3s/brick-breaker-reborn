@@ -1,6 +1,13 @@
 extends Node
 class_name Ball
 
+enum Type {
+	NONE,
+	NORMAL,
+	FIRE,
+	ICE,
+}
+
 @export
 var radius: float = 16.0
 

@@ -97,8 +97,8 @@ class GameContext extends Node:
 	# 		return null
 		
 	# 	return levels[current_level].block_bitmap[y * BreakableGrid.GRID_SIZE.x + x]
-	func get_blocks_for_ball(ball: Ball) -> Array[BreakableBlock]:
-		return levels[current_level].quad_tree.get_blocks_for_ball(ball)
+	func get_blocks_for_circle(pos: Vector2, r: float) -> Array[BreakableBlock]:
+		return levels[current_level].quad_tree.get_blocks_for_circle(pos, r)
 	
 	func get_blocks_for_pos(pos: Vector2) -> Array[BreakableBlock]:
 		return levels[current_level].quad_tree.get_blocks_for_pos(pos)
@@ -163,12 +163,14 @@ class GameContext extends Node:
 	# flags
 	var FLAG_FIREBALL_WAS_ACTIVE: bool = false
 	var FLAG_FIREBALL_ACTIVE: bool = false
+	var FLAG_ICE_BALL_ACTIVE: bool = false
 	var LASER_ACTIVE: bool = false
 	var LASER_COOLDOWN: float = 0.0
 	var GUN_ACTIVE: bool = false
 
 	func set_flags() -> void:
 		FLAG_FIREBALL_ACTIVE = false
+		FLAG_ICE_BALL_ACTIVE = false
 		LASER_ACTIVE = false
 		LASER_COOLDOWN = -1.0
 		GUN_ACTIVE = false
@@ -176,6 +178,8 @@ class GameContext extends Node:
 		for powerup: Powerup in active_powerups:
 			if powerup.type == Powerup.Type.FIRE_BALL:
 				FLAG_FIREBALL_ACTIVE = true
+			elif powerup.type == Powerup.Type.ICE_BALL:
+				FLAG_ICE_BALL_ACTIVE = true
 			elif powerup.type == Powerup.Type.LASER:
 				LASER_ACTIVE = true
 				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)

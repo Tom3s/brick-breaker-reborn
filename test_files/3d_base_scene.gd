@@ -187,7 +187,7 @@ func _process(delta: float) -> void:
 
 		# 		if block.is_broken():
 		# 			break
-		for block: BreakableBlock in context.get_blocks_for_ball(ball):
+		for block: BreakableBlock in context.get_blocks_for_circle(ball.position, ball.radius):
 			# if block == null:
 			# 	LoggerMogyi.log(self, "PANIC smth aint right")
 			# TODO: remove later
@@ -198,6 +198,9 @@ func _process(delta: float) -> void:
 			for line: LineCollider in block.collision:
 				if ball.collide_with(line, block.reflects_ball(context)):
 					block.hit_block(context, ball)
+
+					if context.FLAG_ICE_BALL_ACTIVE:
+						convert_blocks_to_ice(ball.position)
 
 
 			if block.is_broken():
@@ -410,10 +413,13 @@ func _process(delta: float) -> void:
 			wall_sdf_balls[i] = ball.asset_ref.global_position
 
 		if context.FLAG_FIREBALL_ACTIVE:
-			ball.asset_ref.set_flame(true)
-			ball.asset_ref.set_flame_rotation(ball.velocity)
+			ball.asset_ref.set_visual(Ball.Type.FIRE)
+			ball.asset_ref.set_effect_rotation(ball.velocity)
+		elif context.FLAG_ICE_BALL_ACTIVE:
+			ball.asset_ref.set_visual(Ball.Type.ICE)
+			ball.asset_ref.set_effect_rotation(ball.velocity)
 		else:
-			ball.asset_ref.set_flame(false)
+			ball.asset_ref.set_visual(Ball.Type.NORMAL)
 
 	wall_material.set_shader_parameter("balls", wall_sdf_balls)
 
@@ -561,7 +567,8 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 	# map_generator.add_uv_to_color()
 	map_generator.add_random_gradient_to_color()
 	map_generator.add_perlin_noise()
-	map_generator.treshold_grayscale(0.75)
+	# map_generator.treshold_grayscale(0.65)
+	map_generator.treshold_grayscale(0.4)
 
 	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
 
@@ -702,3 +709,10 @@ func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
 		return true
 	
 	return false
+
+func convert_blocks_to_ice(pos: Vector2) -> void:
+	for block: BreakableBlock in context.get_blocks_for_circle(pos, Powerup.ice_ball_radius):
+		# check if block actually collides
+		if block.collides_with_circle(pos, Powerup.ice_ball_radius):
+			block.type = BreakableBlock.BlockType.ICE
+			block.set_visuals()

@@ -1,4 +1,4 @@
-[gd_resource type="VisualShader" load_steps=28 format=3 uid="uid://4xkhcer14qtg"]
+[gd_resource type="VisualShader" load_steps=30 format=3 uid="uid://4xkhcer14qtg"]
 
 [ext_resource type="Script" uid="uid://7ae6ieohn7vs" path="res://addons/shaderV/rgba/noise/worley3d.gd" id="1_xdxdn"]
 
@@ -70,6 +70,9 @@ default_input_values = [0, Quaternion(0, 0, 0, 0)]
 op_type = 2
 function = 4
 
+[sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_4x8ex"]
+constant = 0.99
+
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_bw8bo"]
 input_name = "normal"
 
@@ -89,6 +92,9 @@ input_name = "node_position_world"
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_xdxdn"]
 
+[sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_ufd6w"]
+operator = 2
+
 [resource]
 code = "shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
@@ -101,6 +107,14 @@ render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse
 void vertex() {
 // Input:3
 	vec3 n_out3p0 = VERTEX;
+
+
+// FloatConstant:10
+	float n_out10p0 = 0.990000;
+
+
+// VectorOp:9
+	vec3 n_out9p0 = n_out3p0 * vec3(n_out10p0);
 
 
 // Input:6
@@ -132,6 +146,7 @@ void vertex() {
 
 
 // Output:0
+	VERTEX = n_out9p0;
 	UV = n_out5p0;
 	UV2 = vec2(n_out8p0);
 	COLOR.rgb = n_out2p0;
@@ -258,7 +273,11 @@ nodes/vertex/7/node = SubResource("VisualShaderNodeVectorDecompose_flova")
 nodes/vertex/7/position = Vector2(400, 140)
 nodes/vertex/8/node = SubResource("VisualShaderNodeFloatOp_xdxdn")
 nodes/vertex/8/position = Vector2(620, 240)
-nodes/vertex/connections = PackedInt32Array(3, 0, 4, 0, 3, 0, 5, 0, 6, 0, 5, 1, 5, 0, 0, 4, 2, 0, 0, 6, 6, 0, 7, 0, 8, 0, 0, 5, 7, 2, 8, 0, 4, 2, 8, 1)
+nodes/vertex/9/node = SubResource("VisualShaderNodeVectorOp_ufd6w")
+nodes/vertex/9/position = Vector2(600, -320)
+nodes/vertex/10/node = SubResource("VisualShaderNodeFloatConstant_4x8ex")
+nodes/vertex/10/position = Vector2(234.4203, -293.48367)
+nodes/vertex/connections = PackedInt32Array(3, 0, 4, 0, 3, 0, 5, 0, 6, 0, 5, 1, 5, 0, 0, 4, 2, 0, 0, 6, 6, 0, 7, 0, 8, 0, 0, 5, 7, 2, 8, 0, 4, 2, 8, 1, 3, 0, 9, 0, 10, 0, 9, 1, 9, 0, 0, 0)
 nodes/fragment/0/position = Vector2(2260, 200)
 nodes/fragment/3/node = SubResource("VisualShaderNodeInput_flova")
 nodes/fragment/3/position = Vector2(-880, -60)

@@ -294,7 +294,7 @@ func convert_with_chance_merge(
 				block.has_powerup = true
 				block.powerup = Powerup.new()
 
-				# block.powerup.type = Powerup.Type.BALL_MULTIPLY
+				# block.powerup.type = Powerup.Type.ICE_BALL
 				# block.powerup.ball_multiply_value = 10
 				block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
 

@@ -47,7 +47,7 @@ func remove_block(block: BreakableBlock) -> void:
 		node.remove_block(block)
 
 func draw_ball_collision(ball: Ball) -> void:
-	if !ball_collides_aabb(ball):
+	if !circle_collides_aabb(ball.position, ball.radius):
 		return
 
 	if nodes[0] == null: 
@@ -57,9 +57,9 @@ func draw_ball_collision(ball: Ball) -> void:
 	for node: QuadTree in nodes:
 		node.draw_ball_collision(ball)
 
-func get_blocks_for_ball(ball: Ball) -> Array[BreakableBlock]:
+func get_blocks_for_circle(pos: Vector2, r: float) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock] = []
-	if !ball_collides_aabb(ball):
+	if !circle_collides_aabb(pos, r):
 		return result
 
 	result.append_array(data)
@@ -67,7 +67,7 @@ func get_blocks_for_ball(ball: Ball) -> Array[BreakableBlock]:
 		return result
 	
 	for node: QuadTree in nodes:
-		result.append_array(node.get_blocks_for_ball(ball))
+		result.append_array(node.get_blocks_for_circle(pos, r))
 		
 	return result
 
@@ -100,11 +100,11 @@ func get_blocks_for_aabb(a: Vector2, b: Vector2) -> Array[BreakableBlock]:
 	return result
 
 
-func ball_collides_aabb(ball: Ball) -> bool:
-	if ball.position.x - ball.radius > p2.x: return false
-	if ball.position.x + ball.radius < p1.x: return false
-	if ball.position.y - ball.radius > p2.y: return false
-	if ball.position.y + ball.radius < p1.y: return false
+func circle_collides_aabb(pos: Vector2, r: float) -> bool:
+	if pos.x - r > p2.x: return false
+	if pos.x + r < p1.x: return false
+	if pos.y - r > p2.y: return false
+	if pos.y + r < p1.y: return false
 
 	return true
 

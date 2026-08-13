@@ -1,0 +1,7 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://cfkvt320570ac"]
+
+[ext_resource type="Shader" uid="uid://cewmyd7i3jtba" path="res://visuals/IceBallShader.tres" id="1_01ukp"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_01ukp")
