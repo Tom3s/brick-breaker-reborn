@@ -415,7 +415,7 @@ func _process(delta: float) -> void:
 		if context.FLAG_FIREBALL_ACTIVE:
 			ball.asset_ref.set_visual(Ball.Type.FIRE)
 			ball.asset_ref.set_effect_rotation(ball.velocity)
-		if context.FLAG_ICE_BALL_ACTIVE:
+		elif context.FLAG_ICE_BALL_ACTIVE:
 			ball.asset_ref.set_visual(Ball.Type.ICE)
 			ball.asset_ref.set_effect_rotation(ball.velocity)
 		else:
@@ -568,12 +568,12 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 	map_generator.add_random_gradient_to_color()
 	map_generator.add_perlin_noise()
 	# map_generator.treshold_grayscale(0.65)
-	map_generator.treshold_grayscale(0.3)
+	map_generator.treshold_grayscale(0.4)
 
 	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
 
-	# return map_generator.convert_with_chance_merge(.5, .5)
-	return map_generator.convert_with_chance_merge(.0, .0)
+	return map_generator.convert_with_chance_merge(.5, .5)
+	# return map_generator.convert_with_chance_merge(.0, .0)
 
 
 # func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
