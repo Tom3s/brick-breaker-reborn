@@ -7,6 +7,11 @@ var size: float = 128.0
 var height: float = 16.0
 
 var position: Vector2 = Vector2.ZERO
+var desired_pos: Vector2 = Vector2.ZERO
+
+# TODO: feels good, but might need more tweaking
+var LERP_SPEED: float = 0.9 * 20
+var LERP_LIMIT: float = 1.0
 
 
 var reflection_angle: float = PI / 4
@@ -23,19 +28,27 @@ func set_line() -> void:
 		position + Vector2(-size / 2 - Global.DEFAULT_BALL_RADIUS, -height / 2),
 	)
 
-func move(movement: Vector2) -> void:
-	position.x += movement.x
+func lerp_move(delta: float) -> void:
+	# position.x += movement.x
+	position.x = lerp(position.x, desired_pos.x, LERP_SPEED * delta)
+	if abs(position.x - desired_pos.x) <= LERP_LIMIT:
+		position.x = desired_pos.x
 
-	var limits: float = BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2 - (size / 2)
 
-	if position.x > limits:
-		position.x = limits
-	elif position.x < - limits:
-		position.x = - limits
 
 	position.y = (BreakableGrid.GRID_SIZE.y / 2 - 1) * BreakableGrid.CELL_SIZE
 
 	set_line()
+
+func move_desired_pos(movement: Vector2) -> void:
+	desired_pos.x += movement.x
+
+	var limits: float = BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2 - (size / 2)
+
+	if desired_pos.x > limits:
+		desired_pos.x = limits
+	elif desired_pos.x < - limits:
+		desired_pos.x = - limits
 
 func get_left_side() -> Vector2:
 	return position - Vector2(size / 2, 0)

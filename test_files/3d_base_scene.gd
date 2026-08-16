@@ -62,6 +62,7 @@ func _ready() -> void:
 	
 
 	handle_mouse_movement(Vector2.ZERO)
+	context.paddle.position.x = 0.0
 
 	# paddle.collider_line.debug_set_up = false
 	context.paddle.set_line()
@@ -136,6 +137,8 @@ func _process(delta: float) -> void:
 
 	handle_mouse_movement(mouse_input_handler.accumulated_mouse_movement)
 	mouse_input_handler.accumulated_mouse_movement = Vector2.ZERO
+
+	context.paddle.lerp_move(safe_delta)
 	
 	if !context.balls[0].released && mouse_input_handler.action_just_pressed:
 		release_ball()
@@ -490,7 +493,7 @@ func set_up_screen_collision() -> void:
 
 
 func handle_mouse_movement(movement: Vector2) -> void:
-	context.paddle.move(movement)
+	context.paddle.move_desired_pos(movement)
 
 func release_ball() -> void:
 	context.balls[0].randomize_velocity()
