@@ -1,32 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://cutxkxi4r87a1"]
+[gd_scene load_steps=6 format=3 uid="uid://cutxkxi4r87a1"]
 
 [ext_resource type="Shader" uid="uid://bav00e7wjo16q" path="res://visuals/SkyShader.gdshader" id="1_wnfp2"]
-
-[sub_resource type="Shader" id="Shader_wnfp2"]
-code = "shader_type sky;
-
-void sky() {
-	if (AT_CUBEMAP_PASS) {
-        // Sets the radiance cubemap to a nice shade of blue instead of doing
-        // expensive sky calculations
-        COLOR = vec3(0.2, 0.6, 1.0);
-    } else {
-        // Do expensive sky calculations for background sky only
-        COLOR = get_sky_color(EYEDIR);
-    }
-}
-"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_a84ee"]
-shader = SubResource("Shader_wnfp2")
-
-[sub_resource type="Sky" id="Sky_pj6yj"]
-sky_material = SubResource("ShaderMaterial_a84ee")
 
 [sub_resource type="Environment" id="Environment_uop8o"]
 background_mode = 3
 background_canvas_max_layer = -100
-sky = SubResource("Sky_pj6yj")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pj6yj"]
 shader = ExtResource("1_wnfp2")
