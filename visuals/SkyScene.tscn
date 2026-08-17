@@ -1,0 +1,63 @@
+[gd_scene load_steps=9 format=3 uid="uid://cutxkxi4r87a1"]
+
+[ext_resource type="Shader" uid="uid://bav00e7wjo16q" path="res://visuals/SkyShader.gdshader" id="1_wnfp2"]
+
+[sub_resource type="Shader" id="Shader_wnfp2"]
+code = "shader_type sky;
+
+void sky() {
+	if (AT_CUBEMAP_PASS) {
+        // Sets the radiance cubemap to a nice shade of blue instead of doing
+        // expensive sky calculations
+        COLOR = vec3(0.2, 0.6, 1.0);
+    } else {
+        // Do expensive sky calculations for background sky only
+        COLOR = get_sky_color(EYEDIR);
+    }
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_a84ee"]
+shader = SubResource("Shader_wnfp2")
+
+[sub_resource type="Sky" id="Sky_pj6yj"]
+sky_material = SubResource("ShaderMaterial_a84ee")
+
+[sub_resource type="Environment" id="Environment_uop8o"]
+background_mode = 3
+background_canvas_max_layer = -100
+sky = SubResource("Sky_pj6yj")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_pj6yj"]
+shader = ExtResource("1_wnfp2")
+shader_parameter/cell_amount = 35
+shader_parameter/period = Vector2(5, 10)
+shader_parameter/move_scale = 0.4
+shader_parameter/center_offset = Vector2(0.5, 0.13)
+
+[sub_resource type="Gradient" id="Gradient_yu0gs"]
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_6hpn5"]
+gradient = SubResource("Gradient_yu0gs")
+
+[node name="Node3D" type="WorldEnvironment"]
+environment = SubResource("Environment_uop8o")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = -200
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+
+[node name="TextureRect" type="TextureRect" parent="CanvasLayer/MarginContainer"]
+material = SubResource("ShaderMaterial_pj6yj")
+layout_mode = 2
+texture = SubResource("GradientTexture1D_6hpn5")

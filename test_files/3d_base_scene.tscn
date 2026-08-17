@@ -1,10 +1,11 @@
-[gd_scene load_steps=14 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=12 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
 [ext_resource type="PackedScene" path="res://visuals/LaserAsset.tscn" id="2_ie54n"]
 [ext_resource type="PackedScene" uid="uid://6p15wimk0j4s" path="res://audio/SFXPlayer.tscn" id="3_ie54n"]
 [ext_resource type="Material" uid="uid://b40wmht83lmdh" path="res://visuals/WallSDFMaterial.material" id="3_tvajp"]
+[ext_resource type="PackedScene" uid="uid://cutxkxi4r87a1" path="res://visuals/SkyScene.tscn" id="6_cs8pv"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bcu1a"]
 top_radius = 8.0
@@ -12,7 +13,10 @@ bottom_radius = 8.0
 height = 128.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bcu1a"]
-albedo_color = Color(0.0885599, 0.0885599, 0.0885599, 1)
+transparency = 4
+albedo_color = Color(0.87, 0.87, 0.87, 0.35686275)
+metallic = 0.2
+roughness = 0.05
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yrogh"]
 size = Vector2(1024, 1024)
@@ -25,15 +29,6 @@ orientation = 0
 flip_faces = true
 size = Vector2(1024, 256)
 orientation = 0
-
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_bcu1a"]
-
-[sub_resource type="Sky" id="Sky_ie54n"]
-sky_material = SubResource("ProceduralSkyMaterial_bcu1a")
-
-[sub_resource type="Environment" id="Environment_5hqcb"]
-background_mode = 2
-sky = SubResource("Sky_ie54n")
 
 [node name="3d_base_scene" type="Node3D"]
 script = ExtResource("1_yrogh")
@@ -96,8 +91,7 @@ size = 1024.0
 unique_name_in_owner = true
 script = ExtResource("2_bcu1a")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_5hqcb")
+[node name="Node3D" parent="." instance=ExtResource("6_cs8pv")]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.9514685, 0.062775366, 0.3012754, -0.30547336, 0.073897764, 0.9493287, 0.03733088, -0.9952881, 0.08948761, 0, 114.729614, 0)
@@ -107,3 +101,5 @@ unique_name_in_owner = true
 
 [node name="SFXPlayer" parent="." instance=ExtResource("3_ie54n")]
 unique_name_in_owner = true
+
+[editable path="Node3D"]
