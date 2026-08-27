@@ -126,9 +126,10 @@ script = ExtResource("2_bcu1a")
 [node name="Node3D" parent="." instance=ExtResource("6_cs8pv")]
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(0.9514685, 0.062775366, 0.3012754, -0.30547336, 0.073897764, 0.9493287, 0.03733088, -0.9952881, 0.08948761, 0, 114.729614, 0)
+transform = Transform3D(0.9636304, 0.19158603, 0.18630925, 0, -0.697165, 0.7169106, 0.26723835, -0.69083685, -0.67180943, 0, 0, 0)
 layers = 3
-sky_mode = 1
+light_specular = 0.535
+light_bake_mode = 0
 
 [node name="Debug" type="Node3D" parent="."]
 unique_name_in_owner = true
