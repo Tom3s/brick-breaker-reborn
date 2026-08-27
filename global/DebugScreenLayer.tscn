@@ -8,6 +8,7 @@ font_weight = 625
 multichannel_signed_distance_field = true
 
 [node name="DebugScreenLayer" type="CanvasLayer"]
+layer = 10
 visible = false
 script = ExtResource("1_0qgry")
 
