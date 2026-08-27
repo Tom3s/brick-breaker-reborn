@@ -1,8 +1,8 @@
 extends MeshInstance3D
 class_name BallMesh
 
-@onready var flame: Node3D = %Flame
-@onready var ice: Node3D = %Ice
+@onready var flame: MeshInstance3D = %Flame
+@onready var ice: MeshInstance3D = %Ice
 @onready var effect: Node3D = %Effect
 @onready var debug: MeshInstance3D = %Debug
 
@@ -18,6 +18,16 @@ var is_flame: bool = false
 # 	else:
 # 		material_override.set_shader_parameter("Color", Color.from_string(DEFAULT_COLOR, Color.WHITE))
 # 	flame.visible = new_flame
+
+func _ready() -> void:
+	mesh.radius = Global.DEFAULT_BALL_RADIUS
+	mesh.height = Global.DEFAULT_BALL_RADIUS * 2.0
+	flame.mesh.radius = Global.DEFAULT_BALL_RADIUS + 1
+	flame.mesh.height = Global.DEFAULT_BALL_RADIUS * 2.0 + 1
+	ice.mesh.radius = Global.DEFAULT_BALL_RADIUS + 1
+	ice.mesh.height = Global.DEFAULT_BALL_RADIUS * 2.0 + 1
+
+
 
 func set_visual(type: Ball.Type) -> void:
 	if type == Ball.Type.FIRE:

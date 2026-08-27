@@ -9,7 +9,7 @@ enum Type {
 }
 
 @export
-var radius: float = 16.0
+var radius: float = Global.DEFAULT_BALL_RADIUS
 
 @export
 var target_velocity: float = 512.0
