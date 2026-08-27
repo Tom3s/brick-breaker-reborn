@@ -1,6 +1,6 @@
-[gd_scene load_steps=5 format=3 uid="uid://cj62teh4q3rvb"]
+[gd_scene load_steps=5 format=3 uid="uid://w4r7atdoxgvr"]
 
-[ext_resource type="Script" uid="uid://img3ept218f1" path="res://visuals/LaserAsset.gd" id="1_k0ofi"]
+[ext_resource type="Script" path="res://visuals/LaserAsset.gd" id="1_k0ofi"]
 [ext_resource type="Shader" uid="uid://ceiaou27gkbu8" path="res://visuals/BeamShader.res" id="1_lam52"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k0ofi"]

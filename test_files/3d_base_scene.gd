@@ -16,6 +16,9 @@ extends Node3D
 @onready var projectile_parent: Node3D = %Projectiles
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
 
+@onready var play_layer_viewport: SubViewport = %PlayLayerViewport
+@onready var play_layer_camera: Camera3D = %PlayLayerCamera
+
 @onready var debug_parent: Node3D = %Debug
 
 
@@ -103,6 +106,8 @@ func _process(delta: float) -> void:
 	context.set_flags()
 	# delta *= .1
 	# safe_delta *= .6
+
+	play_layer_viewport.size = get_viewport().get_visible_rect().size
 
 	if Global.DEBUG:
 		context._set_debug_strings()
