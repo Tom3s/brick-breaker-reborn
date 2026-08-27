@@ -4,7 +4,12 @@
 
 [sub_resource type="Environment" id="Environment_uop8o"]
 background_mode = 3
+background_color = Color(1, 1, 1, 1)
 background_canvas_max_layer = -100
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_energy = 0.05
+reflected_light_source = 1
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pj6yj"]
 shader = ExtResource("1_wnfp2")
