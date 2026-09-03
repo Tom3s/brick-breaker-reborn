@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=4 uid="uid://cgx618w40odsy"]
+
+[ext_resource type="Script" uid="uid://bhw41qkr0crns" path="res://visuals/ProceduralBlockMesh.gd" id="1_6cu00"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_6cu00"]
+_surfaces = [{
+"aabb": AABB(-32, 0, -32, 64, 32, 64),
+"attribute_data": PackedByteArray("AP8A////AP//////AP///wAAAP//AAD//wD//wAA//8A/wD///8A////AP///////////wD///8A////AP8A/wAAAP//AAD//wAA//8A////AP//AAD//wAA//8AAAD/"),
+"format": 34359742479,
+"index_count": 132,
+"index_data": PackedByteArray("AAABAAMAAQACAAMABwAFAAQABwAGAAUAEAAJAAgACQAQABEAEQAKAAkACgARABIAEgALAAoACwASABMAEwAMAAsADAATABQAFAANAAwADQAUABUAFQAOAA0ADgAVABYAFgAPAA4ADwAWABcAFwAIAA8ACAAXABAACAABAAAAAQAIAAkACgACAAEAAgAKAAsADAADAAIAAwAMAA0ADgAAAAMAAAAOAA8ABAAFABAAEQAQAAUABQAGABIAEwASAAYABgAHABQAFQAUAAcABwAEABYAFwAWAAQAAAAPAAgAEAAXAAQAAQAJAAoAEgARAAUAAgALAAwAFAATAAYAAwANAA4AFgAVAAcA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 24,
+"vertex_data": PackedByteArray("dG7HwQAAAEJ0bsfBdG7HQQAAAEJ0bsfBdG7HQQAAAEJ0bsdBdG7HwQAAAEJ0bsdBdG7HwQAAAAB0bsfBdG7HQQAAAAB0bsfBdG7HQQAAAAB0bsdBdG7HwQAAAAB0bsdBdG7HwXRux0EAAADCdG7HQXRux0EAAADCAAAAQnRux0F0bsfBAAAAQnRux0F0bsdBdG7HQXRux0EAAABCdG7HwXRux0EAAABCAAAAwnRux0F0bsdBAAAAwnRux0F0bsfBdG7HwTBG4kAAAADCdG7HQTBG4kAAAADCAAAAQjBG4kB0bsfBAAAAQjBG4kB0bsdBdG7HQTBG4kAAAABCdG7HwTBG4kAAAABCAAAAwjBG4kB0bsdBAAAAwjBG4kB0bsfB/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v///////fwCA//////9/AID///9//3//v////3//f/+//3//f/9/AID/f/9//38AgAAA/3//f/+/AAD/f/9//7///////38AgP//////fwCA////f/9//7////9//3//v/9//3//fwCA/3//f/9/AIAAAP9//3//vwAA/3//f/+/")
+}]
+
+[node name="ProceduralBlockMesh" type="MeshInstance3D"]
+mesh = SubResource("ArrayMesh_6cu00")
+script = ExtResource("1_6cu00")
+points = PackedVector2Array(-32, -32, 32, -32, 32, 32, -32, 32)
+offset = 10.0
