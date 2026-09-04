@@ -19,8 +19,8 @@ size = Vector2(1024, 1024)
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jdl2d"]
 render_priority = -1
 shader = ExtResource("3_0eier")
-shader_parameter/blur_amount = 0.015
-shader_parameter/iterations = 1
+shader_parameter/blur_amount = 0.02
+shader_parameter/iterations = 6
 
 [sub_resource type="QuadMesh" id="QuadMesh_5hqcb"]
 size = Vector2(1024, 256)
