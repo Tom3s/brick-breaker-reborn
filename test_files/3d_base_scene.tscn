@@ -102,16 +102,16 @@ render_target_update_mode = 4
 
 [node name="PlayLayerCamera" type="Camera3D" parent="ActivePlayLayer/MarginContainer/SubViewportContainer/PlayLayerViewport"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 0.34202015, 0.9396926, 0, -0.9396926, 0.34202015, 0, 576, 368)
+transform = Transform3D(1, 0, 0, 0, 0.34202015, 0.9396926, 0, -0.9396926, 0.34202015, 0, 468, 280)
 cull_mask = 1047553
 current = true
 fov = 80.0
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.34202015, 0.9396926, 0, -0.9396926, 0.34202015, 0, 576, 368)
+transform = Transform3D(1, 0, 0, 0, 0.30901697, 0.95105654, 0, -0.95105654, 0.30901697, 0, 533.475, 260)
 cull_mask = 2
 current = true
-fov = 80.0
+fov = 72.0
 
 [node name="Camera3D2" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 500, 0)

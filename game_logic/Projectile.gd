@@ -6,7 +6,9 @@ enum Type {
 	GUN_BULLET,
 }
 
-static var GUN_BULLET_VELOCITY: Vector2 = Vector2.UP * BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE * 2
+# static var GUN_BULLET_VELOCITY: Vector2 = Vector2.UP * BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE * 2
+# migrating to landscape slowed the bullet down. This is the old value
+static var GUN_BULLET_VELOCITY: Vector2 = Vector2.UP * 36.0 * BreakableGrid.CELL_SIZE * 2
 
 var type: Type = Type.NONE
 
