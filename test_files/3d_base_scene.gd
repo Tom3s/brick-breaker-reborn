@@ -478,21 +478,21 @@ func set_up_screen_collision() -> void:
 
 	# This is the top barrier
 	context.top_barrier = LineCollider.new()
-	context.top_barrier.set_points(p1, p2)
+	context.top_barrier.set_points(p2, p1)
 
 	# This is the death barrier
 	context.death_barrier = LineCollider.new()
-	context.death_barrier.set_points(p3, p4)
+	context.death_barrier.set_points(p4, p3)
 
 	p3.y += grid_unit_size.y
 	p4.y += grid_unit_size.y
 
 	line = LineCollider.new()
-	line.set_points(p2, p3)
+	line.set_points(p3, p2)
 	context.screen_collision.push_back(line)
 
 	line = LineCollider.new()
-	line.set_points(p4, p1)
+	line.set_points(p1, p4)
 	context.screen_collision.push_back(line)
 
 

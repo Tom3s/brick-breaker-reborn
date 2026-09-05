@@ -20,7 +20,9 @@ func _init() -> void:
 
 func calculate_normals() -> void:
 	tangent = (p2 - p1).normalized()
-	normal = tangent.rotated(PI / 2)
+	normal = tangent.rotated(- PI / 2)
+	# rotating in negative trigo direction bc 2D coordinates 
+	# go downwards. This caused all lines to be flipped
 
 func set_points(p1_new: Vector2, p2_new: Vector2) -> void:
 	p1 = p1_new

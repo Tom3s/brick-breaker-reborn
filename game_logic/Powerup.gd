@@ -78,7 +78,7 @@ func collide_with_paddle(paddle: Paddle) -> bool:
 	var p1: Vector2 = line.p1
 	var p2: Vector2 = line.p2
 
-	if p1.x < position.x || p2.x > position.x:
+	if p1.x > position.x || p2.x < position.x:
 		return false
 	
 	if abs(position.y - p1.y) < grace_distance:

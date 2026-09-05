@@ -57,7 +57,7 @@ func prepare_collision() -> void:
 		var p2: Vector2 = _get_collision_vertex_position(points[(i + 1) % points.size()])
 
 		var line: LineCollider = LineCollider.new()
-		line.set_points(p2, p1)
+		line.set_points(p1, p2)
 		collision.push_back(line)
 
 
