@@ -65,12 +65,13 @@ func create_mesh() -> void:
 
 	for vert in vertices:
 		verts.push_back(vert.position - (vert.direction * offset))
-		print(verts[verts.size() - 1])
 		colors.push_back(color_from_vec3(vert.position))
 		normals.push_back(vert.normal)
 	
 	indices.append_array(create_top_face_indices())
-	indices.append_array(create_bottom_face_indices())
+	var top_tri_count: int = indices.size()
+	for i in top_tri_count:
+		indices.push_back(indices[top_tri_count - 1 - i] + n)
 	indices.append_array(create_side_face_indices())
 	indices.append_array(create_top_bevel_indices())
 	indices.append_array(create_bottom_bevel_indices())
@@ -87,13 +88,61 @@ func create_mesh() -> void:
 	mesh = ArrayMesh.new()
 	mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, surface_array)
 
+# Ear clipping algorithm
+# TODO: since vertices will get nudged slightly after triangulation
+#   they might still end up clipping the outside in a concave way
+#   especially if some points are ~collinear
 func create_top_face_indices() -> PackedInt32Array:
 	var indices: PackedInt32Array = PackedInt32Array()
 
-	# TODO: handle face creation for more indices
-	# this only works for 4
-	indices.append_array([0, 1, 3])
-	indices.append_array([1, 2, 3])
+	var remaining_vertices: Array[int]
+	for i in points.size():
+		remaining_vertices.append(i)
+	
+
+	var current_pointer: int = 0
+	var _failsafe: int = 0
+	while remaining_vertices.size() > 3:
+		_failsafe += 1
+		if _failsafe > 1000:
+			LoggerMogyi.log(self, "Surpassed 1000 iterations! Loop might be infinite", LoggerMogyi.Severity.ERROR)
+			break
+		# wrap index around
+		current_pointer %= remaining_vertices.size()
+
+		var i: int = remaining_vertices[current_pointer]
+		var l: int = remaining_vertices[(remaining_vertices.size() + current_pointer - 1) % remaining_vertices.size()]
+		var r: int = remaining_vertices[(current_pointer + 1) % remaining_vertices.size()]
+
+		var p: Vector2 = points[i]
+		var pl: Vector2 = points[l]
+		var pr: Vector2 = points[r]
+
+		# concave -> skip
+		if (p - pl).cross(pr - p) < 0:
+			current_pointer += 1
+			continue
+		
+		# other vertex inside this triangle
+		var _skip_iteration: bool = false
+		for ii in points.size():
+			if ii == i || ii == l || ii == r:
+				continue
+			
+			var check_vertex: Vector2 = points[ii]
+
+			if Geometry2D.point_is_inside_triangle(check_vertex, p, pl, pr):
+				current_pointer += 1
+				_skip_iteration = true
+				break
+		
+		if _skip_iteration: continue
+
+		remaining_vertices.remove_at(current_pointer)
+		indices.append_array([l, i, r])
+		print("Added %d - %d - %d" % [i, l, r])
+
+	indices.append_array(remaining_vertices)
 
 	return indices
 
@@ -294,9 +343,8 @@ func generate_vertices() -> Array[Vertex]:
 		vert.index = final_vertices.size()
 		final_vertices.push_back(vert)
 
-	# print(final_vertices)
-	for vert in final_vertices:
-		vert.print_vertex()
+	# for vert in final_vertices:
+	# 	vert.print_vertex()
 	
 	return final_vertices
 
