@@ -124,6 +124,24 @@ func collides_with_circle(pos: Vector2, r: float) -> bool:
 func set_visuals() -> void:
 	asset_ref.set_material(type)
 
+# vec2 random2(vec2 uv) {
+#     vec2 p = vec2(
+#         dot(uv, vec2(12.9898, 78.233)),
+#         dot(uv, vec2(39.346, 11.135))
+#     );
+#     return fract(sin(p) * 43758.5453);
+# }
+func _hash_2d(uv: Vector2) -> Vector2:
+	var p: Vector2 = Vector2(
+		uv.dot(Vector2(12.9898, 78.233)),
+        uv.dot(Vector2(39.346, 11.135))
+	)
+
+	return Vector2(
+		fmod(sin(p.x) * 43758.5453, 1.0),
+		fmod(sin(p.y) * 43758.5453, 1.0),
+	)
+
 func fill_points_from_size() -> void:
 	var p1: Vector2 = Vector2.ZERO
 	var p2: Vector2 = Vector2(BreakableGrid.CELL_SIZE * size.x, 0)
@@ -133,11 +151,8 @@ func fill_points_from_size() -> void:
 	points.append_array([p1, p2, p3, p4])
 
 	# make it *wiggly* :3
-	# for i in points.size():
-	# 	points[i] += Vector2(
-	# 		randf_range(-10, 10),
-	# 		randf_range(-10, 10),
-	# 	)
+	for i in points.size():
+		points[i] += _hash_2d(_get_collision_vertex_position(points[i])) * 5.0
 	
 	for point in points:
 		bound_min.x = min(bound_min.x, point.x)
