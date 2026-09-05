@@ -245,7 +245,7 @@ func _process(delta: float) -> void:
 	while index < context.balls.size():
 		var ball: Ball = context.balls[index]
 
-		if ball.collide_with(context.death_barrier, false, false):	
+		if ball.collide_with(context.death_barrier, false, false) || outside_screen_bounds(ball):	
 			if context.balls.size() > 1:
 				# ball_parent.remove_child(ball.asset_ref)
 				ball.asset_ref.queue_free()
@@ -487,8 +487,8 @@ func set_up_screen_collision() -> void:
 	context.death_barrier = LineCollider.new()
 	context.death_barrier.set_points(p4, p3)
 
-	p3.y += grid_unit_size.y
-	p4.y += grid_unit_size.y
+	# p3.y += grid_unit_size.y
+	# p4.y += grid_unit_size.y
 
 	line = LineCollider.new()
 	line.set_points(p3, p2)
@@ -497,6 +497,9 @@ func set_up_screen_collision() -> void:
 	line = LineCollider.new()
 	line.set_points(p1, p4)
 	context.screen_collision.push_back(line)
+
+	context.screen_a = p1
+	context.screen_b = p3
 
 
 
@@ -654,3 +657,12 @@ func convert_blocks_to_ice(pos: Vector2) -> void:
 		if block.collides_with_circle(pos, Powerup.ice_ball_radius):
 			block.type = BreakableBlock.BlockType.ICE
 			block.set_visuals()
+
+func outside_screen_bounds(ball: Ball) -> bool:
+	if ball.position.x + ball.radius * 2 < context.screen_a.x: return true
+	if ball.position.x - ball.radius * 2 > context.screen_b.x: return true
+
+	if ball.position.y < context.screen_a.y - (context.screen_b.y - context.screen_a.y): return true
+	if ball.position.y > context.screen_b.y + (context.screen_b.y - context.screen_a.y): return true
+
+	return false
