@@ -131,6 +131,13 @@ func fill_points_from_size() -> void:
 	var p4: Vector2 = Vector2(0, BreakableGrid.CELL_SIZE * size.y)
 
 	points.append_array([p1, p2, p3, p4])
+
+	# make it *wiggly* :3
+	# for i in points.size():
+	# 	points[i] += Vector2(
+	# 		randf_range(-10, 10),
+	# 		randf_range(-10, 10),
+	# 	)
 	
 	for point in points:
 		bound_min.x = min(bound_min.x, point.x)

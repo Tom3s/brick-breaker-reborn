@@ -534,7 +534,7 @@ func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 		# block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
 		block_mesh.set_polygon(block.points)
 
-		var final_pos: Vector2 = block.a
+		var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
 		block_mesh.global_position.x = final_pos.x
 		block_mesh.global_position.z = final_pos.y
 		# block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
