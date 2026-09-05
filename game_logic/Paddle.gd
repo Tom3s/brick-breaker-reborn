@@ -24,8 +24,8 @@ func _ready() -> void:
 
 func set_line() -> void:
 	line.set_points(
-		position + Vector2(+size / 2 + Global.DEFAULT_BALL_RADIUS, -height / 2),
 		position + Vector2(-size / 2 - Global.DEFAULT_BALL_RADIUS, -height / 2),
+		position + Vector2(+size / 2 + Global.DEFAULT_BALL_RADIUS, -height / 2),
 	)
 
 func lerp_move(delta: float) -> void:

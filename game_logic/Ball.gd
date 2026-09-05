@@ -125,7 +125,7 @@ func collide_with_paddle(paddle: Paddle, boost_on_collision: bool = true) -> boo
 
 	var t: float = case / (p1 - p2).length()
 
-	var reflection_angle: float = lerpf(paddle.reflection_angle, -paddle.reflection_angle, t)
+	var reflection_angle: float = lerpf(-paddle.reflection_angle, paddle.reflection_angle, t)
 
 	if (distance_from_line < radius):
 		var speed_along_normal: float = velocity.dot(line.normal)
