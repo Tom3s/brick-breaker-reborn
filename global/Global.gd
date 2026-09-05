@@ -31,6 +31,8 @@ class GameContext extends Node:
 	var paddle: Paddle
 
 	var screen_collision: Array[LineCollider]
+	var screen_a: Vector2
+	var screen_b: Vector2
 	var top_barrier: LineCollider
 	var death_barrier: LineCollider
 
