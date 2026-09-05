@@ -102,10 +102,10 @@ func reflects_ball(context: Global.GameContext) -> bool:
 	return !(type == BlockType.ICE && context.FLAG_FIREBALL_ACTIVE)
 
 func is_pos_inside(pos: Vector2) -> bool:
-	if pos.x < bound_min.x: return false
-	if pos.x > bound_max.x: return false
-	if pos.y < bound_min.y: return false
-	if pos.y > bound_max.y: return false
+	if pos.x < a.x: return false
+	if pos.x > b.x: return false
+	if pos.y < a.y: return false
+	if pos.y > b.y: return false
 
 	return true
 
@@ -117,7 +117,7 @@ func _sdBox(p: Vector2, b: Vector2) -> float:
 
 func collides_with_circle(pos: Vector2, r: float) -> bool:
 
-	var dist: float = _sdBox(pos - get_origin(), (bound_max - bound_min) / 2)
+	var dist: float = _sdBox(pos - get_origin(), (b - a) / 2)
 
 	return dist < r
 
