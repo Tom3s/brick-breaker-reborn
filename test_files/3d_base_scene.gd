@@ -100,6 +100,9 @@ func _ready() -> void:
 	
 var _debug_fps: float = 0.0
 func _process(delta: float) -> void:
+	play_layer_camera.position = get_viewport().get_camera_3d().position
+	play_layer_camera.rotation = get_viewport().get_camera_3d().rotation
+	play_layer_camera.fov = get_viewport().get_camera_3d().fov
 	_debug_fps = 1.0 / delta
 	var safe_delta: float = min(delta, 1. / 60)
 
@@ -521,7 +524,7 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 	# map_generator.treshold_grayscale(0.65)
 	map_generator.treshold_grayscale(0.4)
 
-	map_generator.copy_texture_to_final_bound(0, 0, 24, 26)
+	map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
 
 	# return map_generator.convert_with_chance_merge(.5, .5)
 	return map_generator.convert_with_chance_merge(.0, .0)
