@@ -1,0 +1,32 @@
+[gd_scene load_steps=5 format=4 uid="uid://7k8jvwn17k10"]
+
+[ext_resource type="Script" uid="uid://46rr1y0d32c4" path="res://test_files/mesh_gen_test.gd" id="1_pffmp"]
+[ext_resource type="PackedScene" uid="uid://cgx618w40odsy" path="res://visuals/ProceduralBlockMesh.tscn" id="2_upyt4"]
+[ext_resource type="Material" uid="uid://c4sk22xdx51c1" path="res://visuals/IceMaterial.material" id="3_upyt4"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_upyt4"]
+_surfaces = [{
+"aabb": AABB(-70.46673, 0, -48.476818, 164.06181, 32, 87.931564),
+"attribute_data": PackedByteArray("AP8A/8j5qT6afFk+//8A/+ZuUz++bFA+//8A/wAAgD+qhRU//////46BVT8SeHs/AP///yDnpz4k8HY/AAAA/8j5qT6afFk+/wAA/+ZuUz++bFA+/wAA/wAAgD+qhRU//wD//46BVT8SeHs/AAD//yDnpz4k8HY/AP8A/8j5qT6afFk+//8A/+ZuUz++bFA+//8A/+ZuUz++bFA+//8A/wAAgD+qhRU///8A/wAAgD+qhRU//////46BVT8SeHs//////46BVT8SeHs/AP///yDnpz4k8HY/AP///yDnpz4k8HY/AP8A/8j5qT6afFk+AP8A/8j5qT6afFk+//8A/+ZuUz++bFA+//8A/+ZuUz++bFA+//8A/wAAgD+qhRU///8A/wAAgD+qhRU//////46BVT8SeHs//////46BVT8SeHs/AP///yDnpz4k8HY/AP///yDnpz4k8HY/AP8A/8j5qT6afFk+"),
+"format": 34359742495,
+"index_count": 168,
+"index_data": PackedByteArray("BAAAAAEABAABAAIAAgADAAQACQAIAAcABwAGAAkABgAFAAkAFAALAAoACwAUABUAFQAMAAsADAAVABYAFgANAAwADQAWABcAFwAOAA0ADgAXABgAGAAPAA4ADwAYABkAGQAQAA8AEAAZABoAGgARABAAEQAaABsAGwASABEAEgAbABwAHAATABIAEwAcAB0AHQAKABMACgAdABQACgABAAAAAQAKAAsADAACAAEAAgAMAA0ADgADAAIAAwAOAA8AEAAEAAMABAAQABEAEgAAAAQAAAASABMABQAGABQAFQAUAAYABgAHABYAFwAWAAcABwAIABgAGQAYAAgACAAJABoAGwAaAAkACQAFABwAHQAcAAUAAAATAAoAFAAdAAUAAQALAAwAFgAVAAYAAgANAA4AGAAXAAcAAwAPABAAGgAZAAgABAARABIAHAAbAAkA"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 30,
+"vertex_data": PackedByteArray("blqFwgAAAEKHqjLCDfBLQgAAAEJmMTPCjgC3QgAAAEKSBq3AC6dTQgAAAEIeUA9C4kOHwgAAAEIs2ApCblqFwgAAAACHqjLCDfBLQgAAAABmMTPCjgC3QgAAAACSBq3AC6dTQgAAAAAeUA9C4kOHwgAAAAAs2ApC5VeFwmJf6UG9Fz7Cyq9GQmJf6UFD6EHCAABaQmJf6UEAADrCAAC7QmJf6UEAAPDArzC7QmJf6UHxMFrAo55hQmJf6UEPoxVCELBOQmJf6UGq0R1CCFiHwmJf6UFWLhZC9+6MwmJf6UHkrwpCCRGLwmJf6UHkrzLC5VeFwvMENUC9Fz7Cyq9GQvMENUBD6EHCAABaQvMENUAAADrCAAC7QvMENUAAAPDArzC7QvMENUDxMFrAo55hQvMENUAPoxVCELBOQvMENUCq0R1CCFiHwvMENUBWLhZC9+6MwvMENUDkrwpCCRGLwvMENUDkrzLC/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/78AAPT+9X6FgAAA9P71foWA////v6qqqar///+/qqqpqvnC/390VZ2s+cL/f3RVnaz7ff9/A4IFgft9/38DggWBAAB8gYJ+/b8AAHyBgn79vwAA9P71foWAAAD0/vV+hYD///+/qqqpqv///7+qqqmq+cL/f3RVnaz5wv9/dFWdrPt9/38DggWB+33/fwOCBYEAAHyBgn79vwAAfIGCfv2/")
+}]
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_pffmp")
+
+[node name="Points" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+polygon = PackedVector2Array(-69.5, -47.5, 52.5, -48.5, 95.5, -5.5, 54.5, 39.5, -70.5, 37.5)
+uv = PackedVector2Array(-69.5, -47.5, 52.5, -48.5, 95.5, -5.5, 54.5, 39.5, -70.5, 37.5)
+
+[node name="Mesh" parent="." instance=ExtResource("2_upyt4")]
+unique_name_in_owner = true
+material_override = ExtResource("3_upyt4")
+mesh = SubResource("ArrayMesh_upyt4")
+points = PackedVector2Array(-69.5, -47.5, 52.5, -48.5, 95.5, -5.5, 54.5, 39.5, -70.5, 37.5)
