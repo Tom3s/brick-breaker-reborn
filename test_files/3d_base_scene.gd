@@ -53,7 +53,7 @@ func _ready() -> void:
 	# context.levels[0].quad_tree._force_split()
 
 	for i in Global.LEVEL_COUNT:
-		context.add_block_array(generate_sparse_map(), i)
+		context.add_block_array(generate_sparse_map(i), i)
 		generate_block_assets(context.levels[i].blocks)
 	
 	# quad = QuadTree.TreeNode.create_node(
@@ -516,10 +516,9 @@ func on_death() -> void:
 	context.balls[0].released = false
 	LoggerMogyi.log(self, "Died")
 
-func generate_sparse_map() -> Array[BreakableBlock]:
+func generate_sparse_map(seed: int = randi()) -> Array[BreakableBlock]:
 	var map_generator := MapGenerator.new()
-	var SEED: int = randi()
-	map_generator.rng._seed = SEED
+	map_generator.rng.seed = seed
 
 	# map_generator.add_uv_to_color()
 	map_generator.add_random_gradient_to_color()

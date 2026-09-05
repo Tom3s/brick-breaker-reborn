@@ -7,12 +7,12 @@ var points: PackedVector2Array
 func init_array() -> void:
 	points.resize(grid_size * grid_size)
 
-func generate_points(rng: RNG) -> void:
+func generate_points(rng: RandomNumberGenerator) -> void:
 	for x in grid_size:
 		for y in grid_size:
 			var index: int = y * grid_size + x
 
-			var point: Vector2 = Vector2(rng.get_float(), rng.get_float()) * 2 - Vector2.ONE
+			var point: Vector2 = Vector2(rng.randf(), rng.randf()) * 2 - Vector2.ONE
 			point = point.normalized()
 
 			points[index] = point
