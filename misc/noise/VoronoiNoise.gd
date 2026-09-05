@@ -8,12 +8,12 @@ var jitter: float = 0.75
 func init_array() -> void:
 	points.resize((grid_size + 2) * (grid_size + 2))
 
-func generate_points(rng: RNG) -> void:
+func generate_points(rng: RandomNumberGenerator) -> void:
 	for x in grid_size + 2:
 		for y in grid_size + 2:
 			var index: int = y * (grid_size + 2) + x
 
-			var point: Vector2 = Vector2(rng.get_float(), rng.get_float())
+			var point: Vector2 = Vector2(rng.randf(), rng.randf())
 			point -= Vector2.ONE / 2
 			point *= jitter
 			point += Vector2.ONE / 2

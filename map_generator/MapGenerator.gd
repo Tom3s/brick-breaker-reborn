@@ -4,7 +4,8 @@ class_name MapGenerator
 var temp_texture: PackedFloat32Array
 var final_texture: PackedFloat32Array
 var color_texture: PackedVector3Array
-var rng: RNG
+# var rng: RNG
+var rng: RandomNumberGenerator
 
 func _init() -> void:
 	# set the base level texture size
@@ -14,8 +15,9 @@ func _init() -> void:
 	used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 	LoggerMogyi.log(self, "Texture initialized with size: %d" % temp_texture.size())
 
-	rng = RNG.new()
-	rng._seed = 9223372036854775807
+	# rng = RNG.new()
+	rng = RandomNumberGenerator.new()
+	# rng._seed = 9223372036854775807
 
 func clear_temp_texture() -> void:
 	temp_texture.clear()
@@ -64,13 +66,13 @@ func get_color(x: int, y: int) -> Vector3:
 
 # func add_random_noise() -> void:
 # 	for i in temp_texture.size():
-# 		temp_texture[i] = Vector3(rng.get_float(), rng.get_float(), rng.get_float())
+# 		temp_texture[i] = Vector3(rng.randf(), rng.randf(), rng.randf())
 	
 # 	LoggerMogyi.log(self, "Random noise added to instance %s" % self)
 
 func add_random_grayscale_noise() -> void:
 	for i in temp_texture.size():
-		temp_texture[i] = rng.get_float()
+		temp_texture[i] = rng.randf()
 	
 	LoggerMogyi.log(self, "Random grayscale noise added to instance %s" % self)
 
@@ -237,7 +239,7 @@ func convert_with_chance_merge(
 
 				# try expanding horizontally
 				# check if the expansion is possible
-				if !expanded_x && rng.get_float() <= chance_x && (x + block_size.x) < BreakableGrid.GRID_SIZE.x && block_size.x < max_merge_x:
+				if !expanded_x && rng.randf() <= chance_x && (x + block_size.x) < BreakableGrid.GRID_SIZE.x && block_size.x < max_merge_x:
 					for y2 in block_size.y:
 						var check_index: int = (y + y2) * BreakableGrid.GRID_SIZE.x + (x + block_size.x)
 						if final_texture[check_index] == 1 && used[check_index] == false:
@@ -260,7 +262,7 @@ func convert_with_chance_merge(
 				# try to expand vertically
 				# check if the expansion is possible
 				var can_expand_y: bool = true
-				if !expanded_y && rng.get_float() <= chance_y && (y + block_size.y) < BreakableGrid.GRID_SIZE.y && block_size.y < max_merge_y:
+				if !expanded_y && rng.randf() <= chance_y && (y + block_size.y) < BreakableGrid.GRID_SIZE.y && block_size.y < max_merge_y:
 					for x2 in block_size.x:
 						var check_index: int = (y + block_size.y) * BreakableGrid.GRID_SIZE.x + (x + x2)
 						if final_texture[check_index] == 1 && used[check_index] == false:
@@ -288,19 +290,19 @@ func convert_with_chance_merge(
 			block.color = get_color(x, y)
 			block.type = block_type
 			block.pos_on_grid = Vector2(x, y)
-			block.health = int(rng.get_float() * block_max_hp) + 1
+			block.health = int(rng.randf() * block_max_hp) + 1
 			block.prepare_collision()
-			if rng.get_float() < .1:
+			if rng.randf() < .1:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
 
 				# block.powerup.type = Powerup.Type.ICE_BALL
 				# block.powerup.ball_multiply_value = 10
-				block.powerup.type = Powerup.get_weighted_powerup(rng.get_float())
+				block.powerup.type = Powerup.get_weighted_powerup(rng.randf())
 
 			result.push_back(block)
 	
-	var key_block_index: int = floorf(result.size() * sqrt(rng.get_float()))
+	var key_block_index: int = floorf(result.size() * sqrt(rng.randf()))
 	var key_block: BreakableBlock = result[key_block_index]
 	key_block.has_powerup = true
 	key_block.powerup = Powerup.new()
@@ -320,16 +322,16 @@ func add_uv_to_color() -> void:
 
 func add_random_gradient_to_color() -> void:
 	var c1: Vector3 = Vector3(
-		rng.get_float(),
-		rng.get_float(),
-		rng.get_float(),
+		rng.randf(),
+		rng.randf(),
+		rng.randf(),
 	)
 	var c2: Vector3 = Vector3(
-		rng.get_float(),
-		rng.get_float(),
-		rng.get_float(),
+		rng.randf(),
+		rng.randf(),
+		rng.randf(),
 	)
-	var angle: float = rng.get_float() * PI * 2
+	var angle: float = rng.randf() * PI * 2
 
 	add_gradient_to_color(c1, c2, angle)
 

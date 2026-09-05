@@ -24,7 +24,8 @@ func initialize() -> void:
 	# print(range(5, 0, 0))
 
 	map_generator = MapGenerator.new()
-	map_generator.rng._seed = seed
+	# map_generator.rng._seed = seed
+	map_generator.rng.seed = seed
 	# map_generator.add_uv_to_color()
 	map_generator.add_rectangle(0, 0, BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y)
 	map_generator.add_gradient_to_color(Vector3.ZERO, Vector3.ONE, 1)
