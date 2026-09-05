@@ -40,6 +40,7 @@ script = ExtResource("1_5spqw")
 input_name = "normal"
 
 [sub_resource type="VisualShaderNodeRemap" id="VisualShaderNodeRemap_qr13a"]
+output_port_for_preview = 0
 default_input_values = [1, 0.0, 2, 1.0, 3, -0.2, 4, 0.2]
 
 [sub_resource type="VisualShaderNodeInput" id="VisualShaderNodeInput_81h2h"]
@@ -47,6 +48,7 @@ linked_parent_graph_frame = 13
 input_name = "uv"
 
 [sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_thdti"]
+output_port_for_preview = 0
 
 [sub_resource type="VisualShaderNodeColorConstant" id="VisualShaderNodeColorConstant_nhop7"]
 constant = Color(0.17819999, 0.41939995, 0.54, 1)
@@ -55,16 +57,19 @@ constant = Color(0.17819999, 0.41939995, 0.54, 1)
 constant = Color(0.58000004, 1, 0.986, 1)
 
 [sub_resource type="VisualShaderNodeMix" id="VisualShaderNodeMix_pglry"]
+output_port_for_preview = 0
 default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(1, 1, 1), 2, Vector3(0.5, 0.5, 0.5)]
 op_type = 3
 
 [sub_resource type="VisualShaderNodeVectorOp" id="VisualShaderNodeVectorOp_yyc0c"]
+output_port_for_preview = 0
 operator = 2
 
 [sub_resource type="VisualShaderNodeSmoothStep" id="VisualShaderNodeSmoothStep_bdhun"]
 default_input_values = [0, 0.09, 1, 0.89, 2, 0.5]
 
 [sub_resource type="VisualShaderNodeRemap" id="VisualShaderNodeRemap_vms6u"]
+output_port_for_preview = 0
 default_input_values = [1, 0.0, 2, 1.0, 3, 0.1, 4, 1.0]
 
 [sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_wopxt"]
@@ -96,12 +101,14 @@ script = ExtResource("5_clfqy")
 input_name = "uv"
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_h3507"]
+output_port_for_preview = 0
 operator = 2
 
 [sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_nybvk"]
 constant = 1.0
 
 [sub_resource type="VisualShaderNodeFloatOp" id="VisualShaderNodeFloatOp_mwhko"]
+output_port_for_preview = 0
 operator = 2
 
 [sub_resource type="VisualShaderNodeReroute" id="VisualShaderNodeReroute_wbfrr"]
@@ -126,6 +133,7 @@ default_input_values = [0, Vector3(0, 0, 0), 1, Vector3(1, 1, 1), 2, Vector3(0.5
 op_type = 3
 
 [sub_resource type="VisualShaderNodeMix" id="VisualShaderNodeMix_ss2ub"]
+output_port_for_preview = 0
 
 [sub_resource type="VisualShaderNodeFloatConstant" id="VisualShaderNodeFloatConstant_m4ufu"]
 constant = 0.8

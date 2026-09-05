@@ -25,6 +25,7 @@ class Vertex:
 	var position: Vector3 
 	var normal: Vector3 
 	var direction: Vector3 
+	var uv: Vector2
 
 	func print_vertex() -> void:
 		print(
@@ -59,13 +60,15 @@ func create_mesh() -> void:
 	surface_array.resize(Mesh.ARRAY_MAX)
 
 	var verts: PackedVector3Array = PackedVector3Array()
+	var uvs: PackedVector2Array = PackedVector2Array()
 	var colors: PackedColorArray = PackedColorArray() 
 	var normals: PackedVector3Array = PackedVector3Array()
 	var indices: PackedInt32Array = PackedInt32Array()
 
 	for vert in vertices:
 		verts.push_back(vert.position - (vert.direction * offset))
-		colors.push_back(color_from_vec3(vert.position))
+		uvs.push_back(vert.uv)
+		colors.push_back(color_from_vec3(vert.position - (vert.direction * offset)))
 		normals.push_back(vert.normal)
 	
 	indices.append_array(create_top_face_indices())
@@ -79,6 +82,7 @@ func create_mesh() -> void:
 
 	# Assign arrays to surface array.
 	surface_array[Mesh.ARRAY_VERTEX] = verts
+	surface_array[Mesh.ARRAY_TEX_UV] = uvs
 	surface_array[Mesh.ARRAY_COLOR] = colors
 	surface_array[Mesh.ARRAY_NORMAL] = normals
 	surface_array[Mesh.ARRAY_INDEX] = indices
@@ -106,6 +110,8 @@ func create_top_face_indices() -> PackedInt32Array:
 		_failsafe += 1
 		if _failsafe > 1000:
 			LoggerMogyi.log(self, "Surpassed 1000 iterations! Loop might be infinite", LoggerMogyi.Severity.ERROR)
+			LoggerMogyi.log(self, "Remaining vertices %s" % str(remaining_vertices))
+			LoggerMogyi.log(self, "Points %s" % str(points))
 			break
 		# wrap index around
 		current_pointer %= remaining_vertices.size()
@@ -140,7 +146,6 @@ func create_top_face_indices() -> PackedInt32Array:
 
 		remaining_vertices.remove_at(current_pointer)
 		indices.append_array([l, i, r])
-		print("Added %d - %d - %d" % [i, l, r])
 
 	indices.append_array(remaining_vertices)
 
@@ -214,8 +219,39 @@ func create_corner_bevel_indices() -> PackedInt32Array:
 	
 	return indices
 
+func _remap_vec2_for_uv(
+	val: Vector2,
+	istart: Vector2,
+	istop: Vector2,
+	ostart: Vector2,
+	ostop: Vector2,
+) -> Vector2:
+	var result: Vector2
+	result.x = remap(
+		val.x,
+		istart.x,
+		istop.x,
+		ostart.x,
+		ostop.x
+	)
+	result.y = remap(
+		val.y,
+		istart.y,
+		istop.y,
+		ostart.y,
+		ostop.y
+	)
+	return result
 
+var bound_min: Vector2
+var bound_max: Vector2
 func generate_vertices() -> Array[Vertex]:
+	# for UVS
+	for point in points:
+		bound_min.x = min(bound_min.x, point.x)
+		bound_min.y = min(bound_min.y, point.y)
+		bound_max.x = max(bound_max.x, point.x)
+		bound_max.y = max(bound_max.y, point.y)
 
 	# generate top vertices
 	var top_vertices: Array[Vertex]
@@ -232,6 +268,7 @@ func generate_vertices() -> Array[Vertex]:
 			p.y,
 		)
 		vertex.normal = Vector3.UP
+		vertex.uv = _remap_vec2_for_uv(p, bound_min, bound_max, Vector2.ZERO, Vector2.ONE)
 
 		var dir2D: Vector2 = ((p - pl).normalized() + (p - pr).normalized()).normalized()
 		if ((p - pl).cross(p - pr) > 0):
@@ -252,6 +289,7 @@ func generate_vertices() -> Array[Vertex]:
 			p.y,
 		)
 		vertex2.normal = Vector3.DOWN
+		vertex2.uv = _remap_vec2_for_uv(p, bound_min, bound_max, Vector2.ZERO, Vector2.ONE)
 		vertex2.direction = vertex.direction
 
 		# no index
@@ -278,6 +316,7 @@ func generate_vertices() -> Array[Vertex]:
 			p.y,
 		)
 		v1.normal = normal3D
+		v1.uv = _remap_vec2_for_uv(p, bound_min, bound_max, Vector2.ZERO, Vector2.ONE)
 		
 		var v2: Vertex = Vertex.new()
 		v2.position = Vector3(
@@ -286,6 +325,7 @@ func generate_vertices() -> Array[Vertex]:
 			p2.y,
 		)
 		v2.normal = normal3D
+		v2.uv = _remap_vec2_for_uv(p2, bound_min, bound_max, Vector2.ZERO, Vector2.ONE)
 
 		v1.direction = Vector3.UP.rotated(
 			normal3D, - PI / 4
@@ -305,6 +345,8 @@ func generate_vertices() -> Array[Vertex]:
 			p.y,
 		)
 		v3.normal = normal3D
+		v3.uv = _remap_vec2_for_uv(p, bound_min, bound_max, Vector2.ZERO, Vector2.ONE)
+
 		var v4: Vertex = Vertex.new()
 		v4.position = Vector3(
 			p2.x,
@@ -312,6 +354,7 @@ func generate_vertices() -> Array[Vertex]:
 			p2.y,
 		)
 		v4.normal = normal3D
+		v4.uv = _remap_vec2_for_uv(p2, bound_min, bound_max, Vector2.ZERO, Vector2.ONE)
 
 		v3.direction = Vector3.DOWN.normalized().rotated(
 			normal3D, PI / 4

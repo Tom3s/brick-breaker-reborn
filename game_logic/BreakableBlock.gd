@@ -10,12 +10,25 @@ enum BlockType {
 
 var pos_on_grid: Vector2i = Vector2i.ZERO
 
+# we gotta rework size to points
 var size: Vector2i = Vector2i.ONE
 var color: Vector3 = Vector3.ONE
 
-var collision: Array[LineCollider]
+# points are local
+var points: PackedVector2Array
+
+# local bounds
+var bound_min: Vector2
+var bound_max: Vector2
+
+
+# dont remove!!
+# global bounds
+# used for debug draw and quadtree collision
 var a: Vector2
 var b: Vector2
+
+var collision: Array[LineCollider]
 
 var type: BlockType = BlockType.NORMAL
 
@@ -35,30 +48,18 @@ func _process(delta: float) -> void:
 		if asset_ref.has_method("hide"):
 			asset_ref.hide()
 
+
 func prepare_collision() -> void:
-	var p1: Vector2 = _get_collision_vertex_position(Vector2.ZERO)
-	var p2: Vector2 = _get_collision_vertex_position(Vector2(0, BreakableGrid.CELL_SIZE * size.y))
-	var p3: Vector2 = _get_collision_vertex_position(Vector2(BreakableGrid.CELL_SIZE * size.x, BreakableGrid.CELL_SIZE * size.y))
-	var p4: Vector2 = _get_collision_vertex_position(Vector2(BreakableGrid.CELL_SIZE * size.x, 0))
+	fill_points_from_size()
 
-	a = p1
-	b = p3
+	for i in points.size():
+		var p1: Vector2 = _get_collision_vertex_position(points[i])
+		var p2: Vector2 = _get_collision_vertex_position(points[(i + 1) % points.size()])
 
-	var line: LineCollider = LineCollider.new()
-	line.set_points(p1, p2)
-	collision.push_back(line)
+		var line: LineCollider = LineCollider.new()
+		line.set_points(p2, p1)
+		collision.push_back(line)
 
-	line = LineCollider.new()
-	line.set_points(p2, p3)
-	collision.push_back(line)
-
-	line = LineCollider.new()
-	line.set_points(p3, p4)
-	collision.push_back(line)
-
-	line = LineCollider.new()
-	line.set_points(p4, p1)
-	collision.push_back(line)
 
 func _get_collision_vertex_position(local_vertex_pos: Vector2) -> Vector2:
 
@@ -69,9 +70,6 @@ func _get_collision_vertex_position(local_vertex_pos: Vector2) -> Vector2:
 	return vertex_pos
 
 func get_origin() -> Vector2:
-	# var p1: Vector2 = _get_collision_vertex_position(Vector2.ZERO)
-	# var p3: Vector2 = _get_collision_vertex_position(Vector2(BreakableGrid.CELL_SIZE * size.x, BreakableGrid.CELL_SIZE * size.y))
-
 	return a.lerp(b, 0.5)
 
 func hit_block(context: Global.GameContext, ball: Ball) -> void:
@@ -104,10 +102,10 @@ func reflects_ball(context: Global.GameContext) -> bool:
 	return !(type == BlockType.ICE && context.FLAG_FIREBALL_ACTIVE)
 
 func is_pos_inside(pos: Vector2) -> bool:
-	if pos.x < a.x: return false
-	if pos.x > b.x: return false
-	if pos.y < a.y: return false
-	if pos.y > b.y: return false
+	if pos.x < bound_min.x: return false
+	if pos.x > bound_max.x: return false
+	if pos.y < bound_min.y: return false
+	if pos.y > bound_max.y: return false
 
 	return true
 
@@ -119,9 +117,26 @@ func _sdBox(p: Vector2, b: Vector2) -> float:
 
 func collides_with_circle(pos: Vector2, r: float) -> bool:
 
-	var dist: float = _sdBox(pos - get_origin(), (b - a) / 2)
+	var dist: float = _sdBox(pos - get_origin(), (bound_max - bound_min) / 2)
 
 	return dist < r
 
 func set_visuals() -> void:
 	asset_ref.set_material(type)
+
+func fill_points_from_size() -> void:
+	var p1: Vector2 = Vector2.ZERO
+	var p2: Vector2 = Vector2(BreakableGrid.CELL_SIZE * size.x, 0)
+	var p3: Vector2 = Vector2(BreakableGrid.CELL_SIZE * size.x, BreakableGrid.CELL_SIZE * size.y)
+	var p4: Vector2 = Vector2(0, BreakableGrid.CELL_SIZE * size.y)
+
+	points.append_array([p1, p2, p3, p4])
+	
+	for point in points:
+		bound_min.x = min(bound_min.x, point.x)
+		bound_min.y = min(bound_min.y, point.y)
+		bound_max.x = max(bound_max.x, point.x)
+		bound_max.y = max(bound_max.y, point.y)
+
+	a = _get_collision_vertex_position(bound_min)
+	b = _get_collision_vertex_position(bound_max)

@@ -510,63 +510,6 @@ func on_death() -> void:
 	context.balls[0].released = false
 	LoggerMogyi.log(self, "Died")
 
-
-# TODO: prune when map generator is ready
-func generate_map() -> void:
-	for child in block_parent.get_children():
-		child.queue_free()
-	context.blocks.clear()
-	context.nr_metal_blocks = 0
-
-	# have X rows where randomly sized (vertical scale) blocks sit next to eachother
-	# there is a margin of 2 grid cells at the sides and top
-	# TODO: no thorough documentation needed, as this is just a placeholder for now
-	var nr_rows: int = 6
-	var nr_cols: int = BreakableGrid.GRID_SIZE.x - 4
-
-	for i in nr_rows:
-		var total: int = 0
-		while total < nr_cols:
-			var block_size: int = randi_range(2, 5)
-
-			if total + block_size > nr_cols:
-				block_size = nr_cols - total
-
-			var block: BreakableBlock = BreakableBlock.new()
-
-			block.pos_on_grid = Vector2i(2 + total, 2 * i + 2)
-			block.size = Vector2i(block_size, 2)
-			block.health = randi_range(1, 3)
-			if randf() < .4:
-				block.type = BreakableBlock.BlockType.ICE
-				block.health = 1
-			if randf() < .2:
-				block.type = BreakableBlock.BlockType.METAL
-				block.health = 1
-				context.nr_metal_blocks += 1
-			block.prepare_collision()
-
-			if randf() < .3:
-				block.has_powerup = true
-				block.powerup = Powerup.new()
-				block.powerup.type = Powerup.Type.BALL_MULTIPLY
-
-			var block_mesh: BlockMesh = block_mesh_scene.instantiate()
-			block_parent.add_child(block_mesh)
-			block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-			var final_pos: Vector2 = block.get_origin()
-			block_mesh.global_position.x = final_pos.x
-			block_mesh.global_position.z = final_pos.y
-			block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
-			block_mesh.set_material(block.type)
-			block_mesh.set_hp(block.health)
-
-			block.asset_ref = block_mesh
-
-			context.blocks.push_back(block)
-
-			total += block_size
-
 func generate_sparse_map() -> Array[BreakableBlock]:
 	var map_generator := MapGenerator.new()
 	var SEED: int = randi()
@@ -584,34 +527,18 @@ func generate_sparse_map() -> Array[BreakableBlock]:
 	# return map_generator.convert_with_chance_merge(.0, .0)
 
 
-# func generate_map_from_array(blocks: Array[BreakableBlock]) -> void:
-# 	for block in blocks:
-# 		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
-# 		block_parent.add_child(block_mesh)
-# 		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-# 		var final_pos: Vector2 = block.get_origin()
-# 		block_mesh.global_position.x = final_pos.x
-# 		block_mesh.global_position.z = final_pos.y
-# 		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
-# 		block_mesh.set_material(block.type)
-# 		block_mesh.set_hp(block.health)
-# 		block_mesh.set_color(block.color)
-
-# 		block.asset_ref = block_mesh
-
-# 		block.just_broken.connect(sfx_player.play_block_hit)
-# 		# context.blocks.push_back(block)
-# 		context.add_block(block)
-
 func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 	for block: BreakableBlock in blocks:
 		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
 		block_parent.add_child(block_mesh)
-		block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-		var final_pos: Vector2 = block.get_origin()
+		# block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+		block_mesh.set_polygon(block.points)
+
+		var final_pos: Vector2 = block.a
 		block_mesh.global_position.x = final_pos.x
 		block_mesh.global_position.z = final_pos.y
-		block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+		# block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+		block_mesh.global_position.y = 0
 		block_mesh.set_material(block.type)
 		if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
 			block_mesh.set_key_block()
@@ -641,7 +568,7 @@ func on_board_clear() -> void:
 	on_death()
 
 	context.broken_block_count = 0
-	generate_map()
+	# generate_map()
 
 # func are_breakable_blocks_remaining() -> bool:
 # 	return context.broken_block_count >= context.blocks.size() - context.nr_metal_blocks
