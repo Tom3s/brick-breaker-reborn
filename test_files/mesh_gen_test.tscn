@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=4 uid="uid://7k8jvwn17k10"]
+
+[ext_resource type="Script" uid="uid://46rr1y0d32c4" path="res://test_files/mesh_gen_test.gd" id="1_pffmp"]
+[ext_resource type="PackedScene" uid="uid://cgx618w40odsy" path="res://visuals/ProceduralBlockMesh.tscn" id="2_upyt4"]
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_pffmp"]
+_surfaces = [{
+"aabb": AABB(-71.97611, 0, -34.215107, 127.69443, 32, 68.785614),
+"attribute_data": PackedByteArray("//8A////////////AP///wD///8A/wD/AP8A//8AAP//AP///wD//wAA//8AAP//AAAA/wAAAP///wD//////////////////////wD///8A////AP///wD///8A/wD/AP8A/wD/AP8A/wD///8A//8AAP//AP///wD///8A////AP//AAD//wAA//8AAP//AAD//wAAAP8AAAD/AAAA/wAAAP//AAD/"),
+"format": 34359742479,
+"index_count": 222,
+"index_data": PackedByteArray("AAABAAMAAQACAAMABwAFAAQABwAGAAUAHAAPAA4ADwAcAB0AHQAQAA8AEAAdAB4AHgARABAAEQAeAB8AHwASABEAEgAfACAAIAATABIAEwAgACEAIQAUABMAFAAhACIAIgAVABQAFQAiACMAIwAWABUAFgAjACQAJAAXABYAFwAkACUAJQAYABcAGAAlACYAJgAZABgAGQAmACcAJwAaABkAGgAnACgAKAAbABoAGwAoACkAKQAOABsADgApABwADgABAAAAAQAOAA8AEAACAAEAAgAQABEAEgADAAIAAwASABMAFAAEAAMABAAUABUAFgAFAAQABQAWABcAGAAGAAUABgAYABkAGgAAAAYAAAAaABsABwAIABwAHQAcAAgACAAJAB4AHwAeAAkACQAKACAAIQAgAAoACgALACIAIwAiAAsACwAMACQAJQAkAAwADAANACYAJwAmAA0ADQAHACgAKQAoAAcAAAAbAA4AHAApAAcAAQAPABAAHgAdAAgAAgARABIAIAAfAAkAAwATABQAIgAhAAoABAAVABYAJAAjAAsABQAXABgAJgAlAAwABgAZABoAKAAnAA0A"),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 42,
+"vertex_data": PackedByteArray("jqObQQAAAEIj2nrBjpxJQgAAAEJdhZlBZOafQQAAAEIaZNhB0sl/wQAAAEKYpaFAjW93wgAAAELDYcNBaSGAwgAAAEJOkWDA6XiewQAAAELCkdDBjqObQQAAAAAj2nrBjpxJQgAAAABdhZlBZOafQQAAAAAaZNhB0sl/wQAAAACYpaFAjW93wgAAAADDYcNBaSGAwgAAAABOkWDA6XiewQAAAADCkdDB5EDqQXRux0Es+5LBjt9eQnRux0Es+4JBBnBVQnRux0GYb8NB9B/NQXRux0E0SApCUnZPQXRux0FMQAVCUnYvwXRux0Fnf5VBgjm9wXRux0EvKYtBP2NxwnRux0HR1vRBOwyIwnRux0ETB9BBxfOPwnRux0EscYC/W4yFwnRux0FmozXBls7ZwXRux0EnlwLCz4ZiwXRux0FF3AjCaEORQXRux0F2R87B5EDqQTBG4kAs+5LBjt9eQjBG4kAs+4JBBnBVQjBG4kCYb8NB9B/NQTBG4kA0SApCUnZPQTBG4kBMQAVCUnYvwTBG4kBnf5VBgjm9wTBG4kAvKYtBP2NxwjBG4kDR1vRBOwyIwjBG4kATB9BBxfOPwjBG4kAscYC/W4yFwjBG4kBmozXBls7ZwTBG4kAnlwLCz4ZiwTBG4kBF3AjCaEORQTBG4kB2R87B/3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//f///AAD/v/9///8AAP+//3///wAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v/9/AAAAAP+//38AAAAA/7//fwAAAAD/v///TrefqSmw//9Ot5+pKbBIov9/xWBSlUii/3/FYFKVck//f2mnv59yT/9/aae/n+Gh/38QYQiV4aH/fxBhCJVXEP9/CZDSvlcQ/38JkNK+AAAy001a/pwAADLTTVr+nP//g+UfmdaP//+D5R+Z1o///063n6kpsP//TrefqSmwSKL/f8VgUpVIov9/xWBSlXJP/39pp7+fck//f2mnv5/hof9/EGEIleGh/38QYQiVVxD/fwmQ0r5XEP9/CZDSvgAAMtNNWv6cAAAy001a/pz//4PlH5nWj///g+UfmdaP")
+}]
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_pffmp")
+
+[node name="Points" type="Polygon2D" parent="."]
+unique_name_in_owner = true
+polygon = PackedVector2Array(6, -25, 55, -25, 13, 4, 29, 47, -10, 20, -46, 51, -31.554901, 8.775871, -65, -26, -23, -25, -7, -63)
+
+[node name="Mesh" parent="." instance=ExtResource("2_upyt4")]
+unique_name_in_owner = true
+mesh = SubResource("ArrayMesh_pffmp")
+points = PackedVector2Array(25, -24, 60, 22, 19, 37, -17, 15, -67, 33, -73, -8, -21, -36)
