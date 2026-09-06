@@ -4,16 +4,16 @@
 [ext_resource type="Material" uid="uid://dssyve32uua8m" path="res://visuals/ColoredMaterial.material" id="2_sdce5"]
 [ext_resource type="Script" uid="uid://dk1w8owocfip" path="res://visuals/PowerupAsset.gd" id="3_r3lpo"]
 [ext_resource type="Texture2D" uid="uid://blcqiwqelbax8" path="res://visuals/textures/powerups/BALL_MULTIPLY.png" id="4_wscj7"]
-[ext_resource type="Texture2D" uid="uid://cmus6rhlaxgs" path="res://visuals/textures/powerups/GUN.png" id="5_sdce5"]
+[ext_resource type="Texture2D" uid="uid://ccs3jvcrywhcw" path="res://visuals/textures/powerups/ICE_BALL.png" id="5_sdce5"]
 
-[sub_resource type="VisualShaderNodeStep" id="VisualShaderNodeStep_x6co4"]
-default_input_values = [0, 0.0, 1, 0.25]
+[sub_resource type="VisualShaderNodeSmoothStep" id="VisualShaderNodeSmoothStep_r3lpo"]
+default_input_values = [0, 0.48, 1, 0.5, 2, 0.5]
 
 [sub_resource type="VisualShaderNodeColorConstant" id="VisualShaderNodeColorConstant_rbnmn"]
 constant = Color(0.06053035, 0.06053035, 0.060530342, 1)
 
 [sub_resource type="VisualShaderNodeStep" id="VisualShaderNodeStep_shc6l"]
-default_input_values = [0, 0.0, 1, 0.05]
+default_input_values = [0, 0.0, 1, 0.2]
 
 [sub_resource type="VisualShaderNodeFloatFunc" id="VisualShaderNodeFloatFunc_r5lxl"]
 function = 31
@@ -23,7 +23,6 @@ source = 5
 
 [sub_resource type="VisualShaderNodeTexture2DParameter" id="VisualShaderNodeTexture2DParameter_vtct2"]
 parameter_name = "Texture"
-texture_type = 1
 texture_filter = 2
 texture_repeat = 2
 
@@ -37,17 +36,17 @@ op_type = 3
 code = "shader_type spatial;
 render_mode blend_mix, depth_draw_opaque, depth_test_default, cull_back, diffuse_lambert, specular_schlick_ggx;
 
-uniform sampler2D Texture : source_color, filter_linear, repeat_disable;
+uniform sampler2D Texture : filter_linear, repeat_disable;
 
 
 
 void fragment() {
-// ColorConstant:8
-	vec4 n_out8p0 = vec4(1.000000, 1.000000, 1.000000, 1.000000);
-
-
 // ColorConstant:2
 	vec4 n_out2p0 = vec4(0.060530, 0.060530, 0.060530, 1.000000);
+
+
+// ColorConstant:8
+	vec4 n_out8p0 = vec4(1.000000, 1.000000, 1.000000, 1.000000);
 
 
 	vec4 n_out6p0;
@@ -55,17 +54,18 @@ void fragment() {
 	n_out6p0 = texture(Texture, UV);
 
 
-// Step:10
-	float n_in10p1 = 0.25000;
-	float n_out10p0 = step(n_out6p0.x, n_in10p1);
+// SmoothStep:11
+	float n_in11p0 = 0.48000;
+	float n_in11p1 = 0.50000;
+	float n_out11p0 = smoothstep(n_in11p0, n_in11p1, n_out6p0.x);
 
 
 // Mix:9
-	vec3 n_out9p0 = mix(vec3(n_out8p0.xyz), vec3(n_out2p0.xyz), vec3(n_out10p0));
+	vec3 n_out9p0 = mix(vec3(n_out2p0.xyz), vec3(n_out8p0.xyz), vec3(n_out11p0));
 
 
 // Step:3
-	float n_in3p1 = 0.05000;
+	float n_in3p1 = 0.20000;
 	float n_out3p0 = step(n_out6p0.x, n_in3p1);
 
 
@@ -80,13 +80,13 @@ void fragment() {
 
 }
 "
-nodes/fragment/0/position = Vector2(680, 140)
+nodes/fragment/0/position = Vector2(900, 120)
 nodes/fragment/2/node = SubResource("VisualShaderNodeColorConstant_rbnmn")
 nodes/fragment/2/position = Vector2(-180, -60)
 nodes/fragment/3/node = SubResource("VisualShaderNodeStep_shc6l")
-nodes/fragment/3/position = Vector2(0, 200)
+nodes/fragment/3/position = Vector2(20, 320)
 nodes/fragment/5/node = SubResource("VisualShaderNodeFloatFunc_r5lxl")
-nodes/fragment/5/position = Vector2(220, 220)
+nodes/fragment/5/position = Vector2(280, 360)
 nodes/fragment/6/node = SubResource("VisualShaderNodeTexture_jkkrc")
 nodes/fragment/6/position = Vector2(-280, 160)
 nodes/fragment/7/node = SubResource("VisualShaderNodeTexture2DParameter_vtct2")
@@ -94,10 +94,10 @@ nodes/fragment/7/position = Vector2(-680, 0)
 nodes/fragment/8/node = SubResource("VisualShaderNodeColorConstant_lnt7l")
 nodes/fragment/8/position = Vector2(-180, -180)
 nodes/fragment/9/node = SubResource("VisualShaderNodeMix_4tlqo")
-nodes/fragment/9/position = Vector2(240, -100)
-nodes/fragment/10/node = SubResource("VisualShaderNodeStep_x6co4")
-nodes/fragment/10/position = Vector2(20, 40)
-nodes/fragment/connections = PackedInt32Array(3, 0, 5, 0, 8, 0, 9, 0, 2, 0, 9, 1, 7, 0, 6, 2, 6, 0, 3, 0, 6, 0, 10, 0, 10, 0, 9, 2, 5, 0, 0, 1, 9, 0, 0, 0)
+nodes/fragment/9/position = Vector2(620, -40)
+nodes/fragment/11/node = SubResource("VisualShaderNodeSmoothStep_r3lpo")
+nodes/fragment/11/position = Vector2(360, 40)
+nodes/fragment/connections = PackedInt32Array(3, 0, 5, 0, 7, 0, 6, 2, 6, 0, 3, 0, 2, 0, 9, 0, 8, 0, 9, 1, 6, 0, 11, 2, 5, 0, 0, 1, 11, 0, 9, 2, 9, 0, 0, 0)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_sdce5"]
 render_priority = 0
