@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://5mbwwe3y6srh"]
+
+[ext_resource type="Script" uid="uid://b6r2t2ivsoqyl" path="res://global/scripts/BWtoSDF.gd" id="1_uhulr"]
+
+[node name="Node" type="Node"]
+script = ExtResource("1_uhulr")
