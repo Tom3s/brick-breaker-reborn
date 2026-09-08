@@ -21,6 +21,7 @@ class Level:
 	
 	var completed: bool = false
 	var unlocked: bool = false
+	var key_enabled: bool = false
 
 class GameContext extends Node:
 
@@ -178,6 +179,14 @@ class GameContext extends Node:
 		
 		return Ball.Type.NONE
 
+	func enable_key() -> void:
+		levels[current_level].key_enabled = true
+
+	func activate_key() -> void:
+		if levels[current_level].key_enabled:
+			levels[current_level].unlocked = true
+
+
 
 	# flags
 	var LASER_ACTIVE: bool = false
@@ -202,7 +211,7 @@ class GameContext extends Node:
 	var _DEBUG_BALL_SLOTS: String
 	var _DEBUG_ACTIVE_NR_BALLS: String
 	var _DEBUG_CURRENT_LEVEL: String
-	var _DEBUG_CURRENT_LEVEL_UNLOCKED: String
+	var _DEBUG_CURRENT_KEY_STATUS: String
 	var _DEBUG_CURRENT_LEVEL_COMPLETE: String
 
 	func _set_debug_strings() -> void:
@@ -218,7 +227,7 @@ class GameContext extends Node:
 
 		_DEBUG_ACTIVE_NR_BALLS = "Nr Balls: %d" % balls.size()
 		_DEBUG_CURRENT_LEVEL = "Current Level: %d" % current_level
-		_DEBUG_CURRENT_LEVEL_UNLOCKED = "Picked Up KEY: %s" % str(levels[current_level].unlocked)
+		_DEBUG_CURRENT_KEY_STATUS = "KEY picked up: %s / Used: %s" % [str(levels[current_level].key_enabled), str(levels[current_level].unlocked)]
 		
 		_DEBUG_CURRENT_LEVEL_COMPLETE = "Current Level Complete: %s" % str(levels[current_level].completed)
 	
@@ -228,7 +237,7 @@ class GameContext extends Node:
 			_DEBUG_BALL_SLOTS,
 			_DEBUG_CURRENT_LEVEL,
 			_DEBUG_CURRENT_LEVEL_COMPLETE,
-			_DEBUG_CURRENT_LEVEL_UNLOCKED,
+			_DEBUG_CURRENT_KEY_STATUS,
 			_DEBUG_ACTIVE_POWERUPS,
 		]
 	
