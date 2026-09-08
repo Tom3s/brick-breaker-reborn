@@ -13,24 +13,24 @@ enum Type {
 	ICE_BALL,
 }
 
-static var weights: PackedInt32Array = [
-	0,
-	0,
-	3,
-	0,
-	1,
-	0,
-	3,
-]
 # static var weights: PackedInt32Array = [
 # 	0,
-# 	2,
-# 	2,
+# 	0,
+# 	3,
+# 	0,
 # 	1,
-# 	2,
-# 	0, # key should always be 0
-# 	2,
+# 	0,
+# 	3,
 # ]
+static var weights: PackedInt32Array = [
+	0,
+	2,
+	6,
+	1,
+	4,
+	0, # key should always be 0
+	6,
+]
 
 var ball_multiply_value: int = 3
 

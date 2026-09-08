@@ -23,6 +23,8 @@ extends Node3D
 
 @onready var roof: MeshInstance3D = %Roof
 
+@onready var ingame_ui: IngameUI = %IngameUI
+
 var wall_material: ShaderMaterial
 
 # var ball: Ball = Ball.new()
@@ -53,8 +55,10 @@ func _ready() -> void:
 
 	# context.levels[0].quad_tree._force_split()
 
+	var base_seed: int = randi()
+
 	for i in Global.LEVEL_COUNT:
-		context.add_block_array(generate_sparse_map(i), i)
+		context.add_block_array(generate_sparse_map(base_seed + i), i)
 		generate_block_assets(context.levels[i].blocks)
 	
 	# quad = QuadTree.TreeNode.create_node(
@@ -466,6 +470,11 @@ func _process(delta: float) -> void:
 	# laser_asset.%Beam.material_override.set_shader_parameter("TimeLeft", context.LASER_COOLDOWN)
 	laser_asset.set_visual(context.LASER_COOLDOWN)
 
+	# set UI
+	ingame_ui.set_ball_slots(context)
+	ingame_ui.set_current_level(context.current_level + 1)
+	ingame_ui.set_key_enabled(context.get_can_key_be_used())
+
 	# DRAW DEBUG
 	if Global.DEBUG && DebugScreen.VISUAL_DEBUG:
 		for block: BreakableBlock in context.get_current_blocks():
@@ -546,8 +555,8 @@ func generate_sparse_map(seed: int = randi()) -> Array[BreakableBlock]:
 
 	map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
 
-	# return map_generator.convert_with_chance_merge(.5, .5)
-	return map_generator.convert_with_chance_merge(.0, .0)
+	return map_generator.convert_with_chance_merge(.5, .5)
+	# return map_generator.convert_with_chance_merge(.0, .0)
 
 
 func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
