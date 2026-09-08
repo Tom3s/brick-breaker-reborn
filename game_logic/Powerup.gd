@@ -139,7 +139,7 @@ func activate_powerup(context: Global.GameContext) -> void:
 		context.active_powerups.push_back(self)
 	
 	elif type == Type.KEY:
-		context.levels[context.current_level].unlocked = true
+		context.enable_key()
 
 func update(delta: float) -> void:
 	time_left -= delta

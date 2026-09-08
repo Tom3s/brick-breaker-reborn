@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=16 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
@@ -6,6 +6,7 @@
 [ext_resource type="Shader" uid="uid://c5fgee6kevb0l" path="res://visuals/ScreenSpaceBlur.gdshader" id="3_0eier"]
 [ext_resource type="PackedScene" uid="uid://6p15wimk0j4s" path="res://audio/SFXPlayer.tscn" id="3_ie54n"]
 [ext_resource type="Material" uid="uid://b40wmht83lmdh" path="res://visuals/WallSDFMaterial.material" id="3_tvajp"]
+[ext_resource type="Shader" uid="uid://do3suaiifptyk" path="res://visuals/WallSDF_code.gdshader" id="5_jdl2d"]
 [ext_resource type="PackedScene" uid="uid://cutxkxi4r87a1" path="res://visuals/SkyScene.tscn" id="6_cs8pv"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bcu1a"]
@@ -30,6 +31,19 @@ orientation = 0
 flip_faces = true
 size = Vector2(1024, 256)
 orientation = 0
+
+[sub_resource type="QuadMesh" id="QuadMesh_7cdmi"]
+flip_faces = true
+size = Vector2(1024, 256)
+orientation = 0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_du04y"]
+render_priority = 0
+shader = ExtResource("5_jdl2d")
+shader_parameter/radius = 32.0
+shader_parameter/balls = PackedVector3Array(2.9349613, 3.668623, -1.9509726, 2.6473498, 2.2004232, 4.6006784, -3.7068086, 1.8370395, -3.6377583, -4.714116, 1.7572131, 2.0149355, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf, inf)
+shader_parameter/field_color = Color(0.6, 1, 1, 1)
+shader_parameter/noise_scale = 0.03
 
 [node name="3d_base_scene" type="Node3D"]
 script = ExtResource("1_yrogh")
@@ -78,6 +92,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512, 128, 0)
 layers = 2
 mesh = SubResource("QuadMesh_tvajp")
 surface_material_override/0 = ExtResource("3_tvajp")
+
+[node name="Roof" type="MeshInstance3D" parent="Arena"]
+unique_name_in_owner = true
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 128, -512)
+layers = 2
+mesh = SubResource("QuadMesh_7cdmi")
+surface_material_override/0 = SubResource("ShaderMaterial_du04y")
 
 [node name="ActivePlayLayer" type="CanvasLayer" parent="."]
 

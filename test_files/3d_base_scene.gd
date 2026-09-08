@@ -21,6 +21,7 @@ extends Node3D
 
 @onready var debug_parent: Node3D = %Debug
 
+@onready var roof: MeshInstance3D = %Roof
 
 var wall_material: ShaderMaterial
 
@@ -84,8 +85,10 @@ func _ready() -> void:
 	%Playfield.mesh.size = 1024 / 32.0 * BreakableGrid.GRID_SIZE
 	%LeftWall.mesh.size.x = 1024 / 32.0 * BreakableGrid.GRID_SIZE.y
 	%RightWall.mesh.size.x = 1024 / 32.0 * BreakableGrid.GRID_SIZE.y
+	roof.mesh.size.x = 1024 / 32.0 * BreakableGrid.GRID_SIZE.x
 	%LeftWall.position.x = -(BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2)
 	%RightWall.position.x = (BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2)
+	roof.position.z = -(BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE / 2)
 
 	wall_material = %LeftWall.get_surface_override_material(0)
 
@@ -166,6 +169,11 @@ func _process(delta: float) -> void:
 	
 	if mouse_input_handler.ball_powerup_activated:
 		context.activate_ball_power()
+	
+	if mouse_input_handler.key_just_activated:
+		context.activate_key()
+		roof.visible = false
+
 
 	# handling blocks before balls
 	# this is bc multiball powerup might rotate the ball's 
@@ -252,6 +260,7 @@ func _process(delta: float) -> void:
 				else:
 					context.prev_level()
 					display_blocks(context.levels[context.current_level].blocks)
+					roof.visible = false
 					break
 		
 		index += 1
@@ -262,6 +271,7 @@ func _process(delta: float) -> void:
 			if level_unlocked:
 				context.next_level()
 				display_blocks(context.levels[context.current_level].blocks)
+				roof.visible = !context.levels[context.current_level].unlocked
 				break
 
 
@@ -277,6 +287,7 @@ func _process(delta: float) -> void:
 		# return
 		context.next_level()
 		display_blocks(context.levels[context.current_level].blocks)
+		roof.visible = !context.levels[context.current_level].unlocked
 
 		if context.balls.size() == 0:
 			var _new_ball: Ball = Ball.new()
@@ -439,6 +450,7 @@ func _process(delta: float) -> void:
 		ball.asset_ref.set_effect_rotation(ball.velocity)
 
 	wall_material.set_shader_parameter("balls", wall_sdf_balls)
+	roof.get_surface_override_material(0).set_shader_parameter("balls", wall_sdf_balls)
 
 
 	for projectile: Projectile in context.projectiles:

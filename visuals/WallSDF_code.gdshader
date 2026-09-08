@@ -66,6 +66,7 @@ void fragment() {
 	ALPHA = remap(ALPHA, 0., 1., .05, 1.);
 
 	ALPHA *= remap(ALBEDO.x, 0., 1., .5, .7);
+	ALPHA = clamp(ALPHA, 0.2, .6);
 	ALPHA *= smoothstep(128., 64., pixel_world_pos.y);
 
 
