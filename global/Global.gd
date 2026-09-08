@@ -154,7 +154,8 @@ class GameContext extends Node:
 		if ball_power_active && ball_powerups.size() >= 2:
 			ball_powerups.remove_at(0)
 		
-		ball_power_active = true
+		if ball_powerups.size() >= 1:
+			ball_power_active = true
 
 	func update_ball_powerup(delta: float) -> void:
 		if ball_powerups.size() < 1:
@@ -186,6 +187,8 @@ class GameContext extends Node:
 		if levels[current_level].key_enabled:
 			levels[current_level].unlocked = true
 
+	func get_can_key_be_used() -> bool:
+		return levels[current_level].key_enabled && !levels[current_level].unlocked
 
 
 	# flags

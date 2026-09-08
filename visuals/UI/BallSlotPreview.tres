@@ -1,0 +1,16 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://bojgtqa8lt8yo"]
+
+[ext_resource type="Shader" uid="uid://fvallpdg7oud" path="res://visuals/UI/BallPowerIcon.gdshader" id="1_leq3o"]
+[ext_resource type="Texture2D" uid="uid://bwwh3nylw1ig4" path="res://visuals/textures/hp_indicators/dots/1.png" id="2_qym3y"]
+
+[resource]
+shader = ExtResource("1_leq3o")
+shader_parameter/sdf_texture = ExtResource("2_qym3y")
+shader_parameter/bg_size = 0.3
+shader_parameter/bg_border = Vector2(0.15, 0.815)
+shader_parameter/icon_color = Color(0.90359825, 0.90359825, 0.903598, 1)
+shader_parameter/icon_outline = Color(0.07, 0.07, 0.07, 1)
+shader_parameter/icon_scale = 0.825
+shader_parameter/icon_left = 1.0
+shader_parameter/bob_dist = 0.025
+shader_parameter/bob_speed = 1.7349999999999999

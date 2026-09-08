@@ -23,6 +23,8 @@ extends Node3D
 
 @onready var roof: MeshInstance3D = %Roof
 
+@onready var ingame_ui: IngameUI = %IngameUI
+
 var wall_material: ShaderMaterial
 
 # var ball: Ball = Ball.new()
@@ -465,6 +467,11 @@ func _process(delta: float) -> void:
 	laser_asset.visible = context.LASER_ACTIVE
 	# laser_asset.%Beam.material_override.set_shader_parameter("TimeLeft", context.LASER_COOLDOWN)
 	laser_asset.set_visual(context.LASER_COOLDOWN)
+
+	# set UI
+	ingame_ui.set_ball_slots(context)
+	ingame_ui.set_current_level(context.current_level + 1)
+	ingame_ui.set_key_enabled(context.get_can_key_be_used())
 
 	# DRAW DEBUG
 	if Global.DEBUG && DebugScreen.VISUAL_DEBUG:

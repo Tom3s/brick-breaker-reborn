@@ -142,7 +142,7 @@ void vertex() {
 	// Called for every vertex the material is visible on.
 	//UV = COLOR.rg;
 	//UV2.x = COLOR.b;
-	COLOR.rgb = VERTEX;
+	COLOR.rgb = VERTEX + NODE_POSITION_WORLD * 1.1;
 }
 
 void fragment() {

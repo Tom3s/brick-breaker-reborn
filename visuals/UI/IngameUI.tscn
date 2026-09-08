@@ -1,0 +1,172 @@
+[gd_scene load_steps=7 format=3 uid="uid://cavmf50eohh6o"]
+
+[ext_resource type="Script" uid="uid://dkjbmr4g8kom5" path="res://visuals/UI/IngameUI.gd" id="1_oh034"]
+[ext_resource type="Texture2D" uid="uid://hag7itsukwj3" path="res://icon.svg" id="2_iwgs4"]
+[ext_resource type="Material" uid="uid://bojgtqa8lt8yo" path="res://visuals/UI/BallSlotPreview.tres" id="3_1wuik"]
+[ext_resource type="Texture2D" uid="uid://ccturkem25uj6" path="res://visuals/textures/powerups/KEY.png" id="3_k3syv"]
+[ext_resource type="Texture2D" uid="uid://77uslpi68i2x" path="res://visuals/textures/hp_indicators/dots/5.png" id="4_1wuik"]
+
+[sub_resource type="Theme" id="Theme_1wuik"]
+default_font_size = 32
+
+[node name="IngameUI" type="VBoxContainer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_1wuik")
+script = ExtResource("1_oh034")
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+
+[node name="Button" type="Button" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 0
+text = "Pause"
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+text = "Lives:"
+
+[node name="CurrentLives" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "3"
+
+[node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3/HBoxContainer"]
+layout_mode = 2
+texture = ExtResource("2_iwgs4")
+expand_mode = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Score: "
+
+[node name="CurrentScore" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1518463"
+
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+custom_minimum_size = Vector2(24, 0)
+layout_mode = 2
+
+[node name="Multiplier" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "x3"
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 10
+
+[node name="Label3" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer2"]
+layout_mode = 2
+text = "Level:"
+
+[node name="CurrentLevel" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "1"
+
+[node name="MaxLevels" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "/10"
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="MainBallSlot" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+material = ExtResource("3_1wuik")
+layout_mode = 2
+texture = ExtResource("2_iwgs4")
+expand_mode = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 64)
+layout_mode = 2
+
+[node name="ReserveBallSlot" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+material = ExtResource("3_1wuik")
+layout_mode = 2
+texture = ExtResource("2_iwgs4")
+expand_mode = 2
+
+[node name="Control" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="Control2" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 24)
+layout_mode = 2
+
+[node name="ActivateKey" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "KEY
+(ENTER)"
+icon = ExtResource("3_k3syv")
+icon_alignment = 1
+expand_icon = true
+
+[node name="Button2" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+visible = false
+self_modulate = Color(1, 1, 1, 0.49019608)
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "BALL
+(RIGHT CLICK)"
+icon = ExtResource("4_1wuik")
+icon_alignment = 1
+expand_icon = true

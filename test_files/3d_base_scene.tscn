@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=17 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://6p15wimk0j4s" path="res://audio/SFXPlayer.tscn" id="3_ie54n"]
 [ext_resource type="Material" uid="uid://b40wmht83lmdh" path="res://visuals/WallSDFMaterial.material" id="3_tvajp"]
 [ext_resource type="Shader" uid="uid://do3suaiifptyk" path="res://visuals/WallSDF_code.gdshader" id="5_jdl2d"]
+[ext_resource type="PackedScene" uid="uid://cavmf50eohh6o" path="res://visuals/UI/IngameUI.tscn" id="6_7cdmi"]
 [ext_resource type="PackedScene" uid="uid://cutxkxi4r87a1" path="res://visuals/SkyScene.tscn" id="6_cs8pv"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bcu1a"]
@@ -128,8 +129,13 @@ cull_mask = 1047553
 current = true
 fov = 80.0
 
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="IngameUI" parent="CanvasLayer" instance=ExtResource("6_7cdmi")]
+unique_name_in_owner = true
+
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.30901697, 0.95105654, 0, -0.95105654, 0.30901697, 0, 533.475, 260)
+transform = Transform3D(1, 0, 0, 0, 0.30901697, 0.95105654, 0, -0.95105654, 0.30901697, 0, 547.06, 213.92)
 cull_mask = 2
 current = true
 fov = 72.0
