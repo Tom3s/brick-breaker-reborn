@@ -24,8 +24,8 @@ class Level:
 
 class GameContext extends Node:
 
-	signal fireball_activated()
-	signal fireball_deactivated()
+	signal ball_powerup_activated(type: Powerup.Type)
+	signal ball_powerup_deactivated(type: Powerup.Type)
 
 	var balls: Array[Ball]
 	var paddle: Paddle
@@ -44,6 +44,10 @@ class GameContext extends Node:
 
 	var powerups: Array[Powerup]
 	var active_powerups: Array[Powerup]
+
+	var BALL_POWERUP_SLOTS: int = 2
+	var ball_powerups: Array[Powerup]
+	var ball_power_active: bool = false
 
 	var projectiles: Array[Projectile]
 
@@ -68,39 +72,16 @@ class GameContext extends Node:
 		levels[level_index].blocks.push_back(block)
 		levels[level_index].quad_tree.add_block(block)
 
-		# for x in block.size.x:
-		# 	for y in block.size.y:
-		# 		var actual_x: int = block.pos_on_grid.x + x
-		# 		var actual_y: int = block.pos_on_grid.y + y
-
-		# 		levels[level_index].block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = block
-
 
 	func remove_block(block: BreakableBlock, level_index: int = current_level) -> void:
 		# TODO: handling memory from here, might wanna move it
 		levels[level_index].blocks.erase(block)
 		levels[level_index].quad_tree.remove_block(block)
 
-
-		# for x in block.size.x:
-		# 	for y in block.size.y:
-		# 		var actual_x: int = block.pos_on_grid.x + x
-		# 		var actual_y: int = block.pos_on_grid.y + y
-
-		# 		levels[level_index].block_bitmap[actual_x + BreakableGrid.GRID_SIZE.x * actual_y] = null
 		
 		levels[level_index].completed = levels[level_index].blocks.is_empty()
 	
-	# func get_block_at(x: int, y: int) -> BreakableBlock:
-	# 	# LoggerMogyi.log(self, "Getting block at (%.3f, %.3f)" % [x, y])
 
-	# 	if y < 0 || y >= BreakableGrid.GRID_SIZE.y:
-	# 		return null
-
-	# 	if x < 0 || x >= BreakableGrid.GRID_SIZE.x:
-	# 		return null
-		
-	# 	return levels[current_level].block_bitmap[y * BreakableGrid.GRID_SIZE.x + x]
 	func get_blocks_for_circle(pos: Vector2, r: float) -> Array[BreakableBlock]:
 		return levels[current_level].quad_tree.get_blocks_for_circle(pos, r)
 	
@@ -164,42 +145,61 @@ class GameContext extends Node:
 	func get_current_blocks() -> Array[BreakableBlock]:
 		return levels[current_level].blocks
 
+	func add_ball_powerup(powerup: Powerup) -> void:
+		if ball_powerups.size() < BALL_POWERUP_SLOTS:
+			ball_powerups.push_back(powerup)
+
+	func activate_ball_power() -> void:
+		if ball_power_active && ball_powerups.size() >= 2:
+			ball_powerups.remove_at(0)
+		
+		ball_power_active = true
+
+	func update_ball_powerup(delta: float) -> void:
+		if ball_powerups.size() < 1:
+			return
+		
+		ball_powerups[0].update(delta)
+
+		if ball_powerups[0].time_left <= 0:
+			ball_powerup_deactivated.emit(ball_powerups[0].type)
+			ball_powerups.remove_at(0)
+			ball_power_active = false
+
+	func get_active_ball_powerup() -> Ball.Type:
+		if !ball_power_active:
+			return Ball.Type.NORMAL
+		
+		# return ball_powerups[0].type
+		if ball_powerups[0].type == Powerup.Type.FIRE_BALL:
+			return Ball.Type.FIRE
+		elif ball_powerups[0].type == Powerup.Type.ICE_BALL:
+			return Ball.Type.ICE
+		
+		return Ball.Type.NONE
+
+
 	# flags
-	var FLAG_FIREBALL_WAS_ACTIVE: bool = false
-	var FLAG_FIREBALL_ACTIVE: bool = false
-	var FLAG_ICE_BALL_ACTIVE: bool = false
 	var LASER_ACTIVE: bool = false
 	var LASER_COOLDOWN: float = 0.0
 	var GUN_ACTIVE: bool = false
 
 	func set_flags() -> void:
-		FLAG_FIREBALL_ACTIVE = false
-		FLAG_ICE_BALL_ACTIVE = false
 		LASER_ACTIVE = false
 		LASER_COOLDOWN = -1.0
 		GUN_ACTIVE = false
 
 		for powerup: Powerup in active_powerups:
-			if powerup.type == Powerup.Type.FIRE_BALL:
-				FLAG_FIREBALL_ACTIVE = true
-			elif powerup.type == Powerup.Type.ICE_BALL:
-				FLAG_ICE_BALL_ACTIVE = true
-			elif powerup.type == Powerup.Type.LASER:
+			if powerup.type == Powerup.Type.LASER:
 				LASER_ACTIVE = true
 				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)
 			elif powerup.type == Powerup.Type.GUN:
 				GUN_ACTIVE = true
 		
-		if FLAG_FIREBALL_ACTIVE != FLAG_FIREBALL_WAS_ACTIVE:
-			if FLAG_FIREBALL_ACTIVE:
-				fireball_activated.emit()
-			else:
-				fireball_deactivated.emit()
-
-		FLAG_FIREBALL_WAS_ACTIVE = FLAG_FIREBALL_ACTIVE
 
 	# debug strings
 	var _DEBUG_ACTIVE_POWERUPS: String
+	var _DEBUG_BALL_SLOTS: String
 	var _DEBUG_ACTIVE_NR_BALLS: String
 	var _DEBUG_CURRENT_LEVEL: String
 	var _DEBUG_CURRENT_LEVEL_UNLOCKED: String
@@ -211,6 +211,11 @@ class GameContext extends Node:
 			var type: String = Powerup.Type.keys()[powerup.type].capitalize()
 			_DEBUG_ACTIVE_POWERUPS += "- %s: %.2fs \n" % [type, powerup.time_left]
 		
+		_DEBUG_BALL_SLOTS = "Ball Slots: "
+		for powerup: Powerup in ball_powerups:
+			var type: String = Powerup.Type.keys()[powerup.type].capitalize()
+			_DEBUG_BALL_SLOTS += "%s: %.2fs |" % [type, powerup.time_left]
+
 		_DEBUG_ACTIVE_NR_BALLS = "Nr Balls: %d" % balls.size()
 		_DEBUG_CURRENT_LEVEL = "Current Level: %d" % current_level
 		_DEBUG_CURRENT_LEVEL_UNLOCKED = "Picked Up KEY: %s" % str(levels[current_level].unlocked)
@@ -218,8 +223,9 @@ class GameContext extends Node:
 		_DEBUG_CURRENT_LEVEL_COMPLETE = "Current Level Complete: %s" % str(levels[current_level].completed)
 	
 	func _get_debug_string() -> String:
-		return "%s\n%s\n%s\n%s\n%s" % [
+		return "%s\n%s\n%s\n%s\n%s\n%s" % [
 			_DEBUG_ACTIVE_NR_BALLS, 
+			_DEBUG_BALL_SLOTS,
 			_DEBUG_CURRENT_LEVEL,
 			_DEBUG_CURRENT_LEVEL_COMPLETE,
 			_DEBUG_CURRENT_LEVEL_UNLOCKED,

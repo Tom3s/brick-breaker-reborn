@@ -149,12 +149,12 @@ func get_damage(context: Global.GameContext, block: BreakableBlock) -> int:
 
 	# TODO: implement type interactions
 	if block.type == BreakableBlock.BlockType.METAL:
-		if context.FLAG_FIREBALL_ACTIVE: 
+		if context.get_active_ball_powerup() == Ball.Type.FIRE: 
 			return 1
 		else: 
 			return 0
 	elif block.type == BreakableBlock.BlockType.NORMAL:
-		if context.FLAG_FIREBALL_ACTIVE: 
+		if context.get_active_ball_powerup() == Ball.Type.FIRE: 
 			return 10
 		else: 
 			return 1

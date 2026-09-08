@@ -7,6 +7,7 @@ class_name MouseInputHandler
 
 var accumulated_mouse_movement: Vector2
 var action_just_pressed: bool
+var ball_powerup_activated: bool
 
 func _process(delta: float) -> void:
 	# TODO: handle mouse hiding properly
@@ -32,3 +33,4 @@ func _unhandled_input(event: InputEvent) -> void:
 	# if Input.is_action_just_pressed("release_ball"):
 	# 	release_ball_pressed.emit()
 	action_just_pressed = Input.is_action_just_pressed("release_ball")
+	ball_powerup_activated = Input.is_action_just_pressed("activate_ball")

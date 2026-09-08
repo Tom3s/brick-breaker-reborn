@@ -13,24 +13,24 @@ enum Type {
 	ICE_BALL,
 }
 
-# static var weights: PackedInt32Array = [
-# 	0,
-# 	0,
-# 	2,
-# 	0,
-# 	0,
-# 	0,
-# 	2,
-# ]
 static var weights: PackedInt32Array = [
 	0,
-	2,
-	2,
+	0,
+	3,
+	0,
 	1,
-	2,
-	0, # key should always be 0
-	2,
+	0,
+	3,
 ]
+# static var weights: PackedInt32Array = [
+# 	0,
+# 	2,
+# 	2,
+# 	1,
+# 	2,
+# 	0, # key should always be 0
+# 	2,
+# ]
 
 var ball_multiply_value: int = 3
 
@@ -118,14 +118,14 @@ func activate_powerup(context: Global.GameContext) -> void:
 	elif type == Type.FIRE_BALL:
 		time_left = fire_ball_max_time
 		infinite = false
-		
-		context.active_powerups.push_back(self)
+
+		context.add_ball_powerup(self)
 	
 	elif type == Type.ICE_BALL:
 		time_left = ice_ball_max_time
 		infinite = false
 		
-		context.active_powerups.push_back(self)
+		context.add_ball_powerup(self)
 	
 	elif type == Type.LASER:
 		time_left = laser_cooldown

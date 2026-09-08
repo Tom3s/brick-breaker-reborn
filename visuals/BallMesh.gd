@@ -30,6 +30,8 @@ func _ready() -> void:
 
 
 func set_visual(type: Ball.Type) -> void:
+	if type == Ball.Type.NONE: return
+	
 	if type == Ball.Type.FIRE:
 		material_override.set_shader_parameter("Color", Color.from_string(FLAME_COLOR, Color.WHITE))
 	elif type == Ball.Type.ICE:
