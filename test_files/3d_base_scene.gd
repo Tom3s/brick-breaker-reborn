@@ -70,8 +70,9 @@ func _ready() -> void:
 	# paddle.collider_line.debug_set_up = false
 	context.paddle.set_line()
 
-	context.fireball_activated.connect(sfx_player.play_flame_ignite)
-	context.fireball_deactivated.connect(sfx_player.play_flame_extinguish)
+	# TODO: add back ball power sounds
+	# context.fireball_activated.connect(sfx_player.play_flame_ignite)
+	# context.fireball_deactivated.connect(sfx_player.play_flame_extinguish)
 
 	# if DEBUG:
 	DebugScreen.add_debug_line(func() -> String: return "FPS(d): %.2f" % _debug_fps)
@@ -112,6 +113,12 @@ func _process(delta: float) -> void:
 
 	play_layer_viewport.size = get_viewport().get_visible_rect().size
 
+	# ooooooooo  ooooooooooo oooooooooo ooooo  oooo  ooooooo8  
+	#  888    88o 888    88   888    888 888    88 o888    88  
+	#  888    888 888ooo8     888oooo88  888    88 888    oooo 
+	#  888    888 888    oo   888    888 888    88 888o    88  
+	# o888ooo88  o888ooo8888 o888ooo888   888oo88   888ooo888  
+                                                         
 	if Global.DEBUG:
 		context._set_debug_strings()
 		
@@ -143,6 +150,12 @@ func _process(delta: float) -> void:
 			DebugScreen.debug_visuals.push_back(context.paddle.line.debug_visual)
 
 
+	# ooooo oooo   oooo oooooooooo ooooo  oooo ooooooooooo 
+	#  888   8888o  88   888    888 888    88  88  888  88 
+	#  888   88 888o88   888oooo88  888    88      888     
+	#  888   88   8888   888        888    88      888     
+	# o888o o88o    88  o888o        888oo88      o888o                                            
+
 	handle_mouse_movement(mouse_input_handler.accumulated_mouse_movement)
 	mouse_input_handler.accumulated_mouse_movement = Vector2.ZERO
 
@@ -150,6 +163,9 @@ func _process(delta: float) -> void:
 	
 	if !context.balls[0].released && mouse_input_handler.action_just_pressed:
 		release_ball()
+	
+	if mouse_input_handler.ball_powerup_activated:
+		context.activate_ball_power()
 
 	# handling blocks before balls
 	# this is bc multiball powerup might rotate the ball's 
@@ -158,46 +174,18 @@ func _process(delta: float) -> void:
 	# investigate with safe_delta and move back if neccessary
 	# blocked by: bitmap optimization
 
-	## for block: BreakableBlock in context.blocks:
-	## 	if block.is_broken():
-	## 		continue
-
-
+	# ooooo ooooo ooooo ooooooooooo      oooooooooo ooooo         ooooooo     oooooooo8 oooo   oooo 
+	#  888   888   888  88  888  88       888    888 888        o888   888o o888     88  888  o88   
+	#  888ooo888   888      888           888oooo88  888        888     888 888          888888     
+	#  888   888   888      888           888    888 888      o 888o   o888 888o     oo  888  88o   
+	# o888o o888o o888o    o888o         o888ooo888 o888ooooo88   88ooo88    888oooo88  o888o o888o 
+                                                                                              
 	for ball: Ball in context.balls:
 		if !ball.released:
-			break # TODO: might be hacky
-
-		# var x_from: int = floorf((ball.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
-		# var y_from: int = floorf((ball.position.y + (grid_unit_size.y / 2)) / BreakableGrid.CELL_SIZE)
-		# var x_to: int = sign(ball.velocity.x)
-		# var y_to: int = sign(ball.velocity.y)
-
-		# x_to = x_to * 2 + x_from
-		# y_to = y_to * 2 + y_from
-
-		# # Cheeky ordering to fix [#044]
-		# # ball first checks in the direction of velocity
-		# # if that fails, falls back to grazing blocks
-		# var x_range: Array = range(x_from, x_to, sign(ball.velocity.x))
-		# x_range.push_back(x_from - sign(ball.velocity.x))
-		# var y_range: Array = range(y_from, y_to, sign(ball.velocity.y))
-		# y_range.push_back(y_from - sign(ball.velocity.y))
-
-		# for x: int in x_range:
-		# 	var block: BreakableBlock
-		# 	for y: int in y_range:
-		# 		block = context.get_block_at(x, y)
-		# 		if block == null:
-		# 			continue
-
-		# 		for line: LineCollider in block.collision:
-
-		# 			if ball.collide_with(line, block.reflects_ball(context)):
-		# 				block.hit_block(context, ball)
+			# break # TODO: might be hacky
+			continue # should fix stuck ball bug
 
 
-		# 		if block.is_broken():
-		# 			break
 		for block: BreakableBlock in context.get_blocks_for_circle(ball.position, ball.radius):
 			# if block == null:
 			# 	LoggerMogyi.log(self, "PANIC smth aint right")
@@ -210,14 +198,11 @@ func _process(delta: float) -> void:
 				if ball.collide_with(line, block.reflects_ball(context)):
 					block.hit_block(context, ball)
 
-					if context.FLAG_ICE_BALL_ACTIVE:
+					if context.get_active_ball_powerup() == Ball.Type.ICE:
 						convert_blocks_to_ice(ball.position)
 
 
 			if block.is_broken():
-				# debugging
-				block.asset_ref.set_color(Vector3.ZERO)
-
 				if block.has_powerup:
 					block.has_powerup = false
 					spawn_powerup(block)
@@ -228,10 +213,15 @@ func _process(delta: float) -> void:
 				block.asset_ref.queue_free()
 				# LoggerMogyi.log(self, "Removed asset ref for block")
 				context.remove_block(block)
-				break	
+				break
 
 
-	# if !ball.released:
+	# oooooooooo      o      ooooo       ooooo        oooooooo8  
+	#  888    888    888      888         888        888         
+	#  888oooo88    8  88     888         888         888oooooo  
+	#  888    888  8oooo88    888      o  888      o         888 
+	# o888ooo888 o88o  o888o o888ooooo88 o888ooooo88 o88oooo888  
+
 	if context.balls.size() == 1 && !context.balls[0].released:
 		context.balls[0].set_position(context.paddle.position + Vector2.UP * context.balls[0].radius * 2)
 	else:
@@ -239,7 +229,12 @@ func _process(delta: float) -> void:
 		for ball: Ball in context.balls:
 			ball.move(safe_delta)
 
-	# handle collision
+	#   oooooooo8   ooooooo  ooooo       ooooo       ooooo  oooooooo8 ooooo  ooooooo  oooo   oooo 
+	# o888     88 o888   888o 888         888         888  888         888 o888   888o 8888o  88  
+	# 888         888     888 888         888         888   888oooooo  888 888     888 88 888o88  
+	# 888o     oo 888o   o888 888      o  888      o  888          888 888 888o   o888 88   8888  
+	#  888oooo88    88ooo88  o888ooooo88 o888ooooo88 o888o o88oooo888 o888o  88ooo88  o88o    88  
+                                                                                            
 	# check for death barrier first
 	var index: int = 0
 	while index < context.balls.size():
@@ -270,17 +265,11 @@ func _process(delta: float) -> void:
 				break
 
 
-
-	# var collided: bool = false
-
 	for line in context.screen_collision:
 		# ball.collide_with(line, true)
 		for ball: Ball in context.balls:
 			ball.collide_with(line, true)
 
-	
-
-	
 	
 	if context.is_current_level_complete():
 		# TODO: change blocks to breakable if only non-breakable remain
@@ -299,7 +288,12 @@ func _process(delta: float) -> void:
 		if ball.collide_with_paddle(context.paddle):
 			sfx_player.play_paddle_hit()
 
-	
+	# ooooooooooo ooooooooooo ooooooooooo ooooooooooo  oooooooo8 ooooooooooo  oooooooo8  
+	#  888    88   888    88   888    88   888    88 o888     88 88  888  88 888         
+	#  888ooo8     888ooo8     888ooo8     888ooo8   888             888      888oooooo  
+	#  888    oo   888         888         888    oo 888o     oo     888             888 
+	# o888ooo8888 o888o       o888o       o888ooo8888 888oooo88     o888o    o88oooo888  
+                                                                                   
 	# update active effects
 	var disable_effect_queue: Array[Powerup]
 	for powerup: Powerup in context.active_powerups:
@@ -330,6 +324,9 @@ func _process(delta: float) -> void:
 			
 			sfx_player.play_laser_shot()
 	
+	if context.ball_power_active:
+		context.update_ball_powerup(safe_delta)
+
 	for powerup: Powerup in disable_effect_queue:
 		context.active_powerups.erase(powerup)
 	
@@ -379,8 +376,15 @@ func _process(delta: float) -> void:
 	#   888  88    888   888oooooo  888    88   8  88     888         888oooooo  
 	#    88888     888          888 888    88  8oooo88    888      o         888 
 	#     888     o888o o88oooo888   888oo88 o88o  o888o o888ooooo88 o88oooo888  
-																			
-													 
+
+	# ==========================================================================================
+
+	# oooooooooo    ooooooo  oooo     oooo ooooooooooo oooooooooo ooooo  oooo oooooooooo   oooooooo8  
+	#  888    888 o888   888o 88   88  88   888    88   888    888 888    88   888    888 888         
+	#  888oooo88  888     888  88 888 88    888ooo8     888oooo88  888    88   888oooo88   888oooooo  
+	#  888        888o   o888   888 888     888    oo   888  88o   888    88   888                888 
+	# o888o         88ooo88      8   8     o888ooo8888 o888o  88o8  888oo88   o888o       o88oooo888  
+                                                                                                		 
 
 	# update powerup pickups
 	for powerup: Powerup in context.powerups:
@@ -423,14 +427,16 @@ func _process(delta: float) -> void:
 		if i < 32: # TODO: MAX_BALL_COUNT
 			wall_sdf_balls[i] = ball.asset_ref.global_position
 
-		if context.FLAG_FIREBALL_ACTIVE:
-			ball.asset_ref.set_visual(Ball.Type.FIRE)
-			ball.asset_ref.set_effect_rotation(ball.velocity)
-		elif context.FLAG_ICE_BALL_ACTIVE:
-			ball.asset_ref.set_visual(Ball.Type.ICE)
-			ball.asset_ref.set_effect_rotation(ball.velocity)
-		else:
-			ball.asset_ref.set_visual(Ball.Type.NORMAL)
+		# if context.get_active_ball_powerup():
+		# 	ball.asset_ref.set_visual(Ball.Type.FIRE)
+		# 	ball.asset_ref.set_effect_rotation(ball.velocity)
+		# elif context.FLAG_ICE_BALL_ACTIVE:
+		# 	ball.asset_ref.set_visual(Ball.Type.ICE)
+		# 	ball.asset_ref.set_effect_rotation(ball.velocity)
+		# else:
+		# 	ball.asset_ref.set_visual(Ball.Type.NORMAL)
+		ball.asset_ref.set_visual(context.get_active_ball_powerup())
+		ball.asset_ref.set_effect_rotation(ball.velocity)
 
 	wall_material.set_shader_parameter("balls", wall_sdf_balls)
 
