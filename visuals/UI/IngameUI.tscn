@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://cavmf50eohh6o"]
+[gd_scene load_steps=8 format=3 uid="uid://cavmf50eohh6o"]
 
 [ext_resource type="Script" uid="uid://dkjbmr4g8kom5" path="res://visuals/UI/IngameUI.gd" id="1_oh034"]
 [ext_resource type="Texture2D" uid="uid://hag7itsukwj3" path="res://icon.svg" id="2_iwgs4"]
@@ -8,6 +8,9 @@
 
 [sub_resource type="Theme" id="Theme_1wuik"]
 default_font_size = 32
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1wuik"]
+size = Vector2(256, 256)
 
 [node name="IngameUI" type="VBoxContainer"]
 anchors_preset = 15
@@ -130,7 +133,7 @@ expand_mode = 3
 layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 64)
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 
 [node name="ReserveBallSlot" type="TextureRect" parent="MarginContainer/HBoxContainer/VBoxContainer/HBoxContainer/VBoxContainer/HBoxContainer"]
@@ -145,10 +148,41 @@ custom_minimum_size = Vector2(0, 24)
 layout_mode = 2
 
 [node name="Control2" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-custom_minimum_size = Vector2(0, 24)
+custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
 
-[node name="ActivateKey" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+[node name="ActivateBall" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 0
+text = "BALL
+R-CLICK"
+icon = ExtResource("4_1wuik")
+clip_text = true
+icon_alignment = 1
+expand_icon = true
+
+[node name="TouchScreenButton" type="TouchScreenButton" parent="MarginContainer/HBoxContainer/VBoxContainer/ActivateBall"]
+position = Vector2(64, 64)
+scale = Vector2(0.5, 0.5)
+shape = SubResource("RectangleShape2D_1wuik")
+action = "activate_ball"
+
+[node name="Control4" type="Control" parent="MarginContainer/HBoxContainer"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+
+[node name="Control3" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+
+[node name="ActivateKey" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
@@ -159,14 +193,8 @@ icon = ExtResource("3_k3syv")
 icon_alignment = 1
 expand_icon = true
 
-[node name="Button2" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
-visible = false
-self_modulate = Color(1, 1, 1, 0.49019608)
-custom_minimum_size = Vector2(128, 128)
-layout_mode = 2
-size_flags_horizontal = 0
-text = "BALL
-(RIGHT CLICK)"
-icon = ExtResource("4_1wuik")
-icon_alignment = 1
-expand_icon = true
+[node name="TouchScreenButton" type="TouchScreenButton" parent="MarginContainer/HBoxContainer/VBoxContainer2/ActivateKey"]
+position = Vector2(64, 64)
+scale = Vector2(0.5, 0.5)
+shape = SubResource("RectangleShape2D_1wuik")
+action = "activate_key"

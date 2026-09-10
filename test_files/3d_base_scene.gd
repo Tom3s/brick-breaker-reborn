@@ -125,7 +125,7 @@ func _process(delta: float) -> void:
 	#  888    888 888ooo8     888oooo88  888    88 888    oooo 
 	#  888    888 888    oo   888    888 888    88 888o    88  
 	# o888ooo88  o888ooo8888 o888ooo888   888oo88   888ooo888  
-                                                         
+														 
 	if Global.DEBUG:
 		context._set_debug_strings()
 		
@@ -168,16 +168,19 @@ func _process(delta: float) -> void:
 
 	context.paddle.lerp_move(safe_delta)
 	
-	if !context.balls[0].released && mouse_input_handler.action_just_pressed:
+	if !context.balls[0].released && mouse_input_handler.release_ball_just_pressed():
 		release_ball()
 	
-	if mouse_input_handler.ball_powerup_activated:
+	if mouse_input_handler.ball_powerup_just_pressed():
 		context.activate_ball_power()
+		print("pressing ball powerup")
+
 	
-	if mouse_input_handler.key_just_activated:
+	if mouse_input_handler.unlock_just_pressed():
 		context.activate_key()
 		roof.visible = false
 
+	# WARNING: no input event should be handled after this, as it may be incorrect state
 
 	# handling blocks before balls
 	# this is bc multiball powerup might rotate the ball's 
@@ -191,7 +194,7 @@ func _process(delta: float) -> void:
 	#  888ooo888   888      888           888oooo88  888        888     888 888          888888     
 	#  888   888   888      888           888    888 888      o 888o   o888 888o     oo  888  88o   
 	# o888o o888o o888o    o888o         o888ooo888 o888ooooo88   88ooo88    888oooo88  o888o o888o 
-                                                                                              
+																							  
 	for ball: Ball in context.balls:
 		if !ball.released:
 			# break # TODO: might be hacky
@@ -246,7 +249,7 @@ func _process(delta: float) -> void:
 	# 888         888     888 888         888         888   888oooooo  888 888     888 88 888o88  
 	# 888o     oo 888o   o888 888      o  888      o  888          888 888 888o   o888 88   8888  
 	#  888oooo88    88ooo88  o888ooooo88 o888ooooo88 o888o o88oooo888 o888o  88ooo88  o88o    88  
-                                                                                            
+																							
 	# check for death barrier first
 	var index: int = 0
 	while index < context.balls.size():
@@ -308,7 +311,7 @@ func _process(delta: float) -> void:
 	#  888ooo8     888ooo8     888ooo8     888ooo8   888             888      888oooooo  
 	#  888    oo   888         888         888    oo 888o     oo     888             888 
 	# o888ooo8888 o888o       o888o       o888ooo8888 888oooo88     o888o    o88oooo888  
-                                                                                   
+																				   
 	# update active effects
 	var disable_effect_queue: Array[Powerup]
 	for powerup: Powerup in context.active_powerups:
@@ -345,7 +348,7 @@ func _process(delta: float) -> void:
 	for powerup: Powerup in disable_effect_queue:
 		context.active_powerups.erase(powerup)
 	
-	if context.GUN_ACTIVE && mouse_input_handler.action_just_pressed:
+	if context.GUN_ACTIVE && mouse_input_handler.release_ball_just_pressed():
 		LoggerMogyi.log(self, "Shooting with active GUN powerup")
 		spawn_gun_projectiles()
 		sfx_player.play_gun_shot()
@@ -399,7 +402,7 @@ func _process(delta: float) -> void:
 	#  888oooo88  888     888  88 888 88    888ooo8     888oooo88  888    88   888oooo88   888oooooo  
 	#  888        888o   o888   888 888     888    oo   888  88o   888    88   888                888 
 	# o888o         88ooo88      8   8     o888ooo8888 o888o  88o8  888oo88   o888o       o88oooo888  
-                                                                                                		 
+																										 
 
 	# update powerup pickups
 	for powerup: Powerup in context.powerups:
@@ -490,6 +493,9 @@ func _process(delta: float) -> void:
 	# 	Vector3(100, 100, 100),
 	# 	Vector3(-100, 80, -100),
 	# )
+
+	mouse_input_handler.frame_end_propagation()
+
 
 
 var grid_unit_size: Vector2
