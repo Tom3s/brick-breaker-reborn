@@ -15,7 +15,7 @@ var radius: float = Global.DEFAULT_BALL_RADIUS
 var target_velocity: float = 512.0 # 648.0
 
 @export
-var deceleration: float = 8.0 # 10.0
+var deceleration: float = 4800.0 # 6000.0
 
 @export
 var speed_up_factor: float = 2.0
@@ -40,7 +40,7 @@ func move(delta: float) -> void:
 		return
 
 	if velocity.length() > target_velocity:
-		velocity = velocity.normalized() * (velocity.length() - deceleration)
+		velocity = velocity.normalized() * (velocity.length() - deceleration * delta)
 	else:
 		velocity = velocity.normalized() * target_velocity
 	
