@@ -41,8 +41,6 @@ var wall_material: ShaderMaterial
 # var powerups: Array[Powerup]
 var context: Global.GameContext
 
-# var quad: QuadTree.TreeNode
-
 func _ready() -> void:
 	context = Global.GameContext.new()
 	# ball.randomize_velocity()
@@ -53,18 +51,11 @@ func _ready() -> void:
 	# screen_bounds = DisplayServer.window_get_size()
 	set_up_screen_collision()
 
-	# context.levels[0].quad_tree._force_split()
-
 	var base_seed: int = randi()
 
 	for i in Global.LEVEL_COUNT:
 		context.add_block_array(generate_sparse_map(base_seed + i), i)
 		generate_block_assets(context.levels[i].blocks)
-	
-	# quad = QuadTree.TreeNode.create_node(
-	# 	Vector2(-grid_unit_size.x / 2, -grid_unit_size.y / 2),
-	# 	Vector2(grid_unit_size.x / 2, grid_unit_size.y / 2),
-	# )
 
 	display_blocks(context.levels[context.current_level].blocks)
 	
@@ -95,15 +86,6 @@ func _ready() -> void:
 	roof.position.z = -(BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE / 2)
 
 	wall_material = %LeftWall.get_surface_override_material(0)
-
-
-	# debug
-
-	# quad._split()
-	# quad.nodes[0]._split()
-	# quad.nodes[0].nodes[3]._split()
-
-	# quad.draw_debug()
 
 	
 var _debug_fps: float = 0.0
@@ -315,24 +297,15 @@ func _process(delta: float) -> void:
 	# update active effects
 	var disable_effect_queue: Array[Powerup]
 	for powerup: Powerup in context.active_powerups:
-		# powerup.time_left -= safe_delta
 		powerup.update(safe_delta)
 		if powerup.time_left <= 0.0:
-			# LoggerMogyi.log(self, "Removing powerup: %s" % powerup.name)
 			disable_effect_queue.push_back(powerup)
 		
 		if powerup.laser_shot:
-			LoggerMogyi.log(self, "Laser is being shot! NOT IMPLEMENTED FOR QUAD TREE", LoggerMogyi.Severity.ERROR)
-			# for y: int in BreakableGrid.GRID_SIZE.y:
-			# 	var x: int = floorf((context.paddle.position.x + (grid_unit_size.x / 2)) / BreakableGrid.CELL_SIZE)
-			# 	var block: BreakableBlock = context.get_block_at(x, y)
-
-			# 	damage_block_and_clear(block, context.get_laser_damage())
 			for block: BreakableBlock in context.get_blocks_for_aabb(
 				context.paddle.position + Vector2.UP * grid_unit_size.y,
 				context.paddle.position,
 			):
-				# print(block)
 				if DebugScreen.VISUAL_DEBUG:
 					DebugVisual.draw_rectangle_timed(
 						block.a, block.b, Color.ORANGE, 0.75
@@ -365,12 +338,12 @@ func _process(delta: float) -> void:
 	var proj_marked_for_remove: Array[Projectile] = []																					
 	for projectile: Projectile in context.projectiles:
 		projectile.move(safe_delta)
+		# TODO: -grid_unit_size.y / 2 might work just as well
+		if projectile.position.y < -grid_unit_size.y: 
+			proj_marked_for_remove.push_back(projectile)
+			continue
 
 		if projectile.type == Projectile.Type.GUN_BULLET:
-			# TODO: could make a function that turns {game world space} -> {grid index}
-			# var idx2: Vector2 = ((projectile.position + (grid_unit_size / 2)) / BreakableGrid.CELL_SIZE).floor()
-			# LoggerMogyi.log(self, "Checking projectile collision for bullet! NOT IMPLEMENTED FOR QUAD TREE", LoggerMogyi.Severity.ERROR)
-			# var block: BreakableBlock = context.get_block_at(idx2.x, idx2.y)
 			for block: BreakableBlock in context.get_blocks_for_pos(projectile.position):
 				if DebugScreen.VISUAL_DEBUG:
 					DebugVisual.draw_rectangle_timed(
