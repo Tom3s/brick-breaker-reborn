@@ -6,6 +6,7 @@ class_name MouseInputHandler
 # signal release_ball_pressed()
 
 var accumulated_mouse_movement: Vector2
+var last_touch_position: Vector2
 var release_ball_pressed: bool
 var release_ball_was_pressed: bool
 var ball_powerup_pressed: bool
@@ -27,13 +28,17 @@ var last_mouse_pos: Vector2
 var touch_screen_controls: bool
 func _unhandled_input(event: InputEvent) -> void:
 	touch_screen_controls = OS.has_feature("web_android") || OS.has_feature("android")
+	# touch_screen_controls = true
 	
 	if touch_screen_controls:
 		if event is InputEventScreenDrag:
 			if event.index == 0:
-				accumulated_mouse_movement += event.screen_relative
+				accumulated_mouse_movement += (event.position - last_touch_position) * Global.PLAYER_SENSITIVITY
+				last_touch_position = event.position
 		
 		if event is InputEventScreenTouch:
+			if event.index == 0:
+				last_touch_position = event.position
 			if event.index == 0 || event.index == 1:
 				release_ball_pressed = release_ball_pressed || event.pressed
 
@@ -42,7 +47,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	
 	else:
 		if event is InputEventMouseMotion:
-			accumulated_mouse_movement += event.screen_relative
+			accumulated_mouse_movement += event.screen_relative * Global.PLAYER_SENSITIVITY
 
 		release_ball_pressed = Input.is_action_just_pressed("release_ball")
 		ball_powerup_pressed = Input.is_action_just_pressed("activate_ball")
