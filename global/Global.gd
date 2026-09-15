@@ -16,8 +16,8 @@ var PLAYER_SENSITIVITY: float = 2.0 # 0.75 # 0.65
 
 class Level:
 	var blocks: Array[BreakableBlock]
-	# var block_bitmap: Array[BreakableBlock]
-	var quad_tree: QuadTree
+
+	var block_grid: BlockGrid
 	
 	var completed: bool = false
 	var unlocked: bool = false
@@ -56,11 +56,8 @@ class GameContext extends Node:
 		# block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 		for i in LEVEL_COUNT:
 			var level: Level = Level.new()
-			# level.block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
-			level.quad_tree = QuadTree.create_node(
-				-(BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE) / 2,
-				(BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE) / 2,
-			)
+
+			level.block_grid = BlockGrid.new()
 			levels.push_back(level)
 		
 		paddle = Paddle.new()
@@ -71,26 +68,26 @@ class GameContext extends Node:
 
 	func add_block(block: BreakableBlock, level_index: int) -> void:
 		levels[level_index].blocks.push_back(block)
-		levels[level_index].quad_tree.add_block(block)
+		levels[level_index].block_grid.add_block(block)
 
 
 	func remove_block(block: BreakableBlock, level_index: int = current_level) -> void:
 		# TODO: handling memory from here, might wanna move it
 		levels[level_index].blocks.erase(block)
-		levels[level_index].quad_tree.remove_block(block)
+		levels[level_index].block_grid.remove_block(block)
 
 		
 		levels[level_index].completed = levels[level_index].blocks.is_empty()
 	
 
 	func get_blocks_for_circle(pos: Vector2, r: float) -> Array[BreakableBlock]:
-		return levels[current_level].quad_tree.get_blocks_for_circle(pos, r)
+		return levels[current_level].block_grid.get_blocks_for_circle(pos, r)
 	
 	func get_blocks_for_pos(pos: Vector2) -> Array[BreakableBlock]:
-		return levels[current_level].quad_tree.get_blocks_for_pos(pos)
+		return levels[current_level].block_grid.get_blocks_for_pos(pos)
 
 	func get_blocks_for_aabb(a: Vector2, b: Vector2) -> Array[BreakableBlock]:
-		return levels[current_level].quad_tree.get_blocks_for_aabb(a, b)
+		return levels[current_level].block_grid.get_blocks_for_aabb(a, b)
 	
 
 	func is_current_level_complete() -> bool:

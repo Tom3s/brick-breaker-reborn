@@ -115,6 +115,9 @@ func _sdBox(p: Vector2, b: Vector2) -> float:
 	return (Vector2(max(d.x, 0.0), max(d.y, 0.0)) + Vector2(min(max(d.x, d.y), 0.0), min(max(d.x, d.y), 0.0))).length()
 
 
+# TODO: this only applies to the AABB
+# ITS NOT AN ACCURATE POLYGON COLLISION
+# it works for now, but might be funky later on
 func collides_with_circle(pos: Vector2, r: float) -> bool:
 
 	var dist: float = _sdBox(pos - get_origin(), (b - a) / 2)
