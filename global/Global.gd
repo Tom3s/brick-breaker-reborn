@@ -174,6 +174,8 @@ class GameContext extends Node:
 			return Ball.Type.FIRE
 		elif ball_powerups[0].type == Powerup.Type.ICE_BALL:
 			return Ball.Type.ICE
+		elif ball_powerups[0].type == Powerup.Type.MINE_BALL:
+			return Ball.Type.MINE
 		
 		return Ball.Type.NONE
 

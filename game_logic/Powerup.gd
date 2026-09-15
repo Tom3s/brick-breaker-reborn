@@ -11,33 +11,38 @@ enum Type {
 	GUN,
 	KEY,
 	ICE_BALL,
+	MINE_BALL,
 }
 
-static var weights: PackedInt32Array = [
-	0,
-	0,
-	0,
-	1,
-	0,
-	0,
-	0,
-]
 # static var weights: PackedInt32Array = [
 # 	0,
-# 	2,
-# 	6,
+# 	0,
+# 	0,
 # 	1,
-# 	4,
-# 	0, # key should always be 0
-# 	6,
+# 	0,
+# 	0,
+# 	0,
+# 	0,
 # ]
+static var weights: PackedInt32Array = [
+	0, # NONE - should always be 0
+	2, # BALL_MULTIPLY
+	6, # FIRE_BALL
+	1, # LASER
+	4, # GUN
+	0, # KEY - should always be 0
+	6, # ICE_BALL
+	4, # MINE_BALL
+]
 
 var ball_multiply_value: int = 3
 
 var fire_ball_max_time: float = 15.0
 
 var ice_ball_max_time: float = 15.0
+var mine_ball_max_time: float = 15.0
 static var ice_ball_radius: float = BreakableGrid.CELL_SIZE * 4
+static var mine_ball_radius: float = BreakableGrid.CELL_SIZE * 4
 
 var laser_max_shots: int = 3
 var laser_cooldown: float = 1.0
@@ -45,6 +50,10 @@ var laser_shots_left: int = 0
 var laser_shot: bool = false
 
 var gun_max_time: float = 10.0
+
+# TODO: move this to ball damage calculation
+static var mine_ball_damage: int = 3
+
 
 var type: Type = Type.NONE
 
@@ -123,6 +132,12 @@ func activate_powerup(context: Global.GameContext) -> void:
 	
 	elif type == Type.ICE_BALL:
 		time_left = ice_ball_max_time
+		infinite = false
+		
+		context.add_ball_powerup(self)
+	
+	elif type == Type.MINE_BALL:
+		time_left = mine_ball_max_time
 		infinite = false
 		
 		context.add_ball_powerup(self)

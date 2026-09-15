@@ -6,6 +6,7 @@ enum Type {
 	NORMAL,
 	FIRE,
 	ICE,
+	MINE,
 }
 
 @export
