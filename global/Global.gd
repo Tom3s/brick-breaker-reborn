@@ -12,7 +12,7 @@ const LEVEL_COUNT: int = 10
 
 const DEFAULT_BALL_RADIUS: int = 16.0 # 12.0
 
-var PLAYER_SENSITIVITY: float = 0.75 # 0.65
+var PLAYER_SENSITIVITY: float = 2.0 # 0.75 # 0.65
 
 class Level:
 	var blocks: Array[BreakableBlock]

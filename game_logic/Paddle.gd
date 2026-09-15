@@ -41,7 +41,7 @@ func lerp_move(delta: float) -> void:
 	set_line()
 
 func move_desired_pos(movement: Vector2) -> void:
-	desired_pos.x += movement.x * Global.PLAYER_SENSITIVITY
+	desired_pos.x += movement.x # * Global.PLAYER_SENSITIVITY
 
 	var limits: float = BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE / 2 - (size / 2)
 
