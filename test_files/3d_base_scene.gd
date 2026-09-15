@@ -350,7 +350,7 @@ func _process(delta: float) -> void:
 						block.a, block.b, Color.CYAN, 0.1
 					)
 				if block.is_pos_inside(projectile.position):
-					if damage_block_and_clear(block, context.get_gun_damage()) || projectile.position.y < -grid_unit_size.y:
+					if damage_block_and_clear(block, context.get_gun_damage()):
 						proj_marked_for_remove.push_back(projectile)
 
 	
@@ -418,14 +418,6 @@ func _process(delta: float) -> void:
 		if i < 32: # TODO: MAX_BALL_COUNT
 			wall_sdf_balls[i] = ball.asset_ref.global_position
 
-		# if context.get_active_ball_powerup():
-		# 	ball.asset_ref.set_visual(Ball.Type.FIRE)
-		# 	ball.asset_ref.set_effect_rotation(ball.velocity)
-		# elif context.FLAG_ICE_BALL_ACTIVE:
-		# 	ball.asset_ref.set_visual(Ball.Type.ICE)
-		# 	ball.asset_ref.set_effect_rotation(ball.velocity)
-		# else:
-		# 	ball.asset_ref.set_visual(Ball.Type.NORMAL)
 		ball.asset_ref.set_visual(context.get_active_ball_powerup())
 		ball.asset_ref.set_effect_rotation(ball.velocity)
 
@@ -459,13 +451,6 @@ func _process(delta: float) -> void:
 
 	if DebugScreen.VISUAL_DEBUG:
 		DebugScreen.draw_debug_visuals()
-		context.levels[context.current_level].quad_tree.draw_ball_collision(context.balls[0])
-		context.levels[context.current_level].quad_tree.draw_debug()
-	
-	# DebugDraw3D.draw_aabb_ab(
-	# 	Vector3(100, 100, 100),
-	# 	Vector3(-100, 80, -100),
-	# )
 
 	mouse_input_handler.frame_end_propagation()
 
