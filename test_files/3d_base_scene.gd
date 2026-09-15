@@ -197,6 +197,8 @@ func _process(delta: float) -> void:
 
 					if context.get_active_ball_powerup() == Ball.Type.ICE:
 						convert_blocks_to_ice(ball.position)
+					elif context.get_active_ball_powerup() == Ball.Type.MINE:
+						explode_blocks(ball.position)
 
 
 			if block.is_broken():
@@ -647,6 +649,12 @@ func convert_blocks_to_ice(pos: Vector2) -> void:
 		if block.collides_with_circle(pos, Powerup.ice_ball_radius):
 			block.type = BreakableBlock.BlockType.ICE
 			block.set_visuals()
+
+func explode_blocks(pos: Vector2) -> void:
+	for block: BreakableBlock in context.get_blocks_for_circle(pos, Powerup.mine_ball_radius):
+		# check if block actually collides
+		if block.collides_with_circle(pos, Powerup.mine_ball_radius):
+			damage_block_and_clear(block, Powerup.mine_ball_damage)
 
 func outside_screen_bounds(ball: Ball) -> bool:
 	if ball.position.x + ball.radius * 2 < context.screen_a.x: return true

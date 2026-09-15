@@ -4,11 +4,13 @@ class_name BallMesh
 @onready var flame: MeshInstance3D = %Flame
 @onready var ice: MeshInstance3D = %Ice
 @onready var effect: Node3D = %Effect
+@onready var fuse: GPUParticles3D = %Fuse
 @onready var debug: MeshInstance3D = %Debug
 
 const DEFAULT_COLOR: String = "0098d2"
 const FLAME_COLOR: String = "ff892e"
 const ICE_COLOR: String = "FFFFFF"
+const MINE_COLOR: String = "202020"
 
 var is_flame: bool = false
 
@@ -36,12 +38,15 @@ func set_visual(type: Ball.Type) -> void:
 		material_override.set_shader_parameter("Color", Color.from_string(FLAME_COLOR, Color.WHITE))
 	elif type == Ball.Type.ICE:
 		material_override.set_shader_parameter("Color", Color.from_string(ICE_COLOR, Color.WHITE))
+	elif type == Ball.Type.MINE:
+		material_override.set_shader_parameter("Color", Color.from_string(MINE_COLOR, Color.WHITE))
 	elif type == Ball.Type.NORMAL:
 		material_override.set_shader_parameter("Color", Color.from_string(DEFAULT_COLOR, Color.WHITE))
 	
 	effect.visible = type != Ball.Type.NORMAL
 	flame.visible = type == Ball.Type.FIRE
 	ice.visible = type == Ball.Type.ICE
+	fuse.emitting = type == Ball.Type.MINE
 
 
 # func set_flame_rotation(velocity: Vector2) -> void:

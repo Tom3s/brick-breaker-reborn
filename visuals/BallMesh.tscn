@@ -1,9 +1,10 @@
-[gd_scene load_steps=9 format=3 uid="uid://dh6eign1fffi"]
+[gd_scene load_steps=18 format=3 uid="uid://dh6eign1fffi"]
 
 [ext_resource type="Shader" uid="uid://cgjb8scdym0jl" path="res://visuals/BasicBallShader.res" id="1_iiwoc"]
 [ext_resource type="Script" uid="uid://cw0lypiwj44q" path="res://visuals/BallMesh.gd" id="2_jm5qt"]
 [ext_resource type="Material" uid="uid://qdcc3elroa3i" path="res://visuals/FlameMaterial.material" id="3_jm5qt"]
 [ext_resource type="Material" uid="uid://cfkvt320570ac" path="res://visuals/IceBallMaterial.tres" id="4_xv43n"]
+[ext_resource type="Shader" uid="uid://bv27fbvx6dqew" path="res://visuals/FlameParticle.tres" id="5_gg35l"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_jm5qt"]
 render_priority = 0
@@ -26,6 +27,42 @@ height = 33.0
 radial_segments = 24
 rings = 12
 
+[sub_resource type="SphereMesh" id="SphereMesh_764ty"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1tkb7"]
+render_priority = 0
+shader = ExtResource("5_gg35l")
+
+[sub_resource type="Gradient" id="Gradient_gg35l"]
+offsets = PackedFloat32Array(0.37333333, 0.6666667, 0.8066667)
+colors = PackedColorArray(1, 1, 1, 1, 0.18, 0.18, 0.18, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_764ty"]
+gradient = SubResource("Gradient_gg35l")
+
+[sub_resource type="Curve" id="Curve_1tkb7"]
+_limits = [0.0, 2.2, 0.0, 1.0]
+_data = [Vector2(0, 1.0629213), 0.0, 8.701124, 0, 0, Vector2(0.1875, 1.483146), 0.0, 0.0, 0, 0, Vector2(0.51704544, 0.7662921), 0.0, 0.0, 0, 0, Vector2(0.6988636, 1.013483), 0.0, 0.0, 0, 0, Vector2(0.8465909, 1.2112359), 0.0, 0.0, 0, 0, Vector2(1, 0.04494381), 0.0, 0.0, 0, 0]
+point_count = 6
+
+[sub_resource type="CurveTexture" id="CurveTexture_jbhqb"]
+curve = SubResource("Curve_1tkb7")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_jbhqb"]
+inherit_velocity_ratio = 0.104
+direction = Vector3(0, 1, 0)
+initial_velocity_max = 9.349999
+gravity = Vector3(0, -2.58, 0)
+scale_min = 2.05
+scale_max = 2.05
+scale_curve = SubResource("CurveTexture_jbhqb")
+color_ramp = SubResource("GradientTexture1D_764ty")
+turbulence_influence_min = 0.70000005
+turbulence_influence_max = 0.70000005
+
+[sub_resource type="QuadMesh" id="QuadMesh_dunsf"]
+size = Vector2(8, 8)
+
 [node name="BallMesh" type="MeshInstance3D"]
 material_override = SubResource("ShaderMaterial_jm5qt")
 mesh = SubResource("SphereMesh_s2g42")
@@ -42,6 +79,7 @@ unique_name_in_owner = true
 [node name="Ice" type="MeshInstance3D" parent="Effect"]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+visible = false
 mesh = SubResource("SphereMesh_gg35l")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("4_xv43n")
@@ -49,6 +87,20 @@ surface_material_override/0 = ExtResource("4_xv43n")
 [node name="Flame" type="MeshInstance3D" parent="Effect"]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+visible = false
 mesh = SubResource("SphereMesh_gg35l")
 skeleton = NodePath("../..")
 surface_material_override/0 = ExtResource("3_jm5qt")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Effect"]
+visible = false
+mesh = SubResource("SphereMesh_764ty")
+
+[node name="Fuse" type="GPUParticles3D" parent="Effect"]
+unique_name_in_owner = true
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 13, 9.058)
+material_override = SubResource("ShaderMaterial_1tkb7")
+amount = 12
+lifetime = 0.72
+process_material = SubResource("ParticleProcessMaterial_jbhqb")
+draw_pass_1 = SubResource("QuadMesh_dunsf")
