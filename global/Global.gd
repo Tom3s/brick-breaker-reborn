@@ -194,11 +194,13 @@ class GameContext extends Node:
 	var LASER_ACTIVE: bool = false
 	var LASER_COOLDOWN: float = 0.0
 	var GUN_ACTIVE: bool = false
+	var TUNNEL_ACTIVE: bool = false
 
 	func set_flags() -> void:
 		LASER_ACTIVE = false
 		LASER_COOLDOWN = -1.0
 		GUN_ACTIVE = false
+		TUNNEL_ACTIVE = false
 
 		for powerup: Powerup in active_powerups:
 			if powerup.type == Powerup.Type.LASER:
@@ -206,6 +208,8 @@ class GameContext extends Node:
 				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)
 			elif powerup.type == Powerup.Type.GUN:
 				GUN_ACTIVE = true
+			elif powerup.type == Powerup.Type.TUNNEL:
+				TUNNEL_ACTIVE = true
 		
 
 	# debug strings

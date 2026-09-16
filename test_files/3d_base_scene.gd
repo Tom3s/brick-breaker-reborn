@@ -150,6 +150,7 @@ func _process(delta: float) -> void:
 	mouse_input_handler.accumulated_mouse_movement = Vector2.ZERO
 
 	context.paddle.lerp_move(safe_delta)
+
 	
 	if !context.balls[0].released && mouse_input_handler.release_ball_just_pressed():
 		release_ball()
@@ -338,7 +339,24 @@ func _process(delta: float) -> void:
 	#  888ooo8     888ooo8     888ooo8     888ooo8   888             888      888oooooo  
 	#  888    oo   888         888         888    oo 888o     oo     888             888 
 	# o888ooo8888 o888o       o888o       o888ooo8888 888oooo88     o888o    o88oooo888  
-																				   
+
+	if context.TUNNEL_ACTIVE:
+		context.paddle.set_tunnel_lines()
+		for ball: Ball in context.balls:
+			var collision_result := context.paddle.tunnel_left.collide_with_ball(ball)
+			if collision_result.collided:
+				ball.position = collision_result.position
+				ball.velocity = collision_result.velocity
+				ball.boost()
+				continue
+			
+			collision_result = context.paddle.tunnel_right.collide_with_ball(ball)
+			if collision_result.collided:
+				ball.position = collision_result.position
+				ball.velocity = collision_result.velocity
+				ball.boost()
+
+
 	# update active effects
 	var disable_effect_queue: Array[Powerup]
 	for powerup: Powerup in context.active_powerups:
@@ -452,6 +470,10 @@ func _process(delta: float) -> void:
 			context.powerups.erase(powerup)
 			powerup.asset.queue_free()
 
+	if context.TUNNEL_ACTIVE:
+		context.paddle.tunnel_left.debug_visual.draw_debug()
+		context.paddle.tunnel_right.debug_visual.draw_debug()
+
 	var wall_sdf_balls: PackedVector3Array
 	wall_sdf_balls.resize(32) # TODO: MAX_BALL_COUNT
 	wall_sdf_balls.fill(Vector3.INF)
@@ -503,6 +525,12 @@ func _process(delta: float) -> void:
 		for block: BreakableBlock in context.get_current_blocks():
 			for line: LineCollider in block.collision:
 				DebugScreen.debug_visuals.push_back(line.debug_visual)
+		
+		# TODO: uncomment this once proper visual is implemented
+		# if context.TUNNEL_ACTIVE:
+		# 	DebugScreen.debug_visuals.push_back(context.paddle.tunnel_left.debug_visual)
+		# 	DebugScreen.debug_visuals.push_back(context.paddle.tunnel_right.debug_visual)
+
 
 	if DebugScreen.VISUAL_DEBUG:
 		DebugScreen.draw_debug_visuals()

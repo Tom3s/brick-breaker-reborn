@@ -18,6 +18,9 @@ var reflection_angle: float = PI / 4
 
 var line: LineCollider = LineCollider.new()
 
+var tunnel_left: LineCollider = LineCollider.new()
+var tunnel_right: LineCollider = LineCollider.new()
+
 
 func _ready() -> void:
 	set_line()
@@ -55,3 +58,13 @@ func get_left_side() -> Vector2:
 
 func get_right_side() -> Vector2:
 	return position + Vector2(size / 2, 0)
+
+func set_tunnel_lines() -> void:
+	tunnel_left.set_points(
+		line.p1 + Vector2.UP * BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE,
+		line.p1, 
+	)
+	tunnel_right.set_points(
+		line.p2, 
+		line.p2 + Vector2.UP * BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE, 
+	)
