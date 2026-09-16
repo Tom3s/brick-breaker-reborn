@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://bph4d3lawoslh"]
+
+[ext_resource type="Script" uid="uid://yxanj5tx3bcu" path="res://test_files/continuous_collision_test.gd" id="1_dso2j"]
+
+[node name="ContinuousCollisionTest" type="Node2D"]
+script = ExtResource("1_dso2j")
+radius = 32.0
+
+[node name="LineA" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(240, 216)
+
+[node name="LineB" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(827, 234)
+
+[node name="BallPosPrev" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(767, 113)
+
+[node name="BallPosCurrent" type="Marker2D" parent="."]
+unique_name_in_owner = true
+position = Vector2(904, 376)
