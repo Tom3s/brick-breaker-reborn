@@ -19,6 +19,11 @@ func _run() -> void:
 				file_name = dir.get_next()
 				continue
 			
+			# Comment out to redo all files
+			# will skip those textures, that are already processed
+			if FileAccess.file_exists(final_path + file_name):
+				file_name = dir.get_next()
+				continue
 
 			convert_texture_to_sdf(file_name)
 

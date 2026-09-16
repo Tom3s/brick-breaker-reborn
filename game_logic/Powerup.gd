@@ -12,6 +12,7 @@ enum Type {
 	KEY,
 	ICE_BALL,
 	MINE_BALL,
+	TUNNEL,
 }
 
 # static var weights: PackedInt32Array = [
@@ -19,20 +20,22 @@ enum Type {
 # 	0,
 # 	0,
 # 	0,
+# 	0,
+# 	0,
+# 	0,
+# 	0,
 # 	1,
-# 	0,
-# 	0,
-# 	0,
 # ]
 static var weights: PackedInt32Array = [
 	0, # NONE - should always be 0
-	2, # BALL_MULTIPLY
+	3, # BALL_MULTIPLY
 	6, # FIRE_BALL
 	1, # LASER
 	4, # GUN
 	0, # KEY - should always be 0
 	6, # ICE_BALL
 	4, # MINE_BALL
+	2, # TUNNEL
 ]
 
 var ball_multiply_value: int = 3
@@ -50,6 +53,7 @@ var laser_shots_left: int = 0
 var laser_shot: bool = false
 
 var gun_max_time: float = 10.0
+var tunnel_max_time: float = 10.0
 
 # TODO: move this to ball damage calculation
 static var mine_ball_damage: int = 3
@@ -150,6 +154,11 @@ func activate_powerup(context: Global.GameContext) -> void:
 	
 	elif type == Type.GUN:
 		time_left = gun_max_time
+
+		context.active_powerups.push_back(self)
+
+	elif type == Type.TUNNEL:
+		time_left = tunnel_max_time
 
 		context.active_powerups.push_back(self)
 	
