@@ -378,16 +378,20 @@ func _process(delta: float) -> void:
 			
 			sfx_player.play_laser_shot()
 	
+
 	if context.ball_power_active:
 		context.update_ball_powerup(safe_delta)
 
 	for powerup: Powerup in disable_effect_queue:
 		context.active_powerups.erase(powerup)
 	
-	if context.GUN_ACTIVE && mouse_input_handler.release_ball_just_pressed():
+	context.gun_cooldown -= safe_delta
+	if context.GUN_ACTIVE && mouse_input_handler.action_press_buffered() && context.gun_cooldown <= 0.0:
 		LoggerMogyi.log(self, "Shooting with active GUN powerup")
 		spawn_gun_projectiles()
 		sfx_player.play_gun_shot()
+		context.gun_cooldown = Powerup.GUN_MAX_COOLDOWN
+		mouse_input_handler.action_last_pressed = mouse_input_handler.BUFFER_LENGTH
 
 	# update projectiles
 	#
@@ -535,7 +539,7 @@ func _process(delta: float) -> void:
 	if DebugScreen.VISUAL_DEBUG:
 		DebugScreen.draw_debug_visuals()
 
-	mouse_input_handler.frame_end_propagation()
+	mouse_input_handler.frame_end_propagation(safe_delta)
 
 
 
