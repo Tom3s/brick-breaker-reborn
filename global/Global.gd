@@ -46,6 +46,8 @@ class GameContext extends Node:
 	var powerups: Array[Powerup]
 	var active_powerups: Array[Powerup]
 
+	var gun_cooldown: float = 0.0
+
 	var BALL_POWERUP_SLOTS: int = 2
 	var ball_powerups: Array[Powerup]
 	var ball_power_active: bool = false

@@ -14,6 +14,9 @@ var ball_powerup_was_pressed: bool
 var unlock_pressed: bool
 var unlock_was_pressed: bool
 
+var action_last_pressed: float = 0.0
+var BUFFER_LENGTH: float = 0.1
+
 func _process(delta: float) -> void:
 	# TODO: handle mouse hiding properly
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -22,6 +25,7 @@ func _process(delta: float) -> void:
 		else:
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	
+
 
 var last_mouse_pos: Vector2
 # var last_touch_second: 
@@ -41,6 +45,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				last_touch_position = event.position
 			if event.index == 0 || event.index == 1:
 				release_ball_pressed = release_ball_pressed || event.pressed
+				
 
 		ball_powerup_pressed = Input.is_action_just_pressed("activate_ball")
 		unlock_pressed = Input.is_action_just_pressed("activate_key")
@@ -52,7 +57,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		release_ball_pressed = Input.is_action_just_pressed("release_ball")
 		ball_powerup_pressed = Input.is_action_just_pressed("activate_ball")
 		unlock_pressed = Input.is_action_just_pressed("activate_key")
-
 
 	# release_ball_pressed = Input.is_action_pressed("release_ball")
 	# ball_powerup_activated = !ball_powerup_was_activated && Input.is_action_pressed("activate_ball")
@@ -68,7 +72,15 @@ func ball_powerup_just_pressed() -> bool:
 func unlock_just_pressed() -> bool:
 	return !unlock_was_pressed && unlock_pressed
 
-func frame_end_propagation() -> void:
+func action_press_buffered() -> bool:
+	return action_last_pressed <= BUFFER_LENGTH
+
+func frame_end_propagation(delta: float) -> void:
+	if release_ball_just_pressed():
+		action_last_pressed = 0.0
+	else:
+		action_last_pressed += delta
+
 	ball_powerup_was_pressed = ball_powerup_pressed
 	release_ball_was_pressed = release_ball_pressed
 	unlock_was_pressed = unlock_pressed

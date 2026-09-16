@@ -20,11 +20,11 @@ enum Type {
 # 	0,
 # 	0,
 # 	0,
-# 	0,
-# 	0,
-# 	0,
-# 	0,
 # 	1,
+# 	0,
+# 	0,
+# 	0,
+# 	0,
 # ]
 static var weights: PackedInt32Array = [
 	0, # NONE - should always be 0
@@ -53,6 +53,7 @@ var laser_shots_left: int = 0
 var laser_shot: bool = false
 
 var gun_max_time: float = 10.0
+static var GUN_MAX_COOLDOWN: float = 1.0 / 6
 var tunnel_max_time: float = 10.0
 
 # TODO: move this to ball damage calculation
@@ -75,6 +76,7 @@ var grace_distance: float = 16.0
 var infinite: bool = true
 
 var time_left: float = 0.0
+# var cooldown: float = 0.0
 
 func randomize_velocity() -> void:
 	velocity = Vector2(randf_range(-0.5, 0.5), -1).normalized()
@@ -175,6 +177,8 @@ func update(delta: float) -> void:
 			laser_shot = true
 		else:
 			laser_shot = false
+	# elif type == Type.GUN:
+	# 	cooldown -= delta
 
 static func get_weighted_powerup(n: float) -> Type:
 	var total_weight: int
