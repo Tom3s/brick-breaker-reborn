@@ -16,8 +16,8 @@ position = Vector2(827, 234)
 
 [node name="BallPosPrev" type="Marker2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(627, 110)
+position = Vector2(767, 113)
 
 [node name="BallPosCurrent" type="Marker2D" parent="."]
 unique_name_in_owner = true
-position = Vector2(452, 357)
+position = Vector2(904, 376)

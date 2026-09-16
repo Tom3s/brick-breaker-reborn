@@ -215,6 +215,7 @@ func _process(delta: float) -> void:
 						ball.position = collision_result.position
 						ball.velocity = collision_result.velocity
 						# TODO: boost ball on collision
+						ball.boost()
 
 					block.hit_block(context, ball)
 
@@ -281,7 +282,7 @@ func _process(delta: float) -> void:
 				ball.position = collision_result.position
 				ball.velocity = collision_result.velocity
 				# TODO
-				# ball.boost()
+				ball.boost()
 
 			if level_unlocked:
 				context.next_level()
@@ -298,7 +299,7 @@ func _process(delta: float) -> void:
 				ball.position = collision_result.position
 				ball.velocity = collision_result.velocity
 				# TODO
-				# ball.boost()
+				ball.boost()
 			# ball.collide_with(line, true)
 
 	
@@ -328,6 +329,7 @@ func _process(delta: float) -> void:
 				collision_result.t
 			)
 			ball.velocity = Vector2.UP.rotated(reflection_angle)
+			ball.boost()
 
 			sfx_player.play_paddle_hit()
 
@@ -387,14 +389,24 @@ func _process(delta: float) -> void:
 			continue
 
 		if projectile.type == Projectile.Type.GUN_BULLET:
-			for block: BreakableBlock in context.get_blocks_for_pos(projectile.position):
-				if DebugScreen.VISUAL_DEBUG:
-					DebugVisual.draw_rectangle_timed(
-						block.a, block.b, Color.CYAN, 0.1
-					)
-				if block.is_pos_inside(projectile.position):
-					if damage_block_and_clear(block, context.get_gun_damage()):
-						proj_marked_for_remove.push_back(projectile)
+			var blocks: Array[BreakableBlock] = context.get_blocks_for_aabb(projectile.position, projectile.position - (projectile.velocity * safe_delta))
+			if blocks.size() == 0: continue
+
+			var bottom_most_block: BreakableBlock = blocks[0]
+			
+			for i in blocks.size():
+				if i == 0: continue
+
+				if blocks[i].b.y > bottom_most_block.b.y:
+					bottom_most_block = blocks[i]
+			
+			if DebugScreen.VISUAL_DEBUG:
+				DebugVisual.draw_rectangle_timed(
+					bottom_most_block.a, bottom_most_block.b, Color.CYAN, 0.1
+				)
+
+			damage_block_and_clear(bottom_most_block, context.get_gun_damage())
+			proj_marked_for_remove.push_back(projectile)
 
 	
 	for projectile: Projectile in proj_marked_for_remove:
