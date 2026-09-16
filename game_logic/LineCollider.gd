@@ -13,6 +13,7 @@ class LineBallCollisionResult:
 	var collided: bool = false
 	var position: Vector2
 	var velocity: Vector2
+	var t: float
 
 	var contact_point: Vector2
 	var contact_distance: float
@@ -41,11 +42,12 @@ func set_points(p1_new: Vector2, p2_new: Vector2) -> void:
 
 # func get_debug_visual(offset: Vector2) -> DebugVisual:
 
-func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
+# TODO: make logic for non-reflecting bounce
+func collide_with_ball(ball: Ball, delta: float = 1.0) -> LineBallCollisionResult:
 	var result: LineBallCollisionResult = LineBallCollisionResult.new()
 
 	var ball_pos: Vector2 = ball.position
-	var ball_prev: Vector2 = ball.position - ball.velocity
+	var ball_prev: Vector2 = ball.position - ball.velocity * delta
 
 	# d = (x2 - x1) * (y - y1) - (y2 - y1) * (x - x_1)
 	# var curr_side: float = (p2.x - p1.x) * (ball_pos.y - p1.y) - (p2.y - p1.y) * (ball_pos.x - p1.x)
@@ -59,7 +61,8 @@ func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
 	if prev_side > 0:
 		return result
 
-	var intersect_point: Vector2 = Geometry2D.line_intersects_line(
+	# TODO: using Variant bcuz Vector2 is not nullable???!
+	var intersect_point: Variant = Geometry2D.line_intersects_line(
 		p1, p2 - p1,
 		ball.position, ball.velocity
 	)
@@ -81,6 +84,7 @@ func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
 		# var t: float = inverse_lerp(p1, p2, contact_point)
 		var t: float = _inv_lerp_vec2(p1, p2, contact_point)
 
+		result.t = t
 		# if t < 0.0 || t > 1.0:
 		# 	result.collided = false
 		# 	return result
@@ -91,7 +95,7 @@ func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
 
 			var ball_pos_at_contact: Vector2 = (contact_point + normal * ball.radius)
 
-			if (ball_pos_at_contact - ball_prev).length() > ball.velocity.length():
+			if (ball_pos_at_contact - ball_prev).length() > (ball.velocity * delta).length():
 				result.collided = false
 				return result
 
@@ -100,7 +104,7 @@ func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
 			var reflected_error: Vector2 = _reflect(error_since_contact, normal)
 
 			result.position = ball_pos_at_contact + reflected_error
-			result.velocity = (result.position - ball_pos_at_contact).normalized() * ball.velocity.length()
+			result.velocity = (result.position - ball_pos_at_contact).normalized() * (ball.velocity * delta).length()
 			result.contact_distance = (contact_point - ball_prev).length()
 
 			return result
@@ -128,7 +132,7 @@ func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
 			var reflected_error: Vector2 = _reflect(error_since_contact, (ball_pos_at_contact - p2).normalized())
 
 			result.position = ball_pos_at_contact + reflected_error
-			result.velocity = (result.position - ball_pos_at_contact).normalized() * ball.velocity.length()
+			result.velocity = (result.position - ball_pos_at_contact).normalized() * (ball.velocity * delta).length()
 			result.contact_distance = (contact_point - ball_prev).length()
 
 			return result
@@ -157,8 +161,8 @@ func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
 			var reflected_error: Vector2 = _reflect(error_since_contact, (ball_pos_at_contact - p1).normalized())
 
 			result.position = ball_pos_at_contact + reflected_error
-			result.velocity = (result.position - ball_pos_at_contact).normalized() * ball.velocity.length()
-			result.contact_distance = (contact_point - ball.prev).length()
+			result.velocity = (result.position - ball_pos_at_contact).normalized() * (ball.velocity * delta).length()
+			result.contact_distance = (contact_point - ball_prev).length()
 
 			return result
 
@@ -172,13 +176,13 @@ func collide_with_ball(ball: Ball) -> LineBallCollisionResult:
 # {
 #     Vector2 ab = b - a;
 #     Vector2 av = value - a;
-    
+	
 #     float abSquared = ab.sqrMagnitude;
 #     if (abSquared == 0f)
 #     {
 #         return 0f; // a and b are the same point
 #     }
-    
+	
 #     // Project av onto ab, find ratio
 #     return Vector2.Dot(av, ab) / abSquared;
 # }

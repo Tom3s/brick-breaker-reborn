@@ -94,7 +94,8 @@ func _process(delta: float) -> void:
 	play_layer_camera.rotation = get_viewport().get_camera_3d().rotation
 	play_layer_camera.fov = get_viewport().get_camera_3d().fov
 	_debug_fps = 1.0 / delta
-	var safe_delta: float = min(delta, 1. / 60)
+	# var safe_delta: float = min(delta, 1. / 60)
+	var safe_delta: float = delta
 
 	context.set_flags()
 	# delta *= .1
@@ -164,6 +165,19 @@ func _process(delta: float) -> void:
 
 	# WARNING: no input event should be handled after this, as it may be incorrect state
 
+	# oooooooooo      o      ooooo       ooooo        oooooooo8  
+	#  888    888    888      888         888        888         
+	#  888oooo88    8  88     888         888         888oooooo  
+	#  888    888  8oooo88    888      o  888      o         888 
+	# o888ooo888 o88o  o888o o888ooooo88 o888ooooo88 o88oooo888  
+
+	if context.balls.size() == 1 && !context.balls[0].released:
+		context.balls[0].set_position(context.paddle.position + Vector2.UP * context.balls[0].radius * 2)
+	else:
+		# ball.move(delta)
+		for ball: Ball in context.balls:
+			ball.move(safe_delta)
+
 	# handling blocks before balls
 	# this is bc multiball powerup might rotate the ball's 
 	# velocity of out the play area
@@ -192,7 +206,16 @@ func _process(delta: float) -> void:
 					block.a, block.b, Color.BLUE
 				)
 			for line: LineCollider in block.collision:
-				if ball.collide_with(line, block.reflects_ball(context)):
+
+				var collision_result := line.collide_with_ball(ball, safe_delta)
+
+				# if ball.collide_with(line, block.reflects_ball(context)):
+				if collision_result.collided:
+					if block.reflects_ball(context):
+						ball.position = collision_result.position
+						ball.velocity = collision_result.velocity
+						# TODO: boost ball on collision
+
 					block.hit_block(context, ball)
 
 					if context.get_active_ball_powerup() == Ball.Type.ICE:
@@ -215,18 +238,7 @@ func _process(delta: float) -> void:
 				break
 
 
-	# oooooooooo      o      ooooo       ooooo        oooooooo8  
-	#  888    888    888      888         888        888         
-	#  888oooo88    8  88     888         888         888oooooo  
-	#  888    888  8oooo88    888      o  888      o         888 
-	# o888ooo888 o88o  o888o o888ooooo88 o888ooooo88 o88oooo888  
-
-	if context.balls.size() == 1 && !context.balls[0].released:
-		context.balls[0].set_position(context.paddle.position + Vector2.UP * context.balls[0].radius * 2)
-	else:
-		# ball.move(delta)
-		for ball: Ball in context.balls:
-			ball.move(safe_delta)
+	
 
 	#   oooooooo8   ooooooo  ooooo       ooooo       ooooo  oooooooo8 ooooo  ooooooo  oooo   oooo 
 	# o888     88 o888   888o 888         888         888  888         888 o888   888o 8888o  88  
@@ -239,7 +251,9 @@ func _process(delta: float) -> void:
 	while index < context.balls.size():
 		var ball: Ball = context.balls[index]
 
-		if ball.collide_with(context.death_barrier, false, false) || outside_screen_bounds(ball):	
+		var colliion_result := context.death_barrier.collide_with_ball(ball)
+
+		if colliion_result.collided || outside_screen_bounds(ball):	
 			if context.balls.size() > 1:
 				# ball_parent.remove_child(ball.asset_ref)
 				ball.asset_ref.queue_free()
@@ -258,7 +272,17 @@ func _process(delta: float) -> void:
 	
 	var level_unlocked: bool = context.levels[context.current_level].unlocked
 	for ball: Ball in context.balls:
-		if ball.collide_with(context.top_barrier, !level_unlocked, !level_unlocked):
+
+		var collision_result := context.top_barrier.collide_with_ball(ball)
+
+		# if ball.collide_with(context.top_barrier, !level_unlocked, !level_unlocked):
+		if collision_result.collided:
+			if !level_unlocked:
+				ball.position = collision_result.position
+				ball.velocity = collision_result.velocity
+				# TODO
+				# ball.boost()
+
 			if level_unlocked:
 				context.next_level()
 				display_blocks(context.levels[context.current_level].blocks)
@@ -269,7 +293,13 @@ func _process(delta: float) -> void:
 	for line in context.screen_collision:
 		# ball.collide_with(line, true)
 		for ball: Ball in context.balls:
-			ball.collide_with(line, true)
+			var collision_result := line.collide_with_ball(ball)
+			if collision_result.collided:
+				ball.position = collision_result.position
+				ball.velocity = collision_result.velocity
+				# TODO
+				# ball.boost()
+			# ball.collide_with(line, true)
 
 	
 	if context.is_current_level_complete():
@@ -287,7 +317,18 @@ func _process(delta: float) -> void:
 			on_death()
 
 	for ball: Ball in context.balls:
-		if ball.collide_with_paddle(context.paddle):
+		var collision_result := context.paddle.line.collide_with_ball(ball)
+
+		# if ball.collide_with_paddle(context.paddle):
+		if collision_result.collided:
+			ball.position = collision_result.contact_point + (context.paddle.line.normal * ball.radius)
+			var reflection_angle: float = lerpf(
+				-context.paddle.reflection_angle, 
+				context.paddle.reflection_angle, 
+				collision_result.t
+			)
+			ball.velocity = Vector2.UP.rotated(reflection_angle)
+
 			sfx_player.play_paddle_hit()
 
 	# ooooooooooo ooooooooooo ooooooooooo ooooooooooo  oooooooo8 ooooooooooo  oooooooo8  
