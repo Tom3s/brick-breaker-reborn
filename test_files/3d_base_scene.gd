@@ -13,6 +13,7 @@ extends Node3D
 @onready var paddle_mesh: MeshInstance3D = %PaddleMesh
 @onready var laser_asset: LaserAsset = %LaserAsset
 @onready var tunnel_asset: Node3D = %TunnelAsset
+@onready var guns_asset: Node3D = %GunsAsset
 @onready var block_parent: Node3D = %Blocks
 @onready var projectile_parent: Node3D = %Projectiles
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
@@ -515,7 +516,9 @@ func _process(delta: float) -> void:
 	laser_asset.visible = context.LASER_ACTIVE
 	# laser_asset.%Beam.material_override.set_shader_parameter("TimeLeft", context.LASER_COOLDOWN)
 	laser_asset.set_visual(context.LASER_COOLDOWN)
+
 	tunnel_asset.visible = context.TUNNEL_ACTIVE
+	guns_asset.visible = context.GUN_ACTIVE
 
 	# set UI
 	ingame_ui.set_ball_slots(context)
@@ -695,6 +698,7 @@ func spawn_gun_projectiles() -> void:
 	var p: Projectile = Projectile.new()
 	p.init_type(Projectile.Type.GUN_BULLET)
 	p.position = context.paddle.get_left_side()
+	p.position += Vector2.UP * 64.0
 	var asset: Node3D = gun_bullet_asset_scene.instantiate()
 	projectile_parent.add_child(asset)
 	p.asset_ref = asset
@@ -703,6 +707,7 @@ func spawn_gun_projectiles() -> void:
 	p = Projectile.new()
 	p.init_type(Projectile.Type.GUN_BULLET)
 	p.position = context.paddle.get_right_side()
+	p.position += Vector2.UP * 64.0
 	p.position -= Vector2(0.001, 0) # otherwie it perfectly misses the blocks on the right sides
 	asset = gun_bullet_asset_scene.instantiate()
 	projectile_parent.add_child(asset)

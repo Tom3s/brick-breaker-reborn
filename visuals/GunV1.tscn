@@ -1,0 +1,42 @@
+[gd_scene load_steps=3 format=3 uid="uid://ts4oq7x4e7yu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_desjq"]
+albedo_color = Color(0.33, 0.33, 0.33, 1)
+metallic = 1.0
+metallic_specular = 0.73
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6o47r"]
+albedo_color = Color(0, 0.7411765, 0.22745098, 1)
+emission_enabled = true
+emission = Color(0, 0.7411765, 0.22745098, 1)
+
+[node name="GunV1" type="Node3D"]
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+material_override = SubResource("StandardMaterial3D_desjq")
+height = 3.0
+sides = 6
+cone = true
+
+[node name="CSGTorus3D" type="CSGTorus3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4252448, 0)
+material_override = SubResource("StandardMaterial3D_6o47r")
+outer_radius = 0.6
+
+[node name="CSGTorus3D2" type="CSGTorus3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.8735812, 0)
+material_override = SubResource("StandardMaterial3D_6o47r")
+inner_radius = 0.4
+outer_radius = 0.5
+
+[node name="CSGTorus3D3" type="CSGTorus3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3007503, 0)
+material_override = SubResource("StandardMaterial3D_6o47r")
+inner_radius = 0.3
+outer_radius = 0.4
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.972046, 0)
+material_override = SubResource("StandardMaterial3D_6o47r")
+radius = 0.155
