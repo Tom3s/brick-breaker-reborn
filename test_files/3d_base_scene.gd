@@ -412,7 +412,7 @@ func _process(delta: float) -> void:
 			continue
 
 		if projectile.type == Projectile.Type.GUN_BULLET:
-			var blocks: Array[BreakableBlock] = context.get_blocks_for_aabb(projectile.position, projectile.position - (projectile.velocity * safe_delta))
+			var blocks: Array[BreakableBlock] = context.get_blocks_for_aabb(projectile.position + Vector2.LEFT, projectile.position - (projectile.velocity * safe_delta) + Vector2.RIGHT)
 			if blocks.size() == 0: continue
 
 			var bottom_most_block: BreakableBlock = blocks[0]
