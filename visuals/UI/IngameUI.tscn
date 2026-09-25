@@ -150,6 +150,7 @@ layout_mode = 2
 [node name="Control2" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(0, 88)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="ActivateBall" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer"]
 unique_name_in_owner = true
@@ -173,6 +174,7 @@ action = "activate_ball"
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
 size_flags_horizontal = 3
+mouse_filter = 2
 
 [node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
 layout_mode = 2
@@ -181,6 +183,7 @@ size_flags_horizontal = 8
 [node name="Control3" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 custom_minimum_size = Vector2(0, 200)
 layout_mode = 2
+mouse_filter = 2
 
 [node name="ActivateKey" type="Button" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
 unique_name_in_owner = true

@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=22 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
@@ -11,6 +11,7 @@
 [ext_resource type="Shader" uid="uid://do3suaiifptyk" path="res://visuals/WallSDF_code.gdshader" id="5_jdl2d"]
 [ext_resource type="PackedScene" uid="uid://cavmf50eohh6o" path="res://visuals/UI/IngameUI.tscn" id="6_7cdmi"]
 [ext_resource type="PackedScene" uid="uid://cutxkxi4r87a1" path="res://visuals/SkyScene.tscn" id="6_cs8pv"]
+[ext_resource type="PackedScene" uid="uid://bxxekx0mk0sha" path="res://visuals/ParticleVFXManager.tscn" id="8_4bkd6"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_bcu1a"]
 top_radius = 8.0
@@ -140,6 +141,9 @@ transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 1
 layers = 2
 mesh = SubResource("QuadMesh_7cdmi")
 surface_material_override/0 = SubResource("ShaderMaterial_du04y")
+
+[node name="ParticleVFXManager" parent="." instance=ExtResource("8_4bkd6")]
+unique_name_in_owner = true
 
 [node name="ActivePlayLayer" type="CanvasLayer" parent="."]
 

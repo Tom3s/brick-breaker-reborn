@@ -15,28 +15,28 @@ enum Type {
 	TUNNEL,
 }
 
-static var weights: PackedInt32Array = [
-	0, # NONE,- should always be 0
-	0, # BALL_MULTIPLY,
-	0, # FIRE_BALL,
-	0, # LASER,
-	1, # GUN,
-	0, # KEY,- should always be 0
-	0, # ICE_BALL,
-	0, # MINE_BALL,
-	0, # TUNNEL,
-]
 # static var weights: PackedInt32Array = [
-# 	0, # NONE - should always be 0
-# 	3, # BALL_MULTIPLY
-# 	6, # FIRE_BALL
-# 	1, # LASER
-# 	4, # GUN
-# 	0, # KEY - should always be 0
-# 	6, # ICE_BALL
-# 	4, # MINE_BALL
-# 	2, # TUNNEL
+# 	0, # NONE,- should always be 0
+# 	0, # BALL_MULTIPLY,
+# 	0, # FIRE_BALL,
+# 	0, # LASER,
+# 	0, # GUN,
+# 	0, # KEY,- should always be 0
+# 	0, # ICE_BALL,
+# 	1, # MINE_BALL,
+# 	0, # TUNNEL,
 # ]
+static var weights: PackedInt32Array = [
+	0, # NONE - should always be 0
+	3, # BALL_MULTIPLY
+	6, # FIRE_BALL
+	1, # LASER
+	4, # GUN
+	0, # KEY - should always be 0
+	6, # ICE_BALL
+	4, # MINE_BALL
+	2, # TUNNEL
+]
 
 var ball_multiply_value: int = 3
 
