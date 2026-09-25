@@ -12,6 +12,7 @@ extends Node3D
 @onready var powerup_parent: Node3D = %Powerups
 @onready var paddle_mesh: MeshInstance3D = %PaddleMesh
 @onready var laser_asset: LaserAsset = %LaserAsset
+@onready var tunnel_asset: Node3D = %TunnelAsset
 @onready var block_parent: Node3D = %Blocks
 @onready var projectile_parent: Node3D = %Projectiles
 @onready var mouse_input_handler: MouseInputHandler = %MouseInputHandler
@@ -474,10 +475,6 @@ func _process(delta: float) -> void:
 			context.powerups.erase(powerup)
 			powerup.asset.queue_free()
 
-	if context.TUNNEL_ACTIVE:
-		context.paddle.tunnel_left.debug_visual.draw_debug()
-		context.paddle.tunnel_right.debug_visual.draw_debug()
-
 	var wall_sdf_balls: PackedVector3Array
 	wall_sdf_balls.resize(32) # TODO: MAX_BALL_COUNT
 	wall_sdf_balls.fill(Vector3.INF)
@@ -518,6 +515,7 @@ func _process(delta: float) -> void:
 	laser_asset.visible = context.LASER_ACTIVE
 	# laser_asset.%Beam.material_override.set_shader_parameter("TimeLeft", context.LASER_COOLDOWN)
 	laser_asset.set_visual(context.LASER_COOLDOWN)
+	tunnel_asset.visible = context.TUNNEL_ACTIVE
 
 	# set UI
 	ingame_ui.set_ball_slots(context)
@@ -538,6 +536,9 @@ func _process(delta: float) -> void:
 
 	if DebugScreen.VISUAL_DEBUG:
 		DebugScreen.draw_debug_visuals()
+		if  context.TUNNEL_ACTIVE:
+			context.paddle.tunnel_left.debug_visual.draw_debug()
+			context.paddle.tunnel_right.debug_visual.draw_debug()
 
 	mouse_input_handler.frame_end_propagation(safe_delta)
 
