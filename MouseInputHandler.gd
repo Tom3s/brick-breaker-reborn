@@ -17,6 +17,12 @@ var unlock_was_pressed: bool
 var action_last_pressed: float = 0.0
 var BUFFER_LENGTH: float = 0.1
 
+func _init() -> void:
+	touch_screen_controls = OS.has_feature("web_android") || \
+							OS.has_feature("web_ios") || \
+							OS.has_feature("mobile")
+
+
 func _process(delta: float) -> void:
 	# TODO: handle mouse hiding properly
 	if Input.is_action_just_pressed("ui_cancel"):
@@ -29,9 +35,8 @@ func _process(delta: float) -> void:
 
 var last_mouse_pos: Vector2
 # var last_touch_second: 
-var touch_screen_controls: bool
+var touch_screen_controls: bool = false
 func _unhandled_input(event: InputEvent) -> void:
-	touch_screen_controls = OS.has_feature("web_android") || OS.has_feature("android")
 	# touch_screen_controls = true
 	
 	if touch_screen_controls:
