@@ -7,6 +7,7 @@ extends Node3D
 @onready var gun_bullet_asset_scene: PackedScene = preload("res://visuals/GunBullet.tscn")
 
 @onready var sfx_player: SFXPlayer = %SFXPlayer
+@onready var particle_vfx_manager: ParticleVFXManager = %ParticleVFXManager
 # @onready var ball_mesh: MeshInstance3D = %BallMesh
 @onready var ball_parent: Node3D = %Balls
 @onready var powerup_parent: Node3D = %Powerups
@@ -742,6 +743,8 @@ func convert_blocks_to_ice(pos: Vector2) -> void:
 			block.set_visuals()
 
 func explode_blocks(pos: Vector2) -> void:
+	particle_vfx_manager.play_explosion(pos)
+
 	for block: BreakableBlock in context.get_blocks_for_circle(pos, Powerup.mine_ball_radius):
 		# check if block actually collides
 		if block.collides_with_circle(pos, Powerup.mine_ball_radius):
