@@ -1,7 +1,19 @@
-[gd_scene load_steps=2 format=3 uid="uid://bpv23r0yyvo13"]
+[gd_scene load_steps=4 format=3 uid="uid://bpv23r0yyvo13"]
+
+[ext_resource type="Shader" uid="uid://8nnpm20bjsvs" path="res://visuals/shaders/TunnelShader.gdshader" id="1_tf6ng"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_jrfd3"]
+render_priority = 0
+shader = ExtResource("1_tf6ng")
+shader_parameter/tunnel_color = Color(0, 0.7409213, 0.22815579, 1)
+shader_parameter/speed1 = 104.68
+shader_parameter/speed2 = 105.57
+shader_parameter/freq1 = 9.635
+shader_parameter/freq2 = 9.085
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_h7sj2"]
-radius = 8.0
+material = SubResource("ShaderMaterial_jrfd3")
+radius = 6.0
 height = 64.0
 
 [node name="GunBullet" type="Node3D"]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3 uid="uid://cpp2lk1fm5hnc"]
+[gd_scene load_steps=21 format=3 uid="uid://cpp2lk1fm5hnc"]
 
 [ext_resource type="Script" uid="uid://b64o4lcagp16u" path="res://test_files/3d_base_scene.gd" id="1_yrogh"]
 [ext_resource type="Script" uid="uid://lmrmxcfamxrj" path="res://MouseInputHandler.gd" id="2_bcu1a"]
@@ -7,6 +7,7 @@
 [ext_resource type="Shader" uid="uid://8nnpm20bjsvs" path="res://visuals/shaders/TunnelShader.gdshader" id="3_du04y"]
 [ext_resource type="PackedScene" uid="uid://6p15wimk0j4s" path="res://audio/SFXPlayer.tscn" id="3_ie54n"]
 [ext_resource type="Material" uid="uid://b40wmht83lmdh" path="res://visuals/WallSDFMaterial.material" id="3_tvajp"]
+[ext_resource type="PackedScene" uid="uid://ts4oq7x4e7yu" path="res://visuals/GunV1.tscn" id="4_kwhyq"]
 [ext_resource type="Shader" uid="uid://do3suaiifptyk" path="res://visuals/WallSDF_code.gdshader" id="5_jdl2d"]
 [ext_resource type="PackedScene" uid="uid://cavmf50eohh6o" path="res://visuals/UI/IngameUI.tscn" id="6_7cdmi"]
 [ext_resource type="PackedScene" uid="uid://cutxkxi4r87a1" path="res://visuals/SkyScene.tscn" id="6_cs8pv"]
@@ -98,6 +99,16 @@ transform = Transform3D(1, -4.371139e-08, -4.371139e-08, -4.371139e-08, -4.37113
 material_override = SubResource("ShaderMaterial_kwhyq")
 mesh = SubResource("CapsuleMesh_4bkd6")
 skeleton = NodePath("../..")
+
+[node name="GunsAsset" type="Node3D" parent="PaddleMesh"]
+unique_name_in_owner = true
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+
+[node name="GunV1" parent="PaddleMesh/GunsAsset" instance=ExtResource("4_kwhyq")]
+transform = Transform3D(12, 0, 0, 0, -5.2453663e-07, 12, 0, -12, -5.2453663e-07, -64, 3.0707989, 0)
+
+[node name="GunV2" parent="PaddleMesh/GunsAsset" instance=ExtResource("4_kwhyq")]
+transform = Transform3D(12, 0, 0, 0, -5.2453663e-07, 12, 0, -12, -5.2453663e-07, 64, 3.0707989, 0)
 
 [node name="Arena" type="Node3D" parent="."]
 
