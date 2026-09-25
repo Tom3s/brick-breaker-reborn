@@ -13,6 +13,7 @@ config_version=5
 config/name="brick-breaker-reborn"
 run/main_scene="uid://cpp2lk1fm5hnc"
 config/features=PackedStringArray("4.5", "Mobile")
+run/max_fps=25
 config/icon="res://icon.svg"
 
 [autoload]
