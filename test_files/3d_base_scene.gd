@@ -139,6 +139,9 @@ func _process(delta: float) -> void:
 
 			ball.randomize_velocity()
 		
+		if Input.is_action_just_pressed("fuck_ball"):
+			context.balls[0].velocity.y *= 0.01
+
 		# SET DEBUG VISUALS
 		DebugScreen.debug_visuals.clear()
 		if DebugScreen.VISUAL_DEBUG:
@@ -217,6 +220,7 @@ func _process(delta: float) -> void:
 
 				# if ball.collide_with(line, block.reflects_ball(context)):
 				if collision_result.collided:
+					ball.wall_hits_without_blocks = 0
 					if block.reflects_ball(context):
 						ball.position = collision_result.position
 						ball.velocity = collision_result.velocity
@@ -289,6 +293,10 @@ func _process(delta: float) -> void:
 				ball.velocity = collision_result.velocity
 				# TODO
 				ball.boost()
+				ball.wall_hits_without_blocks += 1
+				if ball.is_ball_stale():
+					ball.resolve_staleness(context.top_barrier.normal, grace_rng)
+					particle_vfx_manager.play_small_explosion(ball.position)
 
 			if level_unlocked:
 				context.next_level()
@@ -306,6 +314,11 @@ func _process(delta: float) -> void:
 				ball.velocity = collision_result.velocity
 				# TODO
 				ball.boost()
+				ball.wall_hits_without_blocks += 1
+				if ball.is_ball_stale():
+					ball.resolve_staleness(line.normal, grace_rng)
+					particle_vfx_manager.play_small_explosion(ball.position)
+
 			# ball.collide_with(line, true)
 
 	
@@ -328,6 +341,8 @@ func _process(delta: float) -> void:
 
 		# if ball.collide_with_paddle(context.paddle):
 		if collision_result.collided:
+			ball.wall_hits_without_blocks = 0
+
 			ball.position = collision_result.contact_point + (context.paddle.line.normal * ball.radius)
 			var reflection_angle: float = lerpf(
 				-context.paddle.reflection_angle, 
@@ -352,6 +367,12 @@ func _process(delta: float) -> void:
 			if collision_result.collided:
 				ball.position = collision_result.position
 				ball.velocity = collision_result.velocity
+
+				ball.wall_hits_without_blocks += 1
+				if ball.is_ball_stale():
+					ball.resolve_staleness(context.paddle.tunnel_left.normal, grace_rng)
+					particle_vfx_manager.play_small_explosion(ball.position)
+
 				ball.boost()
 				continue
 			
@@ -359,6 +380,12 @@ func _process(delta: float) -> void:
 			if collision_result.collided:
 				ball.position = collision_result.position
 				ball.velocity = collision_result.velocity
+				
+				ball.wall_hits_without_blocks += 1
+				if ball.is_ball_stale():
+					ball.resolve_staleness(context.paddle.tunnel_right.normal, grace_rng)
+					particle_vfx_manager.play_small_explosion(ball.position)
+
 				ball.boost()
 
 

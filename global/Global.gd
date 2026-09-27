@@ -21,6 +21,8 @@ var GRACE_BLOCK_BREAK_TRESHOLD: float = 12.0
 # var GRACE_POWERUP_TRESHOLD: float = 500.0
 # var GRACE_BLOCK_BREAK_TRESHOLD: float = 5.0
 
+var STALE_BALL_HIT_TRESHOLD: int = 4
+
 class Level:
 	var blocks: Array[BreakableBlock]
 

@@ -31,6 +31,8 @@ var released: bool = false
 
 signal collided()
 
+var wall_hits_without_blocks: int = 0
+
 func randomize_velocity() -> void:
 	velocity = Vector2(randf_range(-0.5, 0.5), -1).normalized()
 	velocity *= target_velocity
@@ -164,6 +166,22 @@ func get_damage(context: Global.GameContext, block: BreakableBlock) -> int:
 
 
 	return 1
+
+func is_ball_stale() -> bool:
+	return wall_hits_without_blocks >= Global.STALE_BALL_HIT_TRESHOLD
+
+func resolve_staleness(normal: Vector2, rng: RandomNumberGenerator) -> void:
+	var current_speed: float = velocity.length()
+
+	var resolve_angle: float = remap(rng.randf(), 0, 1,
+		PI / 4, PI / 2
+	)
+	if rng.randf() < .5:
+		resolve_angle *= -1
+
+	velocity = (normal * current_speed).rotated(resolve_angle)
+
+	wall_hits_without_blocks = 0
 
 func _get_ball_pos_debug() -> String:
 	return "Ball position: %v" % position
