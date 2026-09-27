@@ -43,6 +43,7 @@ var wall_material: ShaderMaterial
 
 # var powerups: Array[Powerup]
 var context: Global.GameContext
+var grace_rng: RandomNumberGenerator = RandomNumberGenerator.new()
 
 func _ready() -> void:
 	context = Global.GameContext.new()
@@ -55,6 +56,7 @@ func _ready() -> void:
 	set_up_screen_collision()
 
 	var base_seed: int = randi()
+	grace_rng.seed = base_seed
 
 	for i in Global.LEVEL_COUNT:
 		context.add_block_array(generate_sparse_map(base_seed + i), i)
@@ -236,10 +238,10 @@ func _process(delta: float) -> void:
 				
 				context.broken_block_count += 1
 
-				# testing?
 				block.asset_ref.queue_free()
-				# LoggerMogyi.log(self, "Removed asset ref for block")
 				context.remove_block(block)
+
+				context.time_block_broken = 0.0
 				break
 
 
@@ -439,6 +441,13 @@ func _process(delta: float) -> void:
 		context.projectiles.erase(projectile)
 
 
+	# Grace Powerup Check
+	if context.should_spawn_grace_powerup():
+		spawn_grace_powerup()
+		context.time_since_grace_powerup = 0.0
+	
+	context.update_grace_timers(safe_delta)
+
 
 	# https://patorjk.com/software/taag/#p=display&f=O8
 	#
@@ -473,6 +482,7 @@ func _process(delta: float) -> void:
 			context.powerups.erase(powerup)
 			powerup.asset.queue_free()
 			ingame_ui.powerup_icons_ui.add_powerup(powerup)
+			context.time_since_last_powerup = 0.0
 		
 		if powerup.position.y > BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE * 1.5:
 			context.powerups.erase(powerup)
@@ -682,15 +692,31 @@ func spawn_powerup(block: BreakableBlock) -> void:
 
 	powerup.randomize_velocity()
 
-	# var mesh: MeshInstance3D = MeshInstance3D.new()
-	# mesh.mesh = SphereMesh.new()
-	# mesh.mesh.radius = 16
-	# mesh.mesh.height = 32
-	# debug_parent.add_child(mesh)
 	var asset: PowerupAsset = powerup_asset_scene.instantiate()
 	powerup_parent.add_child(asset)
 	asset.set_visuals(powerup)
 
+
+
+	powerup.asset = asset
+
+	context.powerups.push_back(powerup)
+
+func spawn_grace_powerup() -> void:
+	var powerup: Powerup = Powerup.new()
+	powerup.type = Powerup.get_random_grace_type(grace_rng.randf())
+	powerup.position = Vector2(
+		remap(grace_rng.randf(), 0, 1,
+			context.screen_a.x, context.screen_b.x
+		), context.screen_a.y
+	)
+
+	powerup.randomize_velocity()
+	powerup.velocity.y = 0.0
+
+	var asset: PowerupAsset = powerup_asset_scene.instantiate()
+	powerup_parent.add_child(asset)
+	asset.set_visuals(powerup)
 
 
 	powerup.asset = asset
@@ -732,6 +758,8 @@ func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
 
 		block.asset_ref.queue_free()
 		context.remove_block(block)
+
+		context.time_block_broken = 0.0
 
 		return true
 	
