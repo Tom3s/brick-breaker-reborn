@@ -13,9 +13,9 @@ reflected_light_source = 1
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pj6yj"]
 shader = ExtResource("1_wnfp2")
-shader_parameter/cell_amount = 35
+shader_parameter/cell_amount = 20
 shader_parameter/period = Vector2(5, 10)
-shader_parameter/move_scale = 0.4
+shader_parameter/move_scale = 0.2
 shader_parameter/center_offset = Vector2(0.5, 0.13)
 
 [sub_resource type="Gradient" id="Gradient_yu0gs"]
