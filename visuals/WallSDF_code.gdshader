@@ -41,6 +41,8 @@ float remap(float v, float inMin, float inMax, float outMin, float outMax) {
   return outMin + (outMax - outMin) * t;
 }
 
+const vec3 dither_magic_number = vec3(0.06711056f, 0.00583715f, 52.9829189f);
+
 void fragment() {
 	vec3 pixel_world_pos = vec3(UV, UV2.x);
 
@@ -60,18 +62,25 @@ void fragment() {
 	ALPHA =
 		pow(sin(
 			remap(dist, -radius, 0, PI, PI * 1.75)
-		), 4)
+		), 4.)
 		* (1. - smoothstep(-radius * 2., radius * 2., dist));
 
-	ALPHA = remap(ALPHA, 0., 1., .05, 1.);
+	ALPHA = remap(ALPHA, 0., 1., .6, 1.);
 
-	ALPHA *= remap(ALBEDO.x, 0., 1., .5, .7);
-	ALPHA = clamp(ALPHA, 0.2, .6);
+	ALPHA *= remap(ALBEDO.x, 0., 1., .6, 1.);
+	//ALPHA = clamp(ALPHA, 0., 0.);
+	ALPHA = smoothstep(0.1, .8, ALPHA);
 	ALPHA *= smoothstep(128., 64., pixel_world_pos.y);
 
 
 
-	ALBEDO *= field_color;
+	ALBEDO = field_color;
+
+	if (ALPHA < 0.001 || ALPHA < fract(dither_magic_number.z * fract(dot(FRAGCOORD.xy, dither_magic_number.xy)))) {
+		discard;
+	} else {
+		ALPHA = 1.0;
+	}
 
 }
 

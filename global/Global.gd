@@ -118,6 +118,9 @@ class GameContext extends Node:
 			LoggerMogyi.log(self, "Completed All Levels!!")
 			current_level = LEVEL_COUNT - 1
 			return
+
+		if current_level >= 2:
+			levels[current_level - 2].completed = true
 		
 		balls = balls.filter(func(b: Ball) -> bool:
 			if b.velocity.y > 0 || b.position.y > BreakableGrid.GRID_SIZE.y * 2:
@@ -198,10 +201,16 @@ class GameContext extends Node:
 		levels[current_level].key_enabled = true
 
 	func activate_key() -> void:
+		if current_level == LEVEL_COUNT - 1:
+			return
+
 		if levels[current_level].key_enabled:
 			levels[current_level].unlocked = true
 
 	func get_can_key_be_used() -> bool:
+		if current_level == LEVEL_COUNT - 1:
+			return false
+		
 		return levels[current_level].key_enabled && !levels[current_level].unlocked
 
 	func update_grace_timers(delta: float) -> void:
@@ -235,7 +244,7 @@ class GameContext extends Node:
 
 		for powerup: Powerup in active_powerups:
 			if powerup.type == Powerup.Type.LASER:
-				LASER_ACTIVE = true
+				LASER_ACTIVE = powerup.laser_shots_left != powerup.laser_max_shots
 				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)
 			elif powerup.type == Powerup.Type.GUN:
 				GUN_ACTIVE = true

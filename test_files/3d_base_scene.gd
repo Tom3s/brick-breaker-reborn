@@ -165,10 +165,9 @@ func _process(delta: float) -> void:
 	
 	if mouse_input_handler.ball_powerup_just_pressed():
 		context.activate_ball_power()
-		print("pressing ball powerup")
 
 	
-	if mouse_input_handler.unlock_just_pressed():
+	if mouse_input_handler.unlock_just_pressed() && context.get_can_key_be_used():
 		context.activate_key()
 		roof.visible = false
 

@@ -13,9 +13,9 @@ reflected_light_source = 1
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pj6yj"]
 shader = ExtResource("1_wnfp2")
-shader_parameter/cell_amount = 35
+shader_parameter/cell_amount = 20
 shader_parameter/period = Vector2(5, 10)
-shader_parameter/move_scale = 0.4
+shader_parameter/move_scale = 0.2
 shader_parameter/center_offset = Vector2(0.5, 0.13)
 
 [sub_resource type="Gradient" id="Gradient_yu0gs"]
@@ -35,6 +35,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 theme_override_constants/margin_left = 0
 theme_override_constants/margin_top = 0
 theme_override_constants/margin_right = 0
@@ -43,4 +44,5 @@ theme_override_constants/margin_bottom = 0
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/MarginContainer"]
 material = SubResource("ShaderMaterial_pj6yj")
 layout_mode = 2
+mouse_filter = 2
 texture = SubResource("GradientTexture1D_6hpn5")

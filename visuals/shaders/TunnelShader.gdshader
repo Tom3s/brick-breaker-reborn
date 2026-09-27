@@ -36,6 +36,8 @@ void fragment() {
 	
 	if (ALPHA < 0.001 || ALPHA < fract(dither_magic_number.z * fract(dot(FRAGCOORD.xy, dither_magic_number.xy)))) {
 		discard;
+	} else {
+		ALPHA = 1.0;
 	}
 }
 
