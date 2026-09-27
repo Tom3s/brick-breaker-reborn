@@ -14,6 +14,13 @@ const DEFAULT_BALL_RADIUS: int = 16.0 # 12.0
 
 var PLAYER_SENSITIVITY: float = 2.0 # 0.75 # 0.65
 
+var GRACE_COOLDOWN: float = 25.0
+var GRACE_POWERUP_TRESHOLD: float = 20.0
+var GRACE_BLOCK_BREAK_TRESHOLD: float = 12.0
+# var GRACE_COOLDOWN: float = 1.0
+# var GRACE_POWERUP_TRESHOLD: float = 500.0
+# var GRACE_BLOCK_BREAK_TRESHOLD: float = 5.0
+
 class Level:
 	var blocks: Array[BreakableBlock]
 
@@ -53,6 +60,10 @@ class GameContext extends Node:
 	var ball_power_active: bool = false
 
 	var projectiles: Array[Projectile]
+
+	var time_since_last_powerup: float = 0.0 
+	var time_since_grace_powerup: float = 0.0 
+	var time_block_broken: float = 0.0 
 
 	func _init() -> void:
 		# block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
@@ -191,6 +202,22 @@ class GameContext extends Node:
 	func get_can_key_be_used() -> bool:
 		return levels[current_level].key_enabled && !levels[current_level].unlocked
 
+	func update_grace_timers(delta: float) -> void:
+		time_block_broken += delta
+		time_since_grace_powerup += delta
+		time_since_last_powerup += delta
+	
+	func should_spawn_grace_powerup() -> bool:
+		if time_since_grace_powerup <= Global.GRACE_COOLDOWN:
+			return false
+		
+		if time_since_last_powerup > Global.GRACE_POWERUP_TRESHOLD:
+			return true
+		
+		if time_block_broken > Global.GRACE_BLOCK_BREAK_TRESHOLD:
+			return true
+		
+		return false
 
 	# flags
 	var LASER_ACTIVE: bool = false

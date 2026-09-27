@@ -38,6 +38,12 @@ static var weights: PackedInt32Array = [
 	2, # TUNNEL
 ]
 
+static var grace_powerups: Array[Type] = [
+	Type.GUN,
+	Type.TUNNEL,
+	Type.LASER,
+]
+
 var ball_multiply_value: int = 3
 
 var fire_ball_max_time: float = 15.0
@@ -200,6 +206,11 @@ static func get_weighted_powerup(n: float) -> Type:
 			return i as Type
 	
 	return Type.NONE
+
+static func get_random_grace_type(r: float) -> Type:
+	return Powerup.grace_powerups[
+		int(Powerup.grace_powerups.size() * r)
+	]
 
 func get_time_normalized() -> float:
 	match type:
