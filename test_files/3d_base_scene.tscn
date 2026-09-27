@@ -84,7 +84,7 @@ mesh = SubResource("CylinderMesh_bcu1a")
 
 [node name="LaserAsset" parent="PaddleMesh" instance=ExtResource("2_ie54n")]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, -4.476046e-05, 1, 0, -1024, -4.371139e-08, -4, 0, 0)
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, -4, 0, 0)
 
 [node name="TunnelAsset" type="Node3D" parent="PaddleMesh"]
 unique_name_in_owner = true

@@ -13,14 +13,10 @@ func _enter_tree() -> void:
 		debug_layer = load("res://global/DebugScreenLayer.tscn").instantiate()
 		get_tree().root.add_child.call_deferred(debug_layer)
 	
-	# debug_layer.ready.connect(func() -> void:
-	# 	process_mode = Node.PROCESS_MODE_INHERIT
-	# )
-
-	# process_mode = Node.PROCESS_MODE_DISABLED
 
 func _ready() -> void:
-	debug_layer.visible = Global.DEBUG
+	# debug_layer.visible = Global.DEBUG
+	debug_layer.visible = false
 	DebugDraw3D.scoped_config().set_thickness(2)
 
 func _process(delta: float) -> void:
