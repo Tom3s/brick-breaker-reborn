@@ -1,0 +1,184 @@
+[gd_scene load_steps=7 format=3 uid="uid://cukdfdvruf5xd"]
+
+[ext_resource type="Script" uid="uid://cofx0vplo60yc" path="res://visuals/UI/PowerupIconsUI.gd" id="1_ehhic"]
+[ext_resource type="Texture2D" uid="uid://dhsw80njjo81c" path="res://visuals/textures/powerups/TUNNEL.png" id="2_ehhic"]
+[ext_resource type="Texture2D" uid="uid://hag7itsukwj3" path="res://icon.svg" id="3_ekevc"]
+
+[sub_resource type="Shader" id="Shader_qym3y"]
+code = "shader_type canvas_item;
+render_mode world_vertex_coords;
+
+uniform sampler2D sdf_texture : source_color;
+//uniform float bg_size = 0.3;
+//uniform vec2 bg_border = vec2(.3, .4);
+uniform vec3 icon_color : source_color;
+uniform vec3 icon_outline : source_color;
+//uniform vec3 bg_color : source_color;
+//uniform vec3 bg_accent : source_color;
+uniform float icon_scale = 0.8;
+uniform float icon_left = 1.0;
+
+uniform float bob_dist = 0.1;
+uniform float bob_speed = 1.3;
+uniform float bob_offset = 0.0;
+
+
+//varying float vertex_local;
+
+
+const mat4 bayerIndex = mat4(
+    vec4(00.0/16.0, 12.0/16.0, 03.0/16.0, 15.0/16.0),
+    vec4(08.0/16.0, 04.0/16.0, 11.0/16.0, 07.0/16.0),
+    vec4(02.0/16.0, 14.0/16.0, 01.0/16.0, 13.0/16.0),
+    vec4(10.0/16.0, 06.0/16.0, 09.0/16.0, 05.0/16.0));
+
+
+
+
+
+void vertex() {
+
+}
+
+float sdBox( in vec2 p, in vec2 b )
+{
+    vec2 d = abs(p)-b;
+    return length(max(d,0.0)) + min(max(d.x,d.y),0.0);
+}
+
+vec2 radial(vec2 uv) {
+	vec2 centeredUV = uv - 0.5;
+
+	// 1. Radial distance (Radius / Magnitude)
+	float radius = length(centeredUV); 
+	// or sqrt(dot(centeredUV, centeredUV))
+
+	// 2. Angular direction (Theta / Angle) in radians [-PI to PI]
+	float angle = atan(centeredUV.x, centeredUV.y); 
+	
+	
+
+	// Optional: Remap angle to a 0.0 to 1.0 range for easier operations
+	float normalizedAngle = (angle + 3.14159265) / (2.0 * 3.14159265);
+    
+    // Use radial coordinates (e.g., radius for a circular gradient)
+    vec2 color = vec2(radius, normalizedAngle);
+    
+    return color;
+}
+
+void fragment() {
+	// Called for every pixel the material is visible on.
+	
+	//float dist = sdBox(UV - .5, vec2(bg_size, bg_size));
+	
+	//float border = min(
+		//step(bg_border.x, dist),
+		//step(bg_border.y, 1.0 - dist)
+	//);
+	
+	//border = clamp(border, .2, .7);
+	//vec3 bg_final_color = mix(bg_color, bg_accent, border);
+	
+	vec2 icon_uv = ((UV - .5) / icon_scale) + .5;
+	icon_uv.y += sin(TIME * bob_speed + bob_offset) * bob_dist;
+	
+	vec3 icon_final = mix(
+		icon_outline, icon_color,
+		smoothstep(0.49, 0.51, texture(sdf_texture, icon_uv).r)
+	);
+	
+	float icon_mask = step(
+		.2, texture(sdf_texture, icon_uv).r
+	);
+	
+	icon_mask *= clamp(step(1.0 - icon_left, 1.0 - radial(UV).g), 0.25, 1.0);
+	float bayer_value = bayerIndex[int(FRAGCOORD.x) % 4][int(FRAGCOORD.y) % 4] + 0.0001;
+	
+	icon_mask = step(bayer_value, icon_mask);
+	
+	
+	//icon_mask = 0.0;
+	
+	
+	//COLOR.rgb = vec3(UV, 0.0);
+	COLOR.rgb = icon_final;
+	//COLOR.rgb = mix(vec3(bg_final_color), icon_final, icon_mask);
+	//COLOR.b = 0.0;
+	//COLOR.rg = radial(UV);
+	//COLOR.a = step(bg_border.y, 1.0 - dist);
+	COLOR.a = icon_mask;
+}
+
+//void light() {
+//	// Called for every pixel for every light affecting the CanvasItem.
+//	// Uncomment to replace the default light processing function with this one.
+//}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_op8jg"]
+shader = SubResource("Shader_qym3y")
+shader_parameter/sdf_texture = ExtResource("2_ehhic")
+shader_parameter/icon_color = Color(0.90359825, 0.90359825, 0.903598, 1)
+shader_parameter/icon_outline = Color(0.07, 0.07, 0.07, 1)
+shader_parameter/icon_scale = 1.0
+shader_parameter/icon_left = 1.0
+shader_parameter/bob_dist = 0.025
+shader_parameter/bob_speed = 1.735
+shader_parameter/bob_offset = 0.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_ehhic"]
+bg_color = Color(0, 0, 0, 0.24705882)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="PowerupIconsUI" type="MarginContainer"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -116.0
+offset_bottom = 33.0
+grow_horizontal = 0
+size_flags_horizontal = 8
+size_flags_vertical = 0
+mouse_filter = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_bottom = 0
+script = ExtResource("1_ehhic")
+
+[node name="DefaultIcon" type="TextureRect" parent="."]
+unique_name_in_owner = true
+visible = false
+material = SubResource("ShaderMaterial_op8jg")
+layout_mode = 2
+texture = ExtResource("3_ekevc")
+expand_mode = 3
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 16
+theme_override_font_sizes/font_size = 24
+text = "Powerups"
+horizontal_alignment = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="VBoxContainer"]
+custom_minimum_size = Vector2(48, 0)
+layout_mode = 2
+size_flags_horizontal = 8
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_ehhic")
+
+[node name="Icons" type="HBoxContainer" parent="VBoxContainer/PanelContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 48)
+layout_direction = 3
+layout_mode = 2
+size_flags_horizontal = 8

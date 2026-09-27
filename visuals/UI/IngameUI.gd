@@ -12,6 +12,8 @@ class_name IngameUI
 
 @onready var activate_key: Button = %ActivateKey
 
+@onready var powerup_icons_ui: PowerupIconsUI = %PowerupIconsUI
+
 func _ready() -> void:
 	main_ball_slot.material = main_ball_slot.material.duplicate()
 	reserve_ball_slot.material = reserve_ball_slot.material.duplicate()
@@ -35,14 +37,11 @@ func set_ball_slots(context: Global.GameContext) -> void:
 
 	if context.ball_powerups.size() >= 1:
 		var main_power: Powerup = context.ball_powerups[0]
-		var texture_loc: String = "res://visuals/textures/powerups/%s.png" % Powerup.Type.keys()[main_power.type]
-		main_ball_slot.material.set_shader_parameter("sdf_texture", load(texture_loc))
+		var texture: Texture = TextureLoader.powerup[main_power.type]
+		main_ball_slot.material.set_shader_parameter("sdf_texture", texture)
 		main_ball_slot.material.set_shader_parameter("icon_left", main_power.time_left / 15.0) # TODO: change properly
 	
 	if context.ball_powerups.size() >= 2:
 		var reserve_power: Powerup = context.ball_powerups[1]
-		var texture_loc: String = "res://visuals/textures/powerups/%s.png" % Powerup.Type.keys()[reserve_power.type]
-		reserve_ball_slot.material.set_shader_parameter("sdf_texture", load(texture_loc))
-
-
-
+		var texture: Texture = TextureLoader.powerup[reserve_power.type]
+		reserve_ball_slot.material.set_shader_parameter("sdf_texture", texture)
