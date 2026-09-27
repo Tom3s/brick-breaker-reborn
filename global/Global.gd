@@ -235,7 +235,7 @@ class GameContext extends Node:
 
 		for powerup: Powerup in active_powerups:
 			if powerup.type == Powerup.Type.LASER:
-				LASER_ACTIVE = true
+				LASER_ACTIVE = powerup.laser_shots_left != powerup.laser_max_shots
 				LASER_COOLDOWN = max(powerup.time_left, LASER_COOLDOWN)
 			elif powerup.type == Powerup.Type.GUN:
 				GUN_ACTIVE = true

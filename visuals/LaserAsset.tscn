@@ -1,26 +1,95 @@
-[gd_scene load_steps=5 format=3 uid="uid://w4r7atdoxgvr"]
+[gd_scene load_steps=7 format=3 uid="uid://w4r7atdoxgvr"]
 
-[ext_resource type="Script" path="res://visuals/LaserAsset.gd" id="1_k0ofi"]
-[ext_resource type="Shader" uid="uid://ceiaou27gkbu8" path="res://visuals/BeamShader.res" id="1_lam52"]
+[ext_resource type="Script" uid="uid://img3ept218f1" path="res://visuals/LaserAsset.gd" id="1_k0ofi"]
+
+[sub_resource type="Shader" id="Shader_lam52"]
+code = "shader_type spatial;
+render_mode unshaded;
+
+const vec3 dither_magic_number = vec3(0.06711056f, 0.00583715f, 52.9829189f);
+
+uniform vec3 fire_color : source_color;
+uniform vec3 cooloff_color : source_color;
+uniform sampler2D color_curve: hint_normal, repeat_disable;
+uniform float speed1 = 1.0;
+uniform float speed2 = 1.0;
+uniform float freq1 = 1.0;
+uniform float freq2 = 1.0;
+
+uniform float time_left = 1.0;
+
+
+
+void vertex() {
+	// Called for every vertex the material is visible on.
+	COLOR.rgb = VERTEX;
+}
+
+float norm(float a) {
+	return (a + 1.0) / 2.0;
+}
+
+float remap(float v, float inMin, float inMax, float outMin, float outMax) {
+  float t = (v - inMin) / (inMax - inMin);
+  return outMin + (outMax - outMin) * t;
+}
+
+void fragment() {
+	// Called for every pixel the material is visible on.
+	//ALBEDO.rgb = tunnel_color;
+	float wave1 = norm(sin((COLOR.g + (TIME * speed1)) / freq1));
+	float wave2 = norm(sin((COLOR.g + (TIME * speed2)) / freq2));
+
+	ALBEDO.rgb = mix(
+		fire_color, cooloff_color, pow(1. - time_left, .2)
+	);
+	ALPHA = remap(wave1 + wave2, 0., 2., 0.6, 1.1);
+
+	ALPHA *= texture(color_curve, vec2(1. - time_left)).r;
+
+	if (ALPHA < 0.001 || ALPHA < fract(dither_magic_number.z * fract(dot(FRAGCOORD.xy, dither_magic_number.xy)))) {
+		discard;
+	}
+}
+
+//void light() {
+//	// Called for every pixel for every light affecting the material.
+//	// Uncomment to replace the default light processing function with this one.
+//}
+"
+
+[sub_resource type="Curve" id="Curve_lam52"]
+_data = [Vector2(0, 1), 0.0, 0.0, 0, 0, Vector2(0.26595744, 1), 0.0, 0.0, 0, 0, Vector2(0.56382984, 0.6741574), -3.6034358, -4.828251, 0, 0, Vector2(0.7765958, 0), 0.0, 0.0, 0, 0, Vector2(1, 0), 0.0, 0.0, 0, 0]
+point_count = 5
+
+[sub_resource type="CurveTexture" id="CurveTexture_k0ofi"]
+texture_mode = 1
+curve = SubResource("Curve_lam52")
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_k0ofi"]
 render_priority = 0
-shader = ExtResource("1_lam52")
-shader_parameter/TimeLeft = 0.0
+shader = SubResource("Shader_lam52")
+shader_parameter/fire_color = Color(0.99999994, 0.70579183, 0.38791806, 1)
+shader_parameter/cooloff_color = Color(0.65, 0.18958335, 0.09749998, 1)
+shader_parameter/color_curve = SubResource("CurveTexture_k0ofi")
+shader_parameter/speed1 = -1999.75
+shader_parameter/speed2 = -1500.045
+shader_parameter/freq1 = 85.845
+shader_parameter/freq2 = 46.625
+shader_parameter/time_left = 0.46
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_m3hmx"]
 top_radius = 8.0
 bottom_radius = 8.0
-height = 1.0
+height = 1024.0
 radial_segments = 8
 cap_top = false
 
 [node name="LaserAsset" type="Node3D"]
-transform = Transform3D(1, 0, 0, 0, 512, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("1_k0ofi")
 
 [node name="Beam" type="MeshInstance3D" parent="."]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 512, 0)
 material_override = SubResource("ShaderMaterial_k0ofi")
 mesh = SubResource("CylinderMesh_m3hmx")
