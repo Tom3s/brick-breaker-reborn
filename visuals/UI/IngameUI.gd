@@ -14,9 +14,18 @@ class_name IngameUI
 
 @onready var powerup_icons_ui: PowerupIconsUI = %PowerupIconsUI
 
+@onready var fsbutton: Button = %FSButton
+
 func _ready() -> void:
 	main_ball_slot.material = main_ball_slot.material.duplicate()
 	reserve_ball_slot.material = reserve_ball_slot.material.duplicate()
+
+	fsbutton.toggled.connect(func(on: bool) -> void:
+		if on == true:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		else:
+			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	)
 
 func set_key_enabled(enabled: bool) -> void:
 	activate_key.disabled = !enabled

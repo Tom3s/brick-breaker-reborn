@@ -25,7 +25,7 @@ func _init() -> void:
 
 func _process(delta: float) -> void:
 	# TODO: handle mouse hiding properly
-	if Input.is_action_just_pressed("ui_cancel"):
+	if Input.is_action_just_pressed("hide_mouse"):
 		if Input.mouse_mode == Input.MOUSE_MODE_VISIBLE:
 			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 		else:
