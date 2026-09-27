@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://cavmf50eohh6o"]
+[gd_scene load_steps=9 format=3 uid="uid://cavmf50eohh6o"]
 
 [ext_resource type="Script" uid="uid://dkjbmr4g8kom5" path="res://visuals/UI/IngameUI.gd" id="1_oh034"]
 [ext_resource type="Texture2D" uid="uid://hag7itsukwj3" path="res://icon.svg" id="2_iwgs4"]
 [ext_resource type="Material" uid="uid://bojgtqa8lt8yo" path="res://visuals/UI/BallSlotPreview.tres" id="3_1wuik"]
 [ext_resource type="Texture2D" uid="uid://ccturkem25uj6" path="res://visuals/textures/powerups/KEY.png" id="3_k3syv"]
 [ext_resource type="Texture2D" uid="uid://77uslpi68i2x" path="res://visuals/textures/hp_indicators/dots/5.png" id="4_1wuik"]
+[ext_resource type="PackedScene" uid="uid://cukdfdvruf5xd" path="res://visuals/UI/PowerupIconsUI.tscn" id="5_goccb"]
 
 [sub_resource type="Theme" id="Theme_1wuik"]
 default_font_size = 32
@@ -180,8 +181,12 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 8
 
+[node name="PowerupIconsUI" parent="MarginContainer/HBoxContainer/VBoxContainer2" instance=ExtResource("5_goccb")]
+unique_name_in_owner = true
+layout_mode = 2
+
 [node name="Control3" type="Control" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
-custom_minimum_size = Vector2(0, 200)
+custom_minimum_size = Vector2(0, 115)
 layout_mode = 2
 mouse_filter = 2
 
@@ -189,7 +194,7 @@ mouse_filter = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
-size_flags_horizontal = 0
+size_flags_horizontal = 8
 text = "KEY
 (ENTER)"
 icon = ExtResource("3_k3syv")

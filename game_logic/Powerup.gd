@@ -15,28 +15,28 @@ enum Type {
 	TUNNEL,
 }
 
-# static var weights: PackedInt32Array = [
-# 	0, # NONE,- should always be 0
-# 	0, # BALL_MULTIPLY,
-# 	0, # FIRE_BALL,
-# 	0, # LASER,
-# 	0, # GUN,
-# 	0, # KEY,- should always be 0
-# 	0, # ICE_BALL,
-# 	1, # MINE_BALL,
-# 	0, # TUNNEL,
-# ]
 static var weights: PackedInt32Array = [
-	0, # NONE - should always be 0
-	3, # BALL_MULTIPLY
-	6, # FIRE_BALL
-	1, # LASER
-	4, # GUN
-	0, # KEY - should always be 0
-	6, # ICE_BALL
-	4, # MINE_BALL
-	2, # TUNNEL
+	0, # NONE,- should always be 0
+	0, # BALL_MULTIPLY,
+	0, # FIRE_BALL,
+	1, # LASER,
+	0, # GUN,
+	0, # KEY,- should always be 0
+	0, # ICE_BALL,
+	0, # MINE_BALL,
+	0, # TUNNEL,
 ]
+# static var weights: PackedInt32Array = [
+# 	0, # NONE - should always be 0
+# 	3, # BALL_MULTIPLY
+# 	6, # FIRE_BALL
+# 	1, # LASER
+# 	4, # GUN
+# 	0, # KEY - should always be 0
+# 	6, # ICE_BALL
+# 	4, # MINE_BALL
+# 	2, # TUNNEL
+# ]
 
 var ball_multiply_value: int = 3
 
@@ -200,3 +200,15 @@ static func get_weighted_powerup(n: float) -> Type:
 			return i as Type
 	
 	return Type.NONE
+
+func get_time_normalized() -> float:
+	match type:
+		Type.LASER:
+			return ((laser_shots_left * laser_cooldown) + time_left) /\
+					(laser_max_shots * laser_cooldown)
+		Type.GUN:
+			return time_left / gun_max_time
+		Type.TUNNEL:
+			return time_left / tunnel_max_time
+		_:
+			return -1.0

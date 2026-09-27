@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 Global="*res://global/Global.gd"
 DebugScreen="*res://global/DebugScreen.gd"
+TextureLoader="*res://global/TextureLoader.gd"
 
 [debug]
 

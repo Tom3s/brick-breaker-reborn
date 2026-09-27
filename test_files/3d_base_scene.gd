@@ -472,6 +472,7 @@ func _process(delta: float) -> void:
 			powerup.activate_powerup(context)
 			context.powerups.erase(powerup)
 			powerup.asset.queue_free()
+			ingame_ui.powerup_icons_ui.add_powerup(powerup)
 		
 		if powerup.position.y > BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE * 1.5:
 			context.powerups.erase(powerup)
@@ -525,6 +526,7 @@ func _process(delta: float) -> void:
 	ingame_ui.set_ball_slots(context)
 	ingame_ui.set_current_level(context.current_level + 1)
 	ingame_ui.set_key_enabled(context.get_can_key_be_used())
+	ingame_ui.powerup_icons_ui.update_powerups()
 
 	# DRAW DEBUG
 	if Global.DEBUG && DebugScreen.VISUAL_DEBUG:
