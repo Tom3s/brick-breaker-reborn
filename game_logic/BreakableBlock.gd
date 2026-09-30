@@ -137,7 +137,7 @@ func set_visuals() -> void:
 func _hash_2d(uv: Vector2) -> Vector2:
 	var p: Vector2 = Vector2(
 		uv.dot(Vector2(12.9898, 78.233)),
-        uv.dot(Vector2(39.346, 11.135))
+		uv.dot(Vector2(39.346, 11.135))
 	)
 
 	return Vector2(

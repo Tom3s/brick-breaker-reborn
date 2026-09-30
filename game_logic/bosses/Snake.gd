@@ -50,7 +50,7 @@ class SnakeGrid:
 class Navigator extends Node:
 	var next_step: Vector2i = Vector2i.ZERO
 
-	func calc_next_step(grid: SnakeGrid, foods: Array[Vector2i], head: Vector2i) -> void:
+	func calc_next_step(grid: SnakeGrid, foods: Array[Food], head: Vector2i) -> void:
 		# init alg
 		var look_dirs: Array[Vector2i] = [
 			Vector2i.UP,
@@ -59,15 +59,15 @@ class Navigator extends Node:
 			Vector2i.RIGHT,
 		]
 
-		var sorted_foods: Array[Vector2i] = foods.duplicate()
+		var sorted_foods: Array[Food] = foods.duplicate()
 
 		# TODO: can use .bind() here to pass head
-		sorted_foods.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+		sorted_foods.sort_custom(func(a: Food, b: Food) -> bool:
 			# a < b
-			return Navigator.wrapped_taxicab_dist(head, a) < Navigator.wrapped_taxicab_dist(head, b) 
+			return Navigator.wrapped_taxicab_dist(head, a.position) < Navigator.wrapped_taxicab_dist(head, b.position) 
 		)
 
-		var target_food: Vector2i = sorted_foods.front()
+		var target_food: Vector2i = sorted_foods.front().position
 
 		var queue: Array[Vector2i] = [
 			head
@@ -175,7 +175,13 @@ var initial_size: int = 8
 var segments: Array[Segment] = []
 
 var grid: SnakeGrid = SnakeGrid.new()
-var foods: Array[Vector2i] = []
+
+class Food:
+	var position: Vector2i
+	var block_ref: BreakableBlock
+	var eaten: bool = false
+
+var foods: Array[Food] = []
 
 var navigator: Navigator = Navigator.new()
 
@@ -217,8 +223,10 @@ func spawn_random_food(rng: RandomNumberGenerator) -> void:
 	spawn_food_at(Vector2i(x, y))
 
 func spawn_food_at(pos: Vector2i) -> void:
+	var food: Food = Food.new()
+	food.position = pos
 	grid.set_cell(pos, SnakeCell.FOOD)
-	foods.push_back(pos)
+	foods.push_back(food)
 
 func move() -> void:
 	grid.set_cell(segments[0].position, SnakeCell.SEGMENT)
@@ -245,9 +253,13 @@ func grow() -> void:
 	segments.push_back(last_segment)
 	grid.set_cell(last_segment.position, SnakeCell.SEGMENT)
 
-	foods.erase(segments[0].position)
+	# foods.erase(segments[0].position)
+	for food in foods:
+		if food.position == segments[0].position:
+			food.eaten = true
+			return
 
-# return if snake has grown in this step as bool
+### returns true if snake has grown
 func update() -> bool:
 	var next_cell: Vector2i = segments[0].position + direction
 
@@ -256,6 +268,7 @@ func update() -> bool:
 	if grid.get_cell(next_cell) == SnakeCell.FOOD:
 		grow()
 		return true
+		
 	elif grid.get_cell(next_cell) == SnakeCell.NONE:
 		move()
 	elif grid.get_cell(next_cell) == SnakeCell.SEGMENT:
@@ -263,7 +276,7 @@ func update() -> bool:
 
 	else:
 		pass
-	
+
 	return false
 
 static func wrap_position(pos: Vector2i) -> Vector2i:
@@ -292,6 +305,7 @@ func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGe
 
 	if cut_index == -1:
 		LoggerMogyi.log(self, "No segment of snake found at %v. Skipping" % cut_pos)
+		return []
 	
 	var _cut_blocks: Array[BreakableBlock] = []
 	# skip exact cut, it wont pawn food
@@ -317,3 +331,12 @@ var FOOD_LIMIT: int = 5
 func refill_food(rng: RandomNumberGenerator) -> void:
 	while foods.size() < FOOD_LIMIT:
 		spawn_random_food(rng)
+	
+func purge_stale_food() -> void:
+	foods = foods.filter(func(f: Food) -> bool: return !f.eaten)
+
+func eat_food(pos: Vector2i) -> void:
+	for food in foods:
+		if food.position == pos:
+			food.eaten = true
+			# return
