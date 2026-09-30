@@ -3,16 +3,13 @@ class_name Snake
 
 class Segment:
 	var position: Vector2i
-	var block: BreakableBlock
 	var is_head: bool
 
-	static func create_segment(pos: Vector2i, type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL) -> Segment:
+	var block_ref: BreakableBlock
+
+	static func create_segment(pos: Vector2i) -> Segment:
 		var segment: Segment = Segment.new()
 		segment.position = pos
-
-		segment.block = BreakableBlock.new()
-		segment.block.type = type
-		segment.block.pos_on_grid = pos
 
 		return segment
 
@@ -49,63 +46,6 @@ class SnakeGrid:
 	func remove_cell(pos: Vector2i) -> void:
 		grid[pos.x][pos.y] = 0
 
-# class NavGrid:
-# 	var used: Array[PackedInt32Array] = []
-# 	var dirs: Array[PackedVector2Array] = []
-
-# 	func reset() -> void:
-# 		if used.size() == 0:
-# 			used.resize(BreakableGrid.GRID_SIZE.x)
-
-# 		for array in used:
-# 			array.resize(BreakableGrid.GRID_SIZE.y)
-# 			array.fill(0)
-		
-# 		if dirs.size() == 0:
-# 			dirs.resize(BreakableGrid.GRID_SIZE.x)
-
-# 		for array in dirs:
-# 			array.resize(BreakableGrid.GRID_SIZE.y)
-# 			array.fill(Vector2.ZERO)
-		
-
-	
-# 	func flood_fill(grid: SnakeGrid, start_foods: Array[Vector2i]) -> void:
-# 		reset()
-
-# 		for x in BreakableGrid.GRID_SIZE.x:
-# 			for y in BreakableGrid.GRID_SIZE.y:
-# 				if grid.get_cell(Vector2i(x, y)) in [SnakeCell.NONE, SnakeCell.SEGMENT]:
-# 					used[x][y] = 0
-# 				else:
-# 					used[x][y] = 1
-
-# 		var queue: Array[Vector2i] = []
-# 		queue.append_array(start_foods)
-
-# 		for food in start_foods:
-# 			used[food.x][food.y] = 1
-
-# 		var look_dirs: Array[Vector2i] = [
-# 			Vector2i.UP,
-# 			Vector2i.DOWN,
-# 			Vector2i.LEFT,
-# 			Vector2i.RIGHT,
-# 		]
-
-# 		while queue.size():
-# 			var curr: Vector2i = queue.pop_front() 
-
-# 			for look in look_dirs:
-# 				var look_at: Vector2i = curr + look
-# 				look_at = Snake.wrap_position(look_at)
-# 				if used[look_at.x][look_at.y] == 0:
-# 					dirs[look_at.x][look_at.y] = Vector2(look * -1)
-# 					used[look_at.x][look_at.y] = 1
-# 					queue.push_back(look_at)
-		
-# 	func get_nav_dir(pos: Vector2i) -> Vector2i:
-# 		return Vector2i(dirs[pos.x][pos.y])
 
 class Navigator extends Node:
 	var next_step: Vector2i = Vector2i.ZERO
@@ -241,6 +181,10 @@ var navigator: Navigator = Navigator.new()
 
 var direction: Vector2i = Vector2i.ZERO
 
+var last_move: float = 0.0
+# lower this to speed up snake
+var move_treshold: float = 1.0 / 4
+
 func init_snake() -> void:
 	for i in initial_size:
 		segments.push_back(
@@ -292,9 +236,9 @@ func move() -> void:
 
 	grid.set_cell(segments[0].position, SnakeCell.HEAD)
 
-func grow(type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL) -> void:
+func grow() -> void:
 	var tail_pos: Vector2i = segments.back().position
-	var last_segment: Segment = Segment.create_segment(tail_pos, type)
+	var last_segment: Segment = Segment.create_segment(tail_pos)
 
 	move()
 
@@ -339,7 +283,7 @@ func set_nav_direction() -> void:
 
 var SNAKE_CUT_FOOD_CHANCE: float = 0.3
 
-func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGenerator.new()) -> void:
+func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGenerator.new()) -> Array[BreakableBlock]:
 	var cut_index: int = segments.find_custom(
 		func(a: Segment) -> bool:
 			return a.position == cut_pos,
@@ -349,9 +293,13 @@ func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGe
 	if cut_index == -1:
 		LoggerMogyi.log(self, "No segment of snake found at %v. Skipping" % cut_pos)
 	
+	var _cut_blocks: Array[BreakableBlock] = []
 	# skip exact cut, it wont pawn food
 	for i in range(cut_index + 1, segments.size()):
 		var segment: Segment = segments[i]
+
+		_cut_blocks.push_back(segment.block_ref)
+
 		if rng.randf() < SNAKE_CUT_FOOD_CHANCE:
 			spawn_food_at(segment.position)
 		else:
@@ -361,3 +309,11 @@ func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGe
 
 	
 	segments.resize(cut_index)
+
+	return _cut_blocks
+
+var FOOD_LIMIT: int = 5
+
+func refill_food(rng: RandomNumberGenerator) -> void:
+	while foods.size() < FOOD_LIMIT:
+		spawn_random_food(rng)

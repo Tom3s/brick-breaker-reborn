@@ -7,8 +7,9 @@ var rng: RandomNumberGenerator = RandomNumberGenerator.new()
 func _ready() -> void:
 	snake.init_snake()
 
-	for i in 5:
-		snake.spawn_random_food(rng)
+	# for i in 5:
+	# 	snake.spawn_random_food(rng)
+	snake.refill_food(rng)
 	
 	snake.direction = Vector2i.RIGHT
 
@@ -47,8 +48,8 @@ func _process(delta: float) -> void:
 		snake.calculate_nav_grid()
 
 
-	if grown && snake.foods.size() < 5:
-		snake.spawn_random_food(rng)
+	if grown:
+		snake.refill_food(rng)
 	
 
 	last_move += delta

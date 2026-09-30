@@ -8,7 +8,7 @@ var DEBUG_DRAW_VISIBLE: bool = true
 
 const BALL_LIMIT: int = 350
 
-const LEVEL_COUNT: int = 10
+const LEVEL_COUNT: int = 1
 
 const DEFAULT_BALL_RADIUS: int = 16.0 # 12.0
 
@@ -31,6 +31,15 @@ class Level:
 	var completed: bool = false
 	var unlocked: bool = false
 	var key_enabled: bool = false
+
+	var boss_level: bool = true
+	var snake: Snake
+	var rng: RandomNumberGenerator
+
+enum BossType {
+	NONE,
+	SNAKE,
+}
 
 class GameContext extends Node:
 
@@ -87,6 +96,12 @@ class GameContext extends Node:
 
 
 	func remove_block(block: BreakableBlock, level_index: int = current_level) -> void:
+		if is_boss_level():
+			# TODO: check boss type
+			var blocks_to_remove:  Array[BreakableBlock] = levels.back().snake.cut_snake_at(block.pos_on_grid)
+			for _block in blocks_to_remove:
+				levels[level_index].blocks.erase(_block)
+				levels[level_index].block_grid.remove_block(_block)
 		# TODO: handling memory from here, might wanna move it
 		levels[level_index].blocks.erase(block)
 		levels[level_index].block_grid.remove_block(block)
@@ -94,6 +109,12 @@ class GameContext extends Node:
 		
 		levels[level_index].completed = levels[level_index].blocks.is_empty()
 	
+	func update_block_pos(block: BreakableBlock, new_pos: Vector2i, level_index: int = current_level) -> void:
+		levels[level_index].block_grid.remove_block(block)
+		block.pos_on_grid = new_pos
+		block.prepare_collision()
+		levels[level_index].block_grid.add_block(block)
+
 
 	func get_blocks_for_circle(pos: Vector2, r: float) -> Array[BreakableBlock]:
 		return levels[current_level].block_grid.get_blocks_for_circle(pos, r)
@@ -122,6 +143,9 @@ class GameContext extends Node:
 		if current_level >= 2:
 			levels[current_level - 2].completed = true
 		
+		if is_boss_level():
+			levels[current_level - 1].completed = true
+
 		balls = balls.filter(func(b: Ball) -> bool:
 			if b.velocity.y > 0 || b.position.y > BreakableGrid.GRID_SIZE.y * 2:
 				b.asset_ref.queue_free()
@@ -229,6 +253,87 @@ class GameContext extends Node:
 			return true
 		
 		return false
+
+	func init_snake_boss(seed: int = randi()) -> void:
+		var boss_level: Global.Level = levels.back()
+		boss_level.boss_level = true
+		boss_level.rng = RandomNumberGenerator.new()
+		boss_level.rng.seed = seed
+
+		var snake_boss: Snake = Snake.new()
+		snake_boss.init_snake()
+
+		snake_boss.refill_food(boss_level.rng)
+		snake_boss.direction = Vector2i.RIGHT
+		snake_boss.calculate_nav_grid()
+
+		var is_head: bool = true
+		for segment in snake_boss.segments:
+			var block: BreakableBlock = _create_block_for_segment(segment)
+			if is_head:	
+				block.type = BreakableBlock.BlockType.METAL
+				block.color = Vector3(1, 1, 0)
+
+			segment.block_ref = block
+
+			add_block(block, LEVEL_COUNT - 1)
+
+			is_head = false
+		
+		boss_level.snake = snake_boss
+
+	func _create_block_for_segment(segment: Snake.Segment) -> BreakableBlock:
+		var block: BreakableBlock = BreakableBlock.new()
+		block.color = Vector3.UP
+		block.type = BreakableBlock.BlockType.NORMAL
+		block.pos_on_grid = segment.position
+
+		# TODO: multi-health snake boss
+		# block.health = 1
+
+		block.prepare_collision()
+
+		return block
+
+	func is_boss_level() -> bool:
+		return current_level == LEVEL_COUNT - 1
+
+	### return true if snake position was updated
+	func update_snake_boss(delta: float) -> bool:
+		var snake: Snake = levels.back().snake
+		var grown: bool = false
+		var moved: bool = false
+
+		if snake.navigator.next_step != Vector2i.MIN:
+			snake.set_nav_direction()
+		# else:
+		# 	move_treshold = 1 / 10.0
+
+		if snake.last_move >= snake.move_treshold:
+			grown = snake.update()
+			snake.last_move -= snake.move_treshold
+			snake.calculate_nav_grid()
+
+			for segment in snake.segments:
+				if segment.block_ref == null:
+					segment.block_ref = _create_block_for_segment(segment)
+					add_block(segment.block_ref, current_level)
+				else:
+					update_block_pos(
+						segment.block_ref,
+						segment.position,
+						current_level
+					)
+
+			moved = true
+		
+		if grown:
+			snake.refill_food(levels.back().rng)
+		
+
+		snake.last_move += delta
+
+		return moved
 
 	# flags
 	var LASER_ACTIVE: bool = false

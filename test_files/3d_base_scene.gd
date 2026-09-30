@@ -58,9 +58,14 @@ func _ready() -> void:
 	var base_seed: int = randi()
 	grace_rng.seed = base_seed
 
-	for i in Global.LEVEL_COUNT:
+	for i in Global.LEVEL_COUNT - 1:
 		context.add_block_array(generate_sparse_map(base_seed + i), i)
 		generate_block_assets(context.levels[i].blocks)
+	# boss level
+	context.init_snake_boss(base_seed)
+	generate_block_assets(context.levels.back().blocks)
+
+
 
 	display_blocks(context.levels[context.current_level].blocks)
 	
@@ -173,6 +178,11 @@ func _process(delta: float) -> void:
 
 	# WARNING: no input event should be handled after this, as it may be incorrect state
 
+	if context.is_boss_level():
+		# TODO: check for type
+		if context.update_snake_boss(safe_delta):
+			display_blocks(context.get_current_blocks())
+		
 	# oooooooooo      o      ooooo       ooooo        oooooooo8  
 	#  888    888    888      888         888        888         
 	#  888oooo88    8  88     888         888         888oooooo  
@@ -655,36 +665,49 @@ func generate_sparse_map(seed: int = randi()) -> Array[BreakableBlock]:
 
 func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 	for block: BreakableBlock in blocks:
-		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
-		block_parent.add_child(block_mesh)
-		# block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-		block_mesh.set_polygon(block.points)
+		create_asset_for_single_block(block)
 
-		var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
-		block_mesh.global_position.x = final_pos.x
-		block_mesh.global_position.z = final_pos.y
-		# block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
-		block_mesh.global_position.y = 0
-		block_mesh.set_material(block.type)
-		if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
-			block_mesh.set_key_block()
-		else:
-			block_mesh.set_hp(block.health)
-			block_mesh.set_color(block.color)
+# TODO: should not mutate block, but return the asset
+func create_asset_for_single_block(block: BreakableBlock) -> void:
+	var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+	block_parent.add_child(block_mesh)
+	# block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+	block_mesh.set_polygon(block.points)
+
+	var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
+	block_mesh.global_position.x = final_pos.x
+	block_mesh.global_position.z = final_pos.y
+	# block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+	block_mesh.global_position.y = 0
+	block_mesh.set_material(block.type)
+	if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
+		block_mesh.set_key_block()
+	else:
+		block_mesh.set_hp(block.health)
+		block_mesh.set_color(block.color)
 
 
-		block.asset_ref = block_mesh
+	block.asset_ref = block_mesh
 
-		block.just_broken.connect(sfx_player.play_block_hit)
+	block.just_broken.connect(sfx_player.play_block_hit)
 
-		block_parent.remove_child(block_mesh)
+	block_parent.remove_child(block_mesh)
 
 func display_blocks(blocks: Array[BreakableBlock]) -> void:
 	for child in block_parent.get_children():
 		block_parent.remove_child(child)
 
 	for block: BreakableBlock in blocks:
+		if block.asset_ref == null:
+			create_asset_for_single_block(block)
 		block_parent.add_child(block.asset_ref)
+
+		# TODO: only update if needed
+		var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
+		block.asset_ref.global_position.x = final_pos.x
+		block.asset_ref.global_position.z = final_pos.y
+		# block.asset_ref.global_position.y = BreakableGrid.CELL_SIZE / 2
+		block.asset_ref.global_position.y = 0
 
 		
 		
