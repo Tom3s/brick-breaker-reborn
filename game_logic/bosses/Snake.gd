@@ -59,7 +59,10 @@ class Navigator extends Node:
 			Vector2i.RIGHT,
 		]
 
-		var sorted_foods: Array[Food] = foods.duplicate()
+
+		var sorted_foods: Array[Food] = foods.filter(func(f: Food) -> bool: return !f.eaten)
+		if sorted_foods.size() == 0:
+			return
 
 		# TODO: can use .bind() here to pass head
 		sorted_foods.sort_custom(func(a: Food, b: Food) -> bool:
@@ -307,7 +310,7 @@ func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGe
 		LoggerMogyi.log(self, "No segment of snake found at %v. Skipping" % cut_pos)
 		return []
 	
-	var _cut_blocks: Array[BreakableBlock] = []
+	var _cut_blocks: Array[BreakableBlock] = [segments[cut_index].block_ref]
 	# skip exact cut, it wont pawn food
 	for i in range(cut_index + 1, segments.size()):
 		var segment: Segment = segments[i]
@@ -321,6 +324,7 @@ func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGe
 	
 	grid.set_cell(cut_pos, SnakeCell.NONE)
 
+
 	
 	segments.resize(cut_index)
 
@@ -329,13 +333,19 @@ func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGe
 var FOOD_LIMIT: int = 5
 
 func refill_food(rng: RandomNumberGenerator) -> void:
+	purge_stale_food()
+	
 	while foods.size() < FOOD_LIMIT:
 		spawn_random_food(rng)
 	
 func purge_stale_food() -> void:
+	for food in foods:
+		if food.eaten:
+			grid.set_cell(food.position, SnakeCell.NONE)
+	
 	foods = foods.filter(func(f: Food) -> bool: return !f.eaten)
 
-func eat_food(pos: Vector2i) -> void:
+func mark_food_as_eaten(pos: Vector2i) -> void:
 	for food in foods:
 		if food.position == pos:
 			food.eaten = true

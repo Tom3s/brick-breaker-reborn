@@ -73,6 +73,8 @@ func set_color(color: Vector3) -> void:
 func set_material(type: BreakableBlock.BlockType) -> void:
 	if type == BreakableBlock.BlockType.NORMAL:
 		mesh.material_override = normal_material.duplicate()
+	if type == BreakableBlock.BlockType.SNAKE_FOOD:
+		mesh.material_override = normal_material.duplicate()
 	elif type == BreakableBlock.BlockType.ICE:
 		mesh.material_override = ice_material.duplicate()
 	elif type == BreakableBlock.BlockType.METAL:

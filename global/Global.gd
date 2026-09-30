@@ -100,13 +100,23 @@ class GameContext extends Node:
 			# TODO: check boss type
 			# !has_powerup => it's snake segment
 			# has_powerup => it's food
-			if !block.has_powerup:
-				var blocks_to_remove:  Array[BreakableBlock] = levels.back().snake.cut_snake_at(block.pos_on_grid)
+			if block.type != BreakableBlock.BlockType.SNAKE_FOOD:
+				var blocks_to_remove: Array[BreakableBlock] = levels.back().snake.cut_snake_at(
+					block.pos_on_grid, 
+					levels.back().rng
+				)
 				for _block in blocks_to_remove:
 					levels[level_index].blocks.erase(_block)
 					levels[level_index].block_grid.remove_block(_block)
+
+				# cut snake can also create foods/blocks 
+				for food: Snake.Food in levels.back().snake.foods:
+					if food.block_ref == null:
+						var _block: BreakableBlock = _create_block_for_food(food)
+						food.block_ref = _block
+						add_block(_block, LEVEL_COUNT - 1)
 			else:
-				levels.back().snake.eat_food(block.pos_on_grid)
+				levels.back().snake.mark_food_as_eaten(block.pos_on_grid)
 				pass
 
 		# TODO: handling memory from here, might wanna move it
@@ -288,6 +298,7 @@ class GameContext extends Node:
 			if is_head:	
 				block.type = BreakableBlock.BlockType.METAL
 				block.color = Vector3(1, 1, 0)
+				block.health = Vector2i.MAX.x - 1
 
 			segment.block_ref = block
 
@@ -313,7 +324,7 @@ class GameContext extends Node:
 	func _create_block_for_food(food: Snake.Food) -> BreakableBlock:
 		var block: BreakableBlock = BreakableBlock.new()
 		block.color = Vector3.RIGHT
-		block.type = BreakableBlock.BlockType.NORMAL
+		block.type = BreakableBlock.BlockType.SNAKE_FOOD
 		block.pos_on_grid = food.position
 
 		block.has_powerup = true
@@ -344,7 +355,8 @@ class GameContext extends Node:
 		if snake.last_move >= snake.move_treshold:
 			grown = snake.update()
 			snake.last_move -= snake.move_treshold
-			snake.calculate_nav_grid()
+			if snake.foods.size() != 0:
+				snake.calculate_nav_grid()
 
 			for segment in snake.segments:
 				if segment.block_ref == null:
@@ -360,17 +372,18 @@ class GameContext extends Node:
 			moved = true
 		
 		for food in snake.foods:
-			if food.block_ref == null:
-				var block: BreakableBlock = _create_block_for_food(food)
-				food.block_ref = block
-				add_block(block, LEVEL_COUNT - 1)
-
 			if food.eaten:
 				remove_block(food.block_ref)
 		
 		if grown:
 			# remove_block(grown.block_ref)
 			snake.refill_food(levels.back().rng)
+
+			for food in snake.foods:
+				if food.block_ref == null:
+					var block: BreakableBlock = _create_block_for_food(food)
+					food.block_ref = block
+					add_block(block, LEVEL_COUNT - 1)
 		
 		snake.purge_stale_food()
 

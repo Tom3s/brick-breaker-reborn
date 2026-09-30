@@ -163,6 +163,8 @@ func get_damage(context: Global.GameContext, block: BreakableBlock) -> int:
 			return 1
 	elif block.type == BreakableBlock.BlockType.ICE:
 		return 100
+	elif block.type == BreakableBlock.BlockType.SNAKE_FOOD:
+		return 1 # should never change
 
 
 	return 1

@@ -28,6 +28,8 @@ extends Node3D
 
 @onready var ingame_ui: IngameUI = %IngameUI
 
+@onready var sky_node: WorldEnvironment = %Node3D
+
 var wall_material: ShaderMaterial
 
 # var ball: Ball = Ball.new()
@@ -246,6 +248,7 @@ func _process(delta: float) -> void:
 
 			if block.is_broken():
 				if block.has_powerup:
+					# TODO: this removes ability to spawn powerup without breaking the block
 					block.has_powerup = false
 					spawn_powerup(block)
 				
@@ -253,6 +256,10 @@ func _process(delta: float) -> void:
 
 				block.asset_ref.queue_free()
 				context.remove_block(block)
+
+				# cutting snake can introduce new blocks
+				if context.is_boss_level():
+					display_blocks(context.get_current_blocks())
 
 				context.time_block_broken = 0.0
 				break
@@ -501,6 +508,10 @@ func _process(delta: float) -> void:
 	#  888        888o   o888   888 888     888    oo   888  88o   888    88   888                888 
 	# o888o         88ooo88      8   8     o888ooo8888 o888o  88o8  888oo88   o888o       o88oooo888  
 																										 
+	if context.is_boss_level():
+		fix_snake_head()
+		context.levels.back().snake.purge_stale_food()
+		# sky_node.draw_snake(context.levels.back().snake)
 
 	# update powerup pickups
 	for powerup: Powerup in context.powerups:
@@ -689,8 +700,6 @@ func create_asset_for_single_block(block: BreakableBlock) -> void:
 
 	block.asset_ref = block_mesh
 
-	block.just_broken.connect(sfx_player.play_block_hit)
-
 	block_parent.remove_child(block_mesh)
 
 func display_blocks(blocks: Array[BreakableBlock]) -> void:
@@ -700,7 +709,11 @@ func display_blocks(blocks: Array[BreakableBlock]) -> void:
 	for block: BreakableBlock in blocks:
 		if block.asset_ref == null:
 			create_asset_for_single_block(block)
-		block_parent.add_child(block.asset_ref)
+			block.just_broken.connect(sfx_player.play_block_hit)
+
+
+		if block.asset_ref.get_parent() == null:
+			block_parent.add_child(block.asset_ref)
 
 		# TODO: only update if needed
 		var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
@@ -736,6 +749,11 @@ func collide_with_screen(powerup: Powerup) -> void:
 		powerup.velocity.x *= -1
 
 func spawn_powerup(block: BreakableBlock) -> void:
+	LoggerMogyi.log(self, "Spawning powerup (%s) for block at %v" % [
+		Powerup.Type.keys()[block.powerup.type].capitalize(),
+		block.pos_on_grid
+	])
+
 	var powerup: Powerup = block.powerup
 	powerup.position = block.get_origin()
 
@@ -800,6 +818,7 @@ func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
 
 	if block != null && block.is_broken():
 		if block.has_powerup:
+			# TODO: this removes ability to spawn powerup without breaking the block
 			block.has_powerup = false
 			spawn_powerup(block)
 		
@@ -807,6 +826,10 @@ func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
 
 		block.asset_ref.queue_free()
 		context.remove_block(block)
+
+		# cutting snake can introduce new blocks
+		if context.is_boss_level():
+			display_blocks(context.get_current_blocks())
 
 		context.time_block_broken = 0.0
 
@@ -837,3 +860,12 @@ func outside_screen_bounds(ball: Ball) -> bool:
 	if ball.position.y > context.screen_b.y + (context.screen_b.y - context.screen_a.y): return true
 
 	return false
+
+func fix_snake_head() -> void:
+	if !context.is_boss_level():
+		return
+	
+	var head: BreakableBlock = context.levels.back().snake.segments.front().block_ref # holy reference
+
+	head.type = BreakableBlock.BlockType.METAL
+	head.set_visuals()
