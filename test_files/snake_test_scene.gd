@@ -10,10 +10,12 @@ func _ready() -> void:
 	for i in 5:
 		snake.spawn_food(rng)
 	
+	snake.direction = Vector2i.RIGHT
+
 	snake.calculate_nav_grid()
 
 var last_move: float = 0.0
-var move_treshold: float = 1.0 / 10
+var move_treshold: float = 0 # 1.0 / 10
 
 func _process(delta: float) -> void:
 	var grown: bool = false
@@ -39,10 +41,11 @@ func _process(delta: float) -> void:
 	if last_move >= move_treshold:
 		grown = snake.update()
 		last_move -= move_treshold
+		snake.calculate_nav_grid()
 
 	if grown:
 		snake.spawn_food(rng)
-		snake.calculate_nav_grid()
+	
 
 	last_move += delta
 

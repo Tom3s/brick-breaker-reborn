@@ -49,43 +49,69 @@ class SnakeGrid:
 	func remove_cell(pos: Vector2i) -> void:
 		grid[pos.x][pos.y] = 0
 
-class NavGrid:
-	var used: Array[PackedInt32Array] = []
-	var dirs: Array[PackedVector2Array] = []
+# class NavGrid:
+# 	var used: Array[PackedInt32Array] = []
+# 	var dirs: Array[PackedVector2Array] = []
 
-	func reset() -> void:
-		if used.size() == 0:
-			used.resize(BreakableGrid.GRID_SIZE.x)
+# 	func reset() -> void:
+# 		if used.size() == 0:
+# 			used.resize(BreakableGrid.GRID_SIZE.x)
 
-		for array in used:
-			array.resize(BreakableGrid.GRID_SIZE.y)
-			array.fill(0)
+# 		for array in used:
+# 			array.resize(BreakableGrid.GRID_SIZE.y)
+# 			array.fill(0)
 		
-		if dirs.size() == 0:
-			dirs.resize(BreakableGrid.GRID_SIZE.x)
+# 		if dirs.size() == 0:
+# 			dirs.resize(BreakableGrid.GRID_SIZE.x)
 
-		for array in dirs:
-			array.resize(BreakableGrid.GRID_SIZE.y)
-			array.fill(Vector2.ZERO)
+# 		for array in dirs:
+# 			array.resize(BreakableGrid.GRID_SIZE.y)
+# 			array.fill(Vector2.ZERO)
 		
 
 	
-	func flood_fill(grid: SnakeGrid, start_foods: Array[Vector2i]) -> void:
-		reset()
+# 	func flood_fill(grid: SnakeGrid, start_foods: Array[Vector2i]) -> void:
+# 		reset()
 
-		for x in BreakableGrid.GRID_SIZE.x:
-			for y in BreakableGrid.GRID_SIZE.y:
-				if grid.get_cell(Vector2i(x, y)) in [SnakeCell.NONE, SnakeCell.SEGMENT]:
-					used[x][y] = 0
-				else:
-					used[x][y] = 1
+# 		for x in BreakableGrid.GRID_SIZE.x:
+# 			for y in BreakableGrid.GRID_SIZE.y:
+# 				if grid.get_cell(Vector2i(x, y)) in [SnakeCell.NONE, SnakeCell.SEGMENT]:
+# 					used[x][y] = 0
+# 				else:
+# 					used[x][y] = 1
 
-		var queue: Array[Vector2i] = []
-		queue.append_array(start_foods)
+# 		var queue: Array[Vector2i] = []
+# 		queue.append_array(start_foods)
 
-		for food in start_foods:
-			used[food.x][food.y] = 1
+# 		for food in start_foods:
+# 			used[food.x][food.y] = 1
 
+# 		var look_dirs: Array[Vector2i] = [
+# 			Vector2i.UP,
+# 			Vector2i.DOWN,
+# 			Vector2i.LEFT,
+# 			Vector2i.RIGHT,
+# 		]
+
+# 		while queue.size():
+# 			var curr: Vector2i = queue.pop_front() 
+
+# 			for look in look_dirs:
+# 				var look_at: Vector2i = curr + look
+# 				look_at = Snake.wrap_position(look_at)
+# 				if used[look_at.x][look_at.y] == 0:
+# 					dirs[look_at.x][look_at.y] = Vector2(look * -1)
+# 					used[look_at.x][look_at.y] = 1
+# 					queue.push_back(look_at)
+		
+# 	func get_nav_dir(pos: Vector2i) -> Vector2i:
+# 		return Vector2i(dirs[pos.x][pos.y])
+
+class Navigator extends Node:
+	var next_step: Vector2i = Vector2i.ZERO
+
+	func calc_next_step(grid: SnakeGrid, foods: Array[Vector2i], head: Vector2i) -> void:
+		# init alg
 		var look_dirs: Array[Vector2i] = [
 			Vector2i.UP,
 			Vector2i.DOWN,
@@ -93,19 +119,109 @@ class NavGrid:
 			Vector2i.RIGHT,
 		]
 
-		while queue.size():
-			var curr: Vector2i = queue.pop_front() 
+		var sorted_foods: Array[Vector2i] = foods.duplicate()
 
-			for look in look_dirs:
-				var look_at: Vector2i = curr + look
-				look_at = Snake.wrap_position(look_at)
-				if used[look_at.x][look_at.y] == 0:
-					dirs[look_at.x][look_at.y] = Vector2(look * -1)
-					used[look_at.x][look_at.y] = 1
-					queue.push_back(look_at)
+		sorted_foods.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+			# a < b
+			return Navigator.wrapped_taxicab_dist(head, a) < Navigator.wrapped_taxicab_dist(head, b) 
+		)
+
+		var target_food: Vector2i = sorted_foods.front()
+
+		var queue: Array[Vector2i] = [
+			head
+		]
+
+		# IMPORTANT:
+		# from[i] is a direction
+		# it represents what direction the previous move was
+		# to get previous location, you must -from[i] from current location
+		var from: Array[PackedVector2Array] = []
+		from.resize(BreakableGrid.GRID_SIZE.x)
+
+		for array in from:
+			array.resize(BreakableGrid.GRID_SIZE.y)
+			array.fill(Vector2.ZERO) 
+
+		var used: Array[PackedInt32Array] = []
+		used.resize(BreakableGrid.GRID_SIZE.x)
+		for array in used:
+			array.resize(BreakableGrid.GRID_SIZE.y)
+			array.fill(0)
 		
-	func get_nav_dir(pos: Vector2i) -> Vector2i:
-		return Vector2i(dirs[pos.x][pos.y])
+		used[head.x][head.y] = 1
+
+		var found_food: Vector2i = Vector2i.MIN
+
+		var _iter: int = 0
+
+		while true:
+			# take all of queue with minial but equal dists
+			queue.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
+				# a < b
+				return Navigator.wrapped_taxicab_dist(target_food, a) < Navigator.wrapped_taxicab_dist(target_food, b) 
+			)
+
+			var min_dist: int = Navigator.wrapped_taxicab_dist(head, queue.front())
+			var push_neighbors_for: Array[Vector2i] = []
+			while queue.size() && Navigator.wrapped_taxicab_dist(head, queue.front()) == min_dist:
+				push_neighbors_for.push_back(queue.pop_front())
+			
+			for pos in push_neighbors_for:
+				if found_food != Vector2i.MIN:
+					break
+				
+				for dir in look_dirs:
+					var neighbor_pos: Vector2i = Snake.wrap_position(pos + dir)
+
+					if grid.get_cell(neighbor_pos) == SnakeCell.NONE && used[neighbor_pos.x][neighbor_pos.y] == 0:
+						queue.push_back(neighbor_pos)
+						used[neighbor_pos.x][neighbor_pos.y] = 1
+						from[neighbor_pos.x][neighbor_pos.y] = Vector2(dir)
+					
+					elif grid.get_cell(neighbor_pos) == SnakeCell.FOOD:
+						from[neighbor_pos.x][neighbor_pos.y] = Vector2(dir)
+						found_food = neighbor_pos
+						break
+			
+			if found_food != Vector2i.MIN:
+				break
+			
+			_iter += 1
+			if _iter > 10000 || queue.size() == 0:
+				LoggerMogyi.log(self, "No path found for food. Aborting!", LoggerMogyi.Severity.ERROR)
+				return
+
+		# retrace route
+		var path: Array[Vector2i] = []
+		var current_path_pos: Vector2i = found_food
+
+		while current_path_pos != head:
+			path.push_back(Vector2i(from[current_path_pos.x][current_path_pos.y]))
+			current_path_pos -= Vector2i(from[current_path_pos.x][current_path_pos.y])
+			current_path_pos = Snake.wrap_position(current_path_pos)
+
+		next_step = path.back()
+	
+	static func wrapped_taxicab_dist(a: Vector2i, b: Vector2i) -> int:
+		var tl: Vector2i = a
+		var br: Vector2i = b
+
+		if a.x > b.x:
+			tl.x = b.x
+			br.x = a.x
+
+		if a.y > b.y:
+			tl.y = b.y
+			br.y = a.y
+
+		if br.x - tl.x > (BreakableGrid.GRID_SIZE.x / 2):
+			tl.x += BreakableGrid.GRID_SIZE.x
+		
+		if br.y - tl.y > ((BreakableGrid.GRID_SIZE.y - SnakeGrid.FORBIDDEN_AFTER_ROW) / 2):
+			tl.y += (BreakableGrid.GRID_SIZE.y - SnakeGrid.FORBIDDEN_AFTER_ROW)
+		
+		return abs(a.x - b.x) + abs(a.y - b.y) 
 
 
 
@@ -118,7 +234,7 @@ var segments: Array[Segment] = []
 var grid: SnakeGrid = SnakeGrid.new()
 var foods: Array[Vector2i] = []
 
-var nav: NavGrid = NavGrid.new()
+var navigator: Navigator = Navigator.new()
 
 # enum Direction {
 # 	NONE = Vector2i.ZERO,
@@ -213,9 +329,9 @@ static func wrap_position(pos: Vector2i) -> Vector2i:
 	return result
 
 func calculate_nav_grid() -> void:
-	nav.flood_fill(grid, foods)
+	navigator.calc_next_step(
+		grid, foods, segments.front().position
+	)
 
 func set_nav_direction() -> void:
-	var desired_direction: Vector2i = nav.get_nav_dir(segments[0].position)
-
-	direction = desired_direction
+	direction = navigator.next_step
