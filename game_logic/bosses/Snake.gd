@@ -121,6 +121,7 @@ class Navigator extends Node:
 
 		var sorted_foods: Array[Vector2i] = foods.duplicate()
 
+		# TODO: can use .bind() here to pass head
 		sorted_foods.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
 			# a < b
 			return Navigator.wrapped_taxicab_dist(head, a) < Navigator.wrapped_taxicab_dist(head, b) 
@@ -157,6 +158,7 @@ class Navigator extends Node:
 
 		while true:
 			# take all of queue with minial but equal dists
+			# TODO: can use .bind() here to pass target_food
 			queue.sort_custom(func(a: Vector2i, b: Vector2i) -> bool:
 				# a < b
 				return Navigator.wrapped_taxicab_dist(target_food, a) < Navigator.wrapped_taxicab_dist(target_food, b) 
@@ -190,6 +192,7 @@ class Navigator extends Node:
 			_iter += 1
 			if _iter > 10000 || queue.size() == 0:
 				LoggerMogyi.log(self, "No path found for food. Aborting!", LoggerMogyi.Severity.ERROR)
+				next_step = Vector2i.MIN
 				return
 
 		# retrace route
@@ -236,14 +239,6 @@ var foods: Array[Vector2i] = []
 
 var navigator: Navigator = Navigator.new()
 
-# enum Direction {
-# 	NONE = Vector2i.ZERO,
-# 	UP = Vector2i.UP,
-# 	DOWN = Vector2i.DOWN,
-# 	LEFT = Vector2i.LEFT,
-# 	RIGHT = Vector2i.RIGHT,
-# }
-
 var direction: Vector2i = Vector2i.ZERO
 
 func init_snake() -> void:
@@ -261,7 +256,7 @@ func init_snake() -> void:
 		grid.set_cell(segment.position, SnakeCell.SEGMENT)
 
 var _LOOP_LIMIT: int = 1000
-func spawn_food(rng: RandomNumberGenerator) -> void:
+func spawn_random_food(rng: RandomNumberGenerator) -> void:
 	var x: int = int(rng.randf() * BreakableGrid.GRID_SIZE.x)
 	var y: int = int(rng.randf() * BreakableGrid.GRID_SIZE.y)
 
@@ -275,8 +270,11 @@ func spawn_food(rng: RandomNumberGenerator) -> void:
 			LoggerMogyi.log(self, "Exceeded loop_limit for spawning food. Aborting", LoggerMogyi.Severity.ERROR)
 			return
 	
-	grid.set_cell(Vector2i(x, y), SnakeCell.FOOD)
-	foods.push_back(Vector2i(x, y))
+	spawn_food_at(Vector2i(x, y))
+
+func spawn_food_at(pos: Vector2i) -> void:
+	grid.set_cell(pos, SnakeCell.FOOD)
+	foods.push_back(pos)
 
 func move() -> void:
 	grid.set_cell(segments[0].position, SnakeCell.SEGMENT)
@@ -316,6 +314,9 @@ func update() -> bool:
 		return true
 	elif grid.get_cell(next_cell) == SnakeCell.NONE:
 		move()
+	elif grid.get_cell(next_cell) == SnakeCell.SEGMENT:
+		cut_snake_at(next_cell)
+
 	else:
 		pass
 	
@@ -335,3 +336,28 @@ func calculate_nav_grid() -> void:
 
 func set_nav_direction() -> void:
 	direction = navigator.next_step
+
+var SNAKE_CUT_FOOD_CHANCE: float = 0.3
+
+func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGenerator.new()) -> void:
+	var cut_index: int = segments.find_custom(
+		func(a: Segment) -> bool:
+			return a.position == cut_pos,
+		1 # skip head, don't cut that
+	)
+
+	if cut_index == -1:
+		LoggerMogyi.log(self, "No segment of snake found at %v. Skipping" % cut_pos)
+	
+	# skip exact cut, it wont pawn food
+	for i in range(cut_index + 1, segments.size()):
+		var segment: Segment = segments[i]
+		if rng.randf() < SNAKE_CUT_FOOD_CHANCE:
+			spawn_food_at(segment.position)
+		else:
+			grid.set_cell(segment.position, SnakeCell.NONE)
+	
+	grid.set_cell(cut_pos, SnakeCell.NONE)
+
+	
+	segments.resize(cut_index)

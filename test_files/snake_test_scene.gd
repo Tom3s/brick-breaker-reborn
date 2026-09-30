@@ -8,7 +8,7 @@ func _ready() -> void:
 	snake.init_snake()
 
 	for i in 5:
-		snake.spawn_food(rng)
+		snake.spawn_random_food(rng)
 	
 	snake.direction = Vector2i.RIGHT
 
@@ -20,7 +20,10 @@ var move_treshold: float = 0 # 1.0 / 10
 func _process(delta: float) -> void:
 	var grown: bool = false
 
-	snake.set_nav_direction()
+	if snake.navigator.next_step != Vector2i.MIN:
+		snake.set_nav_direction()
+	else:
+		move_treshold = 1 / 10.0
 
 	if Input.is_action_just_pressed("debug_snake_up"):
 		snake.direction = Vector2i.UP
@@ -43,8 +46,9 @@ func _process(delta: float) -> void:
 		last_move -= move_treshold
 		snake.calculate_nav_grid()
 
-	if grown:
-		snake.spawn_food(rng)
+
+	if grown && snake.foods.size() < 5:
+		snake.spawn_random_food(rng)
 	
 
 	last_move += delta
