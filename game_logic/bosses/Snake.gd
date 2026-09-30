@@ -20,6 +20,7 @@ enum SnakeCell {
 	NONE,
 	FOOD,
 	SEGMENT,
+	HEAD,
 	OTHER,
 }
 
@@ -162,6 +163,8 @@ func spawn_food(rng: RandomNumberGenerator) -> void:
 	foods.push_back(Vector2i(x, y))
 
 func move() -> void:
+	grid.set_cell(segments[0].position, SnakeCell.SEGMENT)
+
 	grid.remove_cell(segments.back().position)
 
 	for i in range(segments.size() - 1, 0, -1):
@@ -173,7 +176,7 @@ func move() -> void:
 	segments[0].position += direction
 	segments[0].position = wrap_position(segments[0].position)
 
-	grid.set_cell(segments[0].position, SnakeCell.SEGMENT)
+	grid.set_cell(segments[0].position, SnakeCell.HEAD)
 
 func grow(type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL) -> void:
 	var tail_pos: Vector2i = segments.back().position

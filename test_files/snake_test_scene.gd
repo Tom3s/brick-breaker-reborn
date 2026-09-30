@@ -59,6 +59,7 @@ var cell_colors: Array[Color] = [
 	Color.TRANSPARENT,
 	Color.RED,
 	Color.GREEN,
+	Color.YELLOW,
 	Color.DARK_BLUE,
 ]
 
@@ -87,15 +88,6 @@ func _draw() -> void:
 					cell_colors[int(cell)]
 				)
 	
-	draw_rect(
-		Rect2(
-			snake.segments[0].position.x * rect_size,
-			snake.segments[0].position.y * rect_size,
-			rect_size, rect_size
-		),
-		Color.YELLOW
-	)
-
 	
 	# for x in BreakableGrid.GRID_SIZE.x:
 	# 	for y in BreakableGrid.GRID_SIZE.y:
