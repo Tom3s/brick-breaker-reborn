@@ -7,6 +7,11 @@ class_name IngameUI
 @onready var level_label: Label = %CurrentLevel
 @onready var max_level_label: Label = %MaxLevels
 
+@onready var score_container: HBoxContainer = %ScoreContainer
+@onready var health_bar_container: HBoxContainer = %HealthBarContainer
+
+@onready var health_bar: ProgressBar = %HealthBar
+
 @onready var main_ball_slot: TextureRect = %MainBallSlot
 @onready var reserve_ball_slot: TextureRect = %ReserveBallSlot
 
@@ -54,3 +59,10 @@ func set_ball_slots(context: Global.GameContext) -> void:
 		var reserve_power: Powerup = context.ball_powerups[1]
 		var texture: Texture = TextureLoader.powerup[reserve_power.type]
 		reserve_ball_slot.material.set_shader_parameter("sdf_texture", texture)
+
+func show_healthbar(show: bool) -> void:
+	score_container.visible = !show
+	health_bar_container.visible = show
+
+func set_healthbar_health(new_health: int) -> void:
+	health_bar.value = new_health

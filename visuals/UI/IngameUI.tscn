@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://cavmf50eohh6o"]
+[gd_scene load_steps=11 format=3 uid="uid://cavmf50eohh6o"]
 
 [ext_resource type="Script" uid="uid://dkjbmr4g8kom5" path="res://visuals/UI/IngameUI.gd" id="1_oh034"]
 [ext_resource type="Texture2D" uid="uid://hag7itsukwj3" path="res://icon.svg" id="2_iwgs4"]
@@ -9,6 +9,20 @@
 
 [sub_resource type="Theme" id="Theme_1wuik"]
 default_font_size = 32
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_goccb"]
+bg_color = Color(0.3, 0.0854, 0.078, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_l5c5i"]
+bg_color = Color(4.7168137e-06, 0.7080785, 0.50075734, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1wuik"]
 size = Vector2(256, 256)
@@ -60,33 +74,54 @@ text = "Lives:"
 [node name="CurrentLives" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3/HBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "3"
+text = "-"
 
 [node name="TextureRect" type="TextureRect" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer3/HBoxContainer"]
+visible = false
 layout_mode = 2
 texture = ExtResource("2_iwgs4")
 expand_mode = 3
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+[node name="ScoreContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 2
 
-[node name="Label" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/ScoreContainer"]
 layout_mode = 2
 text = "Score: "
 
-[node name="CurrentScore" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+[node name="CurrentScore" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/ScoreContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "1518463"
 
-[node name="Control" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+[node name="Control" type="Control" parent="PanelContainer/MarginContainer/HBoxContainer/ScoreContainer"]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 
-[node name="Multiplier" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer"]
+[node name="Multiplier" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/ScoreContainer"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "x3"
+
+[node name="HealthBarContainer" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HealthBarContainer"]
+visible = false
+layout_mode = 2
+
+[node name="HealthBar" type="ProgressBar" parent="PanelContainer/MarginContainer/HBoxContainer/HealthBarContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_goccb")
+theme_override_styles/fill = SubResource("StyleBoxFlat_l5c5i")
+max_value = 30.0
+value = 30.0
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="PanelContainer/MarginContainer/HBoxContainer"]
 layout_mode = 2

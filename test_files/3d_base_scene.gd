@@ -28,6 +28,8 @@ extends Node3D
 
 @onready var ingame_ui: IngameUI = %IngameUI
 
+@onready var sky_node: WorldEnvironment = %Node3D
+
 var wall_material: ShaderMaterial
 
 # var ball: Ball = Ball.new()
@@ -58,9 +60,14 @@ func _ready() -> void:
 	var base_seed: int = randi()
 	grace_rng.seed = base_seed
 
-	for i in Global.LEVEL_COUNT:
+	for i in Global.LEVEL_COUNT - 1:
 		context.add_block_array(generate_sparse_map(base_seed + i), i)
 		generate_block_assets(context.levels[i].blocks)
+	# boss level
+	context.init_snake_boss(base_seed)
+	generate_block_assets(context.levels.back().blocks)
+
+
 
 	display_blocks(context.levels[context.current_level].blocks)
 	
@@ -91,6 +98,8 @@ func _ready() -> void:
 	roof.position.z = -(BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE / 2)
 
 	wall_material = %LeftWall.get_surface_override_material(0)
+
+	ingame_ui.show_healthbar(context.is_boss_level())
 
 	
 var _debug_fps: float = 0.0
@@ -173,6 +182,11 @@ func _process(delta: float) -> void:
 
 	# WARNING: no input event should be handled after this, as it may be incorrect state
 
+	if context.is_boss_level() && !context.win:
+		# TODO: check for type
+		context.update_snake_boss(safe_delta)
+		display_blocks(context.get_current_blocks())
+		
 	# oooooooooo      o      ooooo       ooooo        oooooooo8  
 	#  888    888    888      888         888        888         
 	#  888oooo88    8  88     888         888         888oooooo  
@@ -236,6 +250,7 @@ func _process(delta: float) -> void:
 
 			if block.is_broken():
 				if block.has_powerup:
+					# TODO: this removes ability to spawn powerup without breaking the block
 					block.has_powerup = false
 					spawn_powerup(block)
 				
@@ -243,6 +258,10 @@ func _process(delta: float) -> void:
 
 				block.asset_ref.queue_free()
 				context.remove_block(block)
+
+				# cutting snake can introduce new blocks
+				if context.is_boss_level():
+					display_blocks(context.get_current_blocks())
 
 				context.time_block_broken = 0.0
 				break
@@ -299,6 +318,7 @@ func _process(delta: float) -> void:
 
 			if level_unlocked:
 				context.next_level()
+				ingame_ui.show_healthbar(context.is_boss_level())
 				display_blocks(context.levels[context.current_level].blocks)
 				roof.visible = !context.levels[context.current_level].unlocked
 				break
@@ -321,11 +341,12 @@ func _process(delta: float) -> void:
 			# ball.collide_with(line, true)
 
 	
-	if context.is_current_level_complete():
+	if context.is_current_level_complete() && !context.win:
 		# TODO: change blocks to breakable if only non-breakable remain
 		# on_board_clear()
 		# return
 		context.next_level()
+		ingame_ui.show_healthbar(context.is_boss_level())
 		display_blocks(context.levels[context.current_level].blocks)
 		roof.visible = !context.levels[context.current_level].unlocked
 
@@ -491,6 +512,17 @@ func _process(delta: float) -> void:
 	#  888        888o   o888   888 888     888    oo   888  88o   888    88   888                888 
 	# o888o         88ooo88      8   8     o888ooo8888 o888o  88o8  888oo88   o888o       o88oooo888  
 																										 
+	if context.is_boss_level() && !context.win:
+		if context.levels.back().snake.is_dead:
+			context.win = true
+			LoggerMogyi.log(self, "Defeated the boss! GGs")
+			ingame_ui.set_healthbar_health(0)
+			context.set_fun_graces()
+		else:
+			fix_snake_head()
+			context.levels.back().snake.purge_stale_food()
+			ingame_ui.set_healthbar_health(context.levels.back().snake.segments.front().block_ref.health)
+		# sky_node.draw_snake(context.levels.back().snake)
 
 	# update powerup pickups
 	for powerup: Powerup in context.powerups:
@@ -655,36 +687,51 @@ func generate_sparse_map(seed: int = randi()) -> Array[BreakableBlock]:
 
 func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 	for block: BreakableBlock in blocks:
-		var block_mesh: BlockMesh = block_mesh_scene.instantiate()
-		block_parent.add_child(block_mesh)
-		# block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
-		block_mesh.set_polygon(block.points)
+		create_asset_for_single_block(block)
 
-		var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
-		block_mesh.global_position.x = final_pos.x
-		block_mesh.global_position.z = final_pos.y
-		# block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
-		block_mesh.global_position.y = 0
-		block_mesh.set_material(block.type)
-		if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
-			block_mesh.set_key_block()
-		else:
-			block_mesh.set_hp(block.health)
-			block_mesh.set_color(block.color)
+# TODO: should not mutate block, but return the asset
+func create_asset_for_single_block(block: BreakableBlock) -> void:
+	var block_mesh: BlockMesh = block_mesh_scene.instantiate()
+	block_parent.add_child(block_mesh)
+	# block_mesh.set_visual_scale(block.size * BreakableGrid.CELL_SIZE)
+	block_mesh.set_polygon(block.points)
+
+	var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
+	block_mesh.global_position.x = final_pos.x
+	block_mesh.global_position.z = final_pos.y
+	# block_mesh.global_position.y = BreakableGrid.CELL_SIZE / 2
+	block_mesh.global_position.y = 0
+	block_mesh.set_material(block.type)
+	if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
+		block_mesh.set_key_block()
+	else:
+		block_mesh.set_hp(block.health)
+		block_mesh.set_color(block.color)
 
 
-		block.asset_ref = block_mesh
+	block.asset_ref = block_mesh
 
-		block.just_broken.connect(sfx_player.play_block_hit)
-
-		block_parent.remove_child(block_mesh)
+	block_parent.remove_child(block_mesh)
 
 func display_blocks(blocks: Array[BreakableBlock]) -> void:
 	for child in block_parent.get_children():
 		block_parent.remove_child(child)
 
 	for block: BreakableBlock in blocks:
-		block_parent.add_child(block.asset_ref)
+		if block.asset_ref == null:
+			create_asset_for_single_block(block)
+			block.just_broken.connect(sfx_player.play_block_hit)
+
+
+		if block.asset_ref.get_parent() == null:
+			block_parent.add_child(block.asset_ref)
+
+		# TODO: only update if needed
+		var final_pos: Vector2 = block._get_collision_vertex_position(Vector2.ZERO)
+		block.asset_ref.global_position.x = final_pos.x
+		block.asset_ref.global_position.z = final_pos.y
+		# block.asset_ref.global_position.y = BreakableGrid.CELL_SIZE / 2
+		block.asset_ref.global_position.y = 0
 
 		
 		
@@ -713,6 +760,11 @@ func collide_with_screen(powerup: Powerup) -> void:
 		powerup.velocity.x *= -1
 
 func spawn_powerup(block: BreakableBlock) -> void:
+	LoggerMogyi.log(self, "Spawning powerup (%s) for block at %v" % [
+		Powerup.Type.keys()[block.powerup.type].capitalize(),
+		block.pos_on_grid
+	])
+
 	var powerup: Powerup = block.powerup
 	powerup.position = block.get_origin()
 
@@ -777,6 +829,7 @@ func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
 
 	if block != null && block.is_broken():
 		if block.has_powerup:
+			# TODO: this removes ability to spawn powerup without breaking the block
 			block.has_powerup = false
 			spawn_powerup(block)
 		
@@ -784,6 +837,10 @@ func damage_block_and_clear(block: BreakableBlock, damage: int) -> bool:
 
 		block.asset_ref.queue_free()
 		context.remove_block(block)
+
+		# cutting snake can introduce new blocks
+		if context.is_boss_level():
+			display_blocks(context.get_current_blocks())
 
 		context.time_block_broken = 0.0
 
@@ -795,8 +852,13 @@ func convert_blocks_to_ice(pos: Vector2) -> void:
 	for block: BreakableBlock in context.get_blocks_for_circle(pos, Powerup.ice_ball_radius):
 		# check if block actually collides
 		if block.collides_with_circle(pos, Powerup.ice_ball_radius):
-			block.type = BreakableBlock.BlockType.ICE
-			block.set_visuals()
+			if context.is_boss_level() && !context.win && \
+				context.levels.back().snake.segments.front().block_ref == block:
+					continue
+
+			if block.type != BreakableBlock.BlockType.SNAKE_FOOD:
+				block.type = BreakableBlock.BlockType.ICE
+				block.set_visuals()
 
 func explode_blocks(pos: Vector2) -> void:
 	particle_vfx_manager.play_explosion(pos)
@@ -814,3 +876,14 @@ func outside_screen_bounds(ball: Ball) -> bool:
 	if ball.position.y > context.screen_b.y + (context.screen_b.y - context.screen_a.y): return true
 
 	return false
+
+func fix_snake_head() -> void:
+	if !context.is_boss_level():
+		return
+	
+	var head: BreakableBlock = context.levels.back().snake.segments.front().block_ref # holy reference
+
+	head.type = BreakableBlock.BlockType.METAL
+	if context.levels.back().snake.segments.size() <= 3:
+		head.type = BreakableBlock.BlockType.NORMAL
+	head.set_visuals()

@@ -1,0 +1,11 @@
+[gd_scene load_steps=3 format=3 uid="uid://cd7lc1hkslx8c"]
+
+[ext_resource type="Script" uid="uid://ilq27fctqytc" path="res://test_files/snake_test_scene.gd" id="1_jibuc"]
+[ext_resource type="Script" uid="uid://dv3dkfk652ejt" path="res://IngameCamera.gd" id="2_hdx0t"]
+
+[node name="snake_test_scene" type="Node2D"]
+script = ExtResource("1_jibuc")
+
+[node name="IngameCamera" type="Camera2D" parent="."]
+script = ExtResource("2_hdx0t")
+metadata/_custom_type_script = "uid://dv3dkfk652ejt"

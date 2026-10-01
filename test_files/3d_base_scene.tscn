@@ -198,6 +198,7 @@ unique_name_in_owner = true
 script = ExtResource("2_bcu1a")
 
 [node name="Node3D" parent="." instance=ExtResource("6_cs8pv")]
+unique_name_in_owner = true
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.9636304, 0.19158603, 0.18630925, 0, -0.697165, 0.7169106, 0.26723835, -0.69083685, -0.67180943, 0, 0, 0)

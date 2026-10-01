@@ -63,7 +63,7 @@ func set_hp(hp: int) -> void:
 	hp_indicator.material_override.set_shader_parameter("Texture", load(texture_path))
 
 func set_key_block() -> void:
-	# hp_indicator.material_override.set_shader_parameter("Texture", load("res://visuals/textures/powerups/KEY.png"))
+	hp_indicator.material_override.set_shader_parameter("Texture", load("res://visuals/textures/powerups/KEY.png"))
 	mesh.material_override.set_shader_parameter("Color", Vector3.ONE)
 
 
@@ -72,6 +72,8 @@ func set_color(color: Vector3) -> void:
 
 func set_material(type: BreakableBlock.BlockType) -> void:
 	if type == BreakableBlock.BlockType.NORMAL:
+		mesh.material_override = normal_material.duplicate()
+	if type == BreakableBlock.BlockType.SNAKE_FOOD:
 		mesh.material_override = normal_material.duplicate()
 	elif type == BreakableBlock.BlockType.ICE:
 		mesh.material_override = ice_material.duplicate()

@@ -5,6 +5,7 @@ enum BlockType {
 	NORMAL,
 	METAL,
 	ICE,
+	SNAKE_FOOD,
 }
 
 
@@ -56,9 +57,12 @@ func prepare_collision() -> void:
 		var p1: Vector2 = _get_collision_vertex_position(points[i])
 		var p2: Vector2 = _get_collision_vertex_position(points[(i + 1) % points.size()])
 
-		var line: LineCollider = LineCollider.new()
-		line.set_points(p1, p2)
-		collision.push_back(line)
+		if collision.size() <= i:
+			var line: LineCollider = LineCollider.new()
+			line.set_points(p1, p2)
+			collision.push_back(line)
+		else:
+			collision[i].set_points(p1, p2)
 
 
 func _get_collision_vertex_position(local_vertex_pos: Vector2) -> Vector2:
@@ -73,10 +77,16 @@ func get_origin() -> Vector2:
 	return a.lerp(b, 0.5)
 
 func hit_block(context: Global.GameContext, ball: Ball) -> void:
+	LoggerMogyi.log(self, "Hitting block at %v with ball pos %v" % [
+		pos_on_grid, ball.position
+	])
 	# broken = true
 	health -= ball.get_damage(context, self)
 	
-	if is_broken(): just_broken.emit(type)
+	if is_broken(): 
+		just_broken.emit(type)
+		LoggerMogyi.log(self, "Block at %v was broken" % pos_on_grid)
+
 
 	if type == BlockType.NORMAL:
 		asset_ref.set_hp(health)
@@ -137,7 +147,7 @@ func set_visuals() -> void:
 func _hash_2d(uv: Vector2) -> Vector2:
 	var p: Vector2 = Vector2(
 		uv.dot(Vector2(12.9898, 78.233)),
-        uv.dot(Vector2(39.346, 11.135))
+		uv.dot(Vector2(39.346, 11.135))
 	)
 
 	return Vector2(
@@ -151,7 +161,8 @@ func fill_points_from_size() -> void:
 	var p3: Vector2 = Vector2(BreakableGrid.CELL_SIZE * size.x, BreakableGrid.CELL_SIZE * size.y)
 	var p4: Vector2 = Vector2(0, BreakableGrid.CELL_SIZE * size.y)
 
-	points.append_array([p1, p2, p3, p4])
+	# points.append_array([p1, p2, p3, p4])
+	points = [p1, p2, p3, p4]
 
 	# make it *wiggly* :3
 	# for i in points.size():

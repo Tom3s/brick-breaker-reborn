@@ -5,12 +5,17 @@ var padding: float = 32.0
 
 func _process(delta: float) -> void:
 	var current_resolution: Vector2 = DisplayServer.window_get_size()
+	# var current_resolution: Vector2 = get_viewport_rect().size
 
 	# var min_square_size: Vector2 = Vector2(min(current_resolution.x, current_resolution.y), min(current_resolution.x, current_resolution.y))
+	position = BreakableGrid.GRID_SIZE * BreakableGrid.CELL_SIZE / 2
 
 	if current_resolution.x < current_resolution.y:
-		zoom = Vector2.ONE * (current_resolution.x / (BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE + padding))
+		zoom = Vector2.ONE * (current_resolution.x / (BreakableGrid.GRID_SIZE.x * BreakableGrid.CELL_SIZE + padding * 2))
+		# position.x -= padding
 	else:
-		zoom = Vector2.ONE * (current_resolution.y / (BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE + padding))
+		zoom = Vector2.ONE * (current_resolution.y / (BreakableGrid.GRID_SIZE.y * BreakableGrid.CELL_SIZE + padding * 2))
+		# position.y -= padding
+	
 
 

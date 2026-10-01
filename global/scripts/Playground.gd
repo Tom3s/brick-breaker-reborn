@@ -12,7 +12,8 @@ func _run() -> void:
 	# var block: ProceduralBlockMesh = ProceduralBlockMesh.new()
 	# block.generate_vertices()
 
-	var line := LineCollider.new()
-	line.set_points(Vector2.ZERO, Vector2.RIGHT)
+	# var line := LineCollider.new()
+	# line.set_points(Vector2.ZERO, Vector2.RIGHT)
 
-	print(line.normal)
+	# print(line.normal)
+	var rng := RandomNumberGenerator.new()
