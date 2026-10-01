@@ -63,7 +63,7 @@ func _ready() -> void:
 	# for i in Global.LEVEL_COUNT - 1:
 	# 	context.add_block_array(generate_sparse_map(base_seed + i), i)
 	# 	generate_block_assets(context.levels[i].blocks)
-	context.add_block_array(generate_beta_maps(1, base_seed))
+	context.add_block_array(generate_beta_maps(2, base_seed))
 	generate_block_assets(context.levels[0].blocks)
 
 	# boss level
@@ -740,7 +740,25 @@ func generate_beta_maps(level_index: int, seed: int = randi()) -> Array[Breakabl
 			))
 
 			return final_blocks
+		
+		2:	
+			map_generator.add_random_gradient_to_color()
+			
+			map_generator.add_voronoi_noise()
+			map_generator.treshold_grayscale(0.4)
 
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			var final_blocks: Array[BreakableBlock] = map_generator.convert_with_chance_merge(
+				.3, .3, # chance to merge
+				3, 1, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				3, # max HP
+				false, # use ball weights
+			)
+
+			return final_blocks
+		
 
 
 		_:
