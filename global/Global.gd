@@ -308,7 +308,7 @@ class GameContext extends Node:
 			var block: BreakableBlock = _create_block_for_segment(segment)
 			if is_head:	
 				block.type = BreakableBlock.BlockType.METAL
-				block.color = Vector3(1, 1, 0)
+				block.color = Vector3(0.525, 0.688, 0.71)
 				# block.health = Vector2i.MAX.x - 1
 				block.health = 30 # snake health hp
 
@@ -322,7 +322,7 @@ class GameContext extends Node:
 
 	func _create_block_for_segment(segment: Snake.Segment) -> BreakableBlock:
 		var block: BreakableBlock = BreakableBlock.new()
-		block.color = Vector3.UP
+		block.color = Vector3(0.165, 0.471, 0.51)
 		block.type = BreakableBlock.BlockType.NORMAL
 		block.pos_on_grid = segment.position
 
@@ -335,7 +335,7 @@ class GameContext extends Node:
 
 	func _create_block_for_food(food: Snake.Food) -> BreakableBlock:
 		var block: BreakableBlock = BreakableBlock.new()
-		block.color = Vector3.RIGHT
+		block.color = Vector3(0.74, 0.111, 0.121)
 		block.type = BreakableBlock.BlockType.SNAKE_FOOD
 		block.pos_on_grid = food.position
 
