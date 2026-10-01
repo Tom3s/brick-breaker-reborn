@@ -190,6 +190,8 @@ var navigator: Navigator = Navigator.new()
 
 var direction: Vector2i = Vector2i.ZERO
 
+var is_dead: bool = false
+
 var last_move: float = 0.0
 # lower this to speed up snake
 var move_treshold: float = 1.0 / 4
@@ -302,9 +304,11 @@ var SNAKE_CUT_FOOD_CHANCE: float = 0.3
 func cut_snake_at(cut_pos: Vector2i, rng: RandomNumberGenerator = RandomNumberGenerator.new()) -> Array[BreakableBlock]:
 	var cut_index: int = segments.find_custom(
 		func(a: Segment) -> bool:
-			return a.position == cut_pos,
-		1 # skip head, don't cut that
+			return a.position == cut_pos
 	)
+
+	if cut_index == 0:
+		is_dead = true
 
 	if cut_index == -1:
 		LoggerMogyi.log(self, "No segment of snake found at %v. Skipping" % cut_pos)
@@ -350,3 +354,8 @@ func mark_food_as_eaten(pos: Vector2i) -> void:
 		if food.position == pos:
 			food.eaten = true
 			# return
+
+func get_head_block() -> BreakableBlock:
+	if !is_dead:
+		return segments.front().block_ref
+	return null

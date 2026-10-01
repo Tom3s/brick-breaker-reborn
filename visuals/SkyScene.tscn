@@ -1,7 +1,7 @@
-[gd_scene load_steps=9 format=3 uid="uid://cutxkxi4r87a1"]
+[gd_scene load_steps=8 format=3 uid="uid://cutxkxi4r87a1"]
 
 [ext_resource type="Script" uid="uid://3ho3gg7klspm" path="res://test_files/snake_sky.gd" id="1_a84ee"]
-[ext_resource type="Shader" uid="uid://bav00e7wjo16q" path="res://visuals/SkyShader.gdshader" id="1_wnfp2"]
+[ext_resource type="Material" uid="uid://djg32usabhnjm" path="res://visuals/Sky_TrippyTunnel.tres" id="2_uop8o"]
 [ext_resource type="Script" uid="uid://dv3dkfk652ejt" path="res://IngameCamera.gd" id="3_pj6yj"]
 [ext_resource type="Script" uid="uid://dyqybr5igbol5" path="res://test_files/snake_draw_rect.gd" id="3_uop8o"]
 
@@ -13,13 +13,6 @@ ambient_light_source = 2
 ambient_light_color = Color(1, 1, 1, 1)
 ambient_light_energy = 0.05
 reflected_light_source = 1
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_uop8o"]
-shader = ExtResource("1_wnfp2")
-shader_parameter/cell_amount = 20
-shader_parameter/period = Vector2(5, 10)
-shader_parameter/move_scale = 0.2
-shader_parameter/center_offset = Vector2(0.5, 0.13)
 
 [sub_resource type="Gradient" id="Gradient_yu0gs"]
 
@@ -47,7 +40,7 @@ theme_override_constants/margin_bottom = 0
 
 [node name="TextureRect" type="TextureRect" parent="CanvasLayer/MarginContainer"]
 unique_name_in_owner = true
-material = SubResource("ShaderMaterial_uop8o")
+material = ExtResource("2_uop8o")
 layout_mode = 2
 mouse_filter = 2
 texture = SubResource("GradientTexture1D_6hpn5")

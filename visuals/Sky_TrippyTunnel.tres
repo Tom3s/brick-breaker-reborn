@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3 uid="uid://djg32usabhnjm"]
+
+[ext_resource type="Shader" uid="uid://bav00e7wjo16q" path="res://visuals/SkyShader.gdshader" id="1_o76xo"]
+
+[resource]
+shader = ExtResource("1_o76xo")
+shader_parameter/cell_amount = 20
+shader_parameter/period = Vector2(5, 10)
+shader_parameter/move_scale = 0.2
+shader_parameter/center_offset = Vector2(0.5, 0.13)

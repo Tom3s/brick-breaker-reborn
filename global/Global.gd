@@ -76,6 +76,8 @@ class GameContext extends Node:
 	var time_since_grace_powerup: float = 0.0 
 	var time_block_broken: float = 0.0 
 
+	var win: bool = false
+
 	func _init() -> void:
 		# block_bitmap.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
 		for i in LEVEL_COUNT:
@@ -105,16 +107,19 @@ class GameContext extends Node:
 					block.pos_on_grid, 
 					levels.back().rng
 				)
-				for _block in blocks_to_remove:
-					levels[level_index].blocks.erase(_block)
-					levels[level_index].block_grid.remove_block(_block)
+				for block_to_remove in blocks_to_remove:
+					levels[level_index].blocks.erase(block_to_remove)
+					levels[level_index].block_grid.remove_block(block_to_remove)
 
+				# snake was cut
+				if blocks_to_remove.size() && !levels.back().snake.is_dead:
+					levels.back().snake.get_head_block().hit_block_dmg(1)
 				# cut snake can also create foods/blocks 
 				for food: Snake.Food in levels.back().snake.foods:
 					if food.block_ref == null:
-						var _block: BreakableBlock = _create_block_for_food(food)
-						food.block_ref = _block
-						add_block(_block, LEVEL_COUNT - 1)
+						var new_block: BreakableBlock = _create_block_for_food(food)
+						food.block_ref = new_block
+						add_block(new_block, LEVEL_COUNT - 1)
 			else:
 				levels.back().snake.mark_food_as_eaten(block.pos_on_grid)
 				pass
@@ -270,6 +275,12 @@ class GameContext extends Node:
 			return true
 		
 		return false
+	
+	func set_fun_graces() -> void:
+		Global.GRACE_COOLDOWN = 1.0 / 20
+		Global.GRACE_POWERUP_TRESHOLD = 0.0
+		Global.STALE_BALL_HIT_TRESHOLD = 1
+		Powerup.grace_powerups = Powerup.fun_grace_powerups
 
 	func init_snake_boss(seed: int = randi()) -> void:
 		var boss_level: Global.Level = levels.back()
@@ -298,7 +309,8 @@ class GameContext extends Node:
 			if is_head:	
 				block.type = BreakableBlock.BlockType.METAL
 				block.color = Vector3(1, 1, 0)
-				block.health = Vector2i.MAX.x - 1
+				# block.health = Vector2i.MAX.x - 1
+				block.health = 30 # snake health hp
 
 			segment.block_ref = block
 
@@ -375,15 +387,15 @@ class GameContext extends Node:
 			if food.eaten:
 				remove_block(food.block_ref)
 		
-		if grown:
+		# if grown:
 			# remove_block(grown.block_ref)
-			snake.refill_food(levels.back().rng)
+		snake.refill_food(levels.back().rng)
 
-			for food in snake.foods:
-				if food.block_ref == null:
-					var block: BreakableBlock = _create_block_for_food(food)
-					food.block_ref = block
-					add_block(block, LEVEL_COUNT - 1)
+		for food in snake.foods:
+			if food.block_ref == null:
+				var block: BreakableBlock = _create_block_for_food(food)
+				food.block_ref = block
+				add_block(block, LEVEL_COUNT - 1)
 		
 		snake.purge_stale_food()
 
@@ -420,6 +432,7 @@ class GameContext extends Node:
 	var _DEBUG_CURRENT_LEVEL: String
 	var _DEBUG_CURRENT_KEY_STATUS: String
 	var _DEBUG_CURRENT_LEVEL_COMPLETE: String
+	var _DEBUG_SNAKE_HEALTH: String
 
 	func _set_debug_strings() -> void:
 		_DEBUG_ACTIVE_POWERUPS = "Active Effects: \n"
@@ -437,14 +450,18 @@ class GameContext extends Node:
 		_DEBUG_CURRENT_KEY_STATUS = "KEY picked up: %s / Used: %s" % [str(levels[current_level].key_enabled), str(levels[current_level].unlocked)]
 		
 		_DEBUG_CURRENT_LEVEL_COMPLETE = "Current Level Complete: %s" % str(levels[current_level].completed)
+
+		if is_boss_level() && !win:
+			_DEBUG_SNAKE_HEALTH = "Snake HP: %d/30" % levels[current_level].snake.segments.front().block_ref.health
 	
 	func _get_debug_string() -> String:
-		return "%s\n%s\n%s\n%s\n%s\n%s" % [
+		return "%s\n%s\n%s\n%s\n%s\n%s\n%s" % [
 			_DEBUG_ACTIVE_NR_BALLS, 
 			_DEBUG_BALL_SLOTS,
 			_DEBUG_CURRENT_LEVEL,
 			_DEBUG_CURRENT_LEVEL_COMPLETE,
 			_DEBUG_CURRENT_KEY_STATUS,
+			_DEBUG_SNAKE_HEALTH,
 			_DEBUG_ACTIVE_POWERUPS,
 		]
 	
@@ -453,4 +470,4 @@ class GameContext extends Node:
 		return 3
 
 	static func get_gun_damage() -> int:
-		return 100
+		return 2

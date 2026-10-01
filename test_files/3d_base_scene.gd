@@ -99,6 +99,8 @@ func _ready() -> void:
 
 	wall_material = %LeftWall.get_surface_override_material(0)
 
+	ingame_ui.show_healthbar(context.is_boss_level())
+
 	
 var _debug_fps: float = 0.0
 func _process(delta: float) -> void:
@@ -180,10 +182,10 @@ func _process(delta: float) -> void:
 
 	# WARNING: no input event should be handled after this, as it may be incorrect state
 
-	if context.is_boss_level():
+	if context.is_boss_level() && !context.win:
 		# TODO: check for type
-		if context.update_snake_boss(safe_delta):
-			display_blocks(context.get_current_blocks())
+		context.update_snake_boss(safe_delta)
+		display_blocks(context.get_current_blocks())
 		
 	# oooooooooo      o      ooooo       ooooo        oooooooo8  
 	#  888    888    888      888         888        888         
@@ -316,6 +318,7 @@ func _process(delta: float) -> void:
 
 			if level_unlocked:
 				context.next_level()
+				ingame_ui.show_healthbar(context.is_boss_level())
 				display_blocks(context.levels[context.current_level].blocks)
 				roof.visible = !context.levels[context.current_level].unlocked
 				break
@@ -338,11 +341,12 @@ func _process(delta: float) -> void:
 			# ball.collide_with(line, true)
 
 	
-	if context.is_current_level_complete():
+	if context.is_current_level_complete() && !context.win:
 		# TODO: change blocks to breakable if only non-breakable remain
 		# on_board_clear()
 		# return
 		context.next_level()
+		ingame_ui.show_healthbar(context.is_boss_level())
 		display_blocks(context.levels[context.current_level].blocks)
 		roof.visible = !context.levels[context.current_level].unlocked
 
@@ -508,9 +512,16 @@ func _process(delta: float) -> void:
 	#  888        888o   o888   888 888     888    oo   888  88o   888    88   888                888 
 	# o888o         88ooo88      8   8     o888ooo8888 o888o  88o8  888oo88   o888o       o88oooo888  
 																										 
-	if context.is_boss_level():
-		fix_snake_head()
-		context.levels.back().snake.purge_stale_food()
+	if context.is_boss_level() && !context.win:
+		if context.levels.back().snake.is_dead:
+			context.win = true
+			LoggerMogyi.log(self, "Defeated the boss! GGs")
+			ingame_ui.set_healthbar_health(0)
+			context.set_fun_graces()
+		else:
+			fix_snake_head()
+			context.levels.back().snake.purge_stale_food()
+			ingame_ui.set_healthbar_health(context.levels.back().snake.segments.front().block_ref.health)
 		# sky_node.draw_snake(context.levels.back().snake)
 
 	# update powerup pickups
@@ -841,8 +852,13 @@ func convert_blocks_to_ice(pos: Vector2) -> void:
 	for block: BreakableBlock in context.get_blocks_for_circle(pos, Powerup.ice_ball_radius):
 		# check if block actually collides
 		if block.collides_with_circle(pos, Powerup.ice_ball_radius):
-			block.type = BreakableBlock.BlockType.ICE
-			block.set_visuals()
+			if context.is_boss_level() && !context.win && \
+				context.levels.back().snake.segments.front().block_ref == block:
+					continue
+
+			if block.type != BreakableBlock.BlockType.SNAKE_FOOD:
+				block.type = BreakableBlock.BlockType.ICE
+				block.set_visuals()
 
 func explode_blocks(pos: Vector2) -> void:
 	particle_vfx_manager.play_explosion(pos)
@@ -868,4 +884,6 @@ func fix_snake_head() -> void:
 	var head: BreakableBlock = context.levels.back().snake.segments.front().block_ref # holy reference
 
 	head.type = BreakableBlock.BlockType.METAL
+	if context.levels.back().snake.segments.size() <= 3:
+		head.type = BreakableBlock.BlockType.NORMAL
 	head.set_visuals()

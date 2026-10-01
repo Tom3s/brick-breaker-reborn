@@ -44,6 +44,15 @@ static var grace_powerups: Array[Type] = [
 	Type.LASER,
 ]
 
+static var fun_grace_powerups: Array[Type] = [
+	Type.BALL_MULTIPLY,
+	Type.FIRE_BALL,
+	Type.LASER,
+	Type.GUN,
+	Type.ICE_BALL,
+	Type.MINE_BALL,
+]
+
 var ball_multiply_value: int = 3
 
 var fire_ball_max_time: float = 15.0
