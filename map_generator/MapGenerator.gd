@@ -109,8 +109,8 @@ func add_circle(cx: int, cy: int, radius: float) -> void:
 
 func add_random_circle(max_radius: int, max_y: int) -> void:
 	var r: int = int(rng.randf() * max_radius) + 1
-	var x: int = rng.randi_range(r + 1, BreakableGrid.GRID_SIZE.x - r - 1)
-	var y: int = rng.randi_range(r + 1, min(BreakableGrid.GRID_SIZE.y, max_y) - r - 1)
+	var x: int = rng.randi_range(r, BreakableGrid.GRID_SIZE.x - r)
+	var y: int = rng.randi_range(r, min(BreakableGrid.GRID_SIZE.y, max_y) - r)
 
 	add_circle(x, y, r)
 

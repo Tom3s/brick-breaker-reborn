@@ -139,7 +139,7 @@ text = "1"
 [node name="MaxLevels" type="Label" parent="PanelContainer/MarginContainer/HBoxContainer/HBoxContainer2"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "/10"
+text = "/8"
 
 [node name="FSButton" type="Button" parent="PanelContainer/MarginContainer/HBoxContainer"]
 unique_name_in_owner = true
