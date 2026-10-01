@@ -107,6 +107,13 @@ func add_circle(cx: int, cy: int, radius: float) -> void:
 			if Vector2(x, y).distance_to(Vector2(cx, cy)) <= radius:
 				temp_texture[index] = 1.0
 
+func add_random_circle(max_radius: int, max_y: int) -> void:
+	var r: int = int(rng.randf() * max_radius) + 1
+	var x: int = rng.randi_range(r + 1, BreakableGrid.GRID_SIZE.x - r - 1)
+	var y: int = rng.randi_range(r + 1, min(BreakableGrid.GRID_SIZE.y, max_y) - r - 1)
+
+	add_circle(x, y, r)
+
 # TODO: check bounds and swap if x1 > x2 (or y1 > y2)
 # this is now handled by thw sign(..) function, but might wanna pretty this up
 func add_rectangle(x1: int, y1: int, x2: int, y2: int) -> void:
@@ -203,6 +210,7 @@ func copy_texture_to_final_bound(from_x: int, from_y: int, to_x: int, to_y: int)
 
 
 var used: Array[bool] 
+var key_placed: bool = false
 func convert_with_chance_merge(
 	chance_x: float = 0.0, 
 	chance_y: float = 0.0, 
@@ -311,11 +319,15 @@ func convert_with_chance_merge(
 
 			result.push_back(block)
 	
-	var key_block_index: int = floorf(result.size() * sqrt(rng.randf()))
-	var key_block: BreakableBlock = result[key_block_index]
-	key_block.has_powerup = true
-	key_block.powerup = Powerup.new()
-	key_block.powerup.type = Powerup.Type.KEY
+	if !key_placed:
+		var key_block_index: int = floorf(result.size() * sqrt(rng.randf()))
+		var key_block: BreakableBlock = result[key_block_index]
+		key_block.has_powerup = true
+		key_block.type = BreakableBlock.BlockType.NORMAL
+		key_block.powerup = Powerup.new()
+		key_block.powerup.type = Powerup.Type.KEY
+
+		key_placed = true
 
 	return result
 

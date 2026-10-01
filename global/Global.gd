@@ -130,6 +130,11 @@ class GameContext extends Node:
 
 		
 		levels[level_index].completed = levels[level_index].blocks.is_empty()
+		if !is_boss_level():
+			levels[level_index].unlocked = levels[level_index].blocks.filter(
+				func(b: BreakableBlock) -> bool:
+					return b.type != BreakableBlock.BlockType.METAL
+			).is_empty()
 	
 	func update_block_pos(block: BreakableBlock, new_pos: Vector2i, level_index: int = current_level) -> void:
 		levels[level_index].block_grid.remove_block(block)

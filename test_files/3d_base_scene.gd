@@ -63,7 +63,7 @@ func _ready() -> void:
 	# for i in Global.LEVEL_COUNT - 1:
 	# 	context.add_block_array(generate_sparse_map(base_seed + i), i)
 	# 	generate_block_assets(context.levels[i].blocks)
-	context.add_block_array(generate_beta_maps(3, base_seed))
+	context.add_block_array(generate_beta_maps(4, base_seed))
 	generate_block_assets(context.levels[0].blocks)
 
 	# boss level
@@ -792,7 +792,68 @@ func generate_beta_maps(level_index: int, seed: int = randi()) -> Array[Breakabl
 
 
 			return final_blocks
+		4:
+			map_generator.add_random_gradient_to_color()
+			
+			map_generator.clear_temp_texture()
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
+			
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
 
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			var final_blocks: Array[BreakableBlock] = map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				1, 3, # max merge size
+				BreakableBlock.BlockType.ICE, # block type
+				1, # max HP
+				false, # use ball weights
+				false, # make it wiggly
+			)
+			
+			map_generator.clear_temp_texture()
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
+			
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				1, 3, # max merge size
+				BreakableBlock.BlockType.METAL, # block type
+				1, # max HP
+				false, # use ball weights
+				false, # make it wiggly
+			))
+			
+			map_generator.clear_temp_texture()
+
+			for i in 8:
+				map_generator.add_random_circle(
+					6, int(BreakableGrid.GRID_SIZE.y * 0.70)
+				)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				1, 1, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				4, # max HP
+				false, # use ball weights
+				true, # make it wiggly
+			))
+
+			return final_blocks
 
 		_:
 			return []
@@ -974,6 +1035,9 @@ func convert_blocks_to_ice(pos: Vector2) -> void:
 			if context.is_boss_level() && !context.win && \
 				context.levels.back().snake.segments.front().block_ref == block:
 					continue
+			
+			if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
+				continue
 
 			if block.type != BreakableBlock.BlockType.SNAKE_FOOD:
 				block.type = BreakableBlock.BlockType.ICE
