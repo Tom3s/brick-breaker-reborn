@@ -27,15 +27,27 @@ enum Type {
 # 	0, # TUNNEL,
 # ]
 static var weights: PackedInt32Array = [
+	 0, # NONE - should always be 0
+	25, # BALL_MULTIPLY
+	50, # FIRE_BALL
+	12, # LASER
+	40, # GUN
+	 0, # KEY - should always be 0
+	60, # ICE_BALL
+	 8, # MINE_BALL
+	15, # TUNNEL
+]
+
+static var ball_weights: PackedInt32Array = [
 	0, # NONE - should always be 0
-	3, # BALL_MULTIPLY
-	6, # FIRE_BALL
-	1, # LASER
-	4, # GUN
+	5, # BALL_MULTIPLY
+	5, # FIRE_BALL
+	0, # LASER
+	0, # GUN
 	0, # KEY - should always be 0
-	6, # ICE_BALL
-	4, # MINE_BALL
-	2, # TUNNEL
+	5, # ICE_BALL
+	1, # MINE_BALL
+	0, # TUNNEL
 ]
 
 static var grace_powerups: Array[Type] = [
@@ -205,6 +217,27 @@ static func get_weighted_powerup(n: float) -> Type:
 
 	for i in weights.size():
 		current_weight += weights[i]
+		if current_weight > partial_weight:
+			LoggerMogyi.log(null, "Selected %s with (%d/%d) for %.3f" % [
+				Type.keys()[i].capitalize(),
+				partial_weight,
+				total_weight,
+				n
+			])
+			return i as Type
+	
+	return Type.NONE
+
+static func get_weighted_ball_powerup(n: float) -> Type:
+	var total_weight: int
+	for w in ball_weights:
+		total_weight += w
+	
+	var partial_weight: float = n * total_weight
+	var current_weight: int = 0
+
+	for i in ball_weights.size():
+		current_weight += ball_weights[i]
 		if current_weight > partial_weight:
 			LoggerMogyi.log(null, "Selected %s with (%d/%d) for %.3f" % [
 				Type.keys()[i].capitalize(),

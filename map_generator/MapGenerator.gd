@@ -107,6 +107,13 @@ func add_circle(cx: int, cy: int, radius: float) -> void:
 			if Vector2(x, y).distance_to(Vector2(cx, cy)) <= radius:
 				temp_texture[index] = 1.0
 
+func add_random_circle(max_radius: int, max_y: int) -> void:
+	var r: int = int(rng.randf() * max_radius) + 1
+	var x: int = rng.randi_range(r, BreakableGrid.GRID_SIZE.x - r)
+	var y: int = rng.randi_range(r, min(BreakableGrid.GRID_SIZE.y, max_y) - r)
+
+	add_circle(x, y, r)
+
 # TODO: check bounds and swap if x1 > x2 (or y1 > y2)
 # this is now handled by thw sign(..) function, but might wanna pretty this up
 func add_rectangle(x1: int, y1: int, x2: int, y2: int) -> void:
@@ -117,7 +124,7 @@ func add_rectangle(x1: int, y1: int, x2: int, y2: int) -> void:
 
 func treshold_grayscale(treshold: float) -> void:
 	for i in temp_texture.size():
-		temp_texture[i] = 1.0 if temp_texture[i] >= treshold else 0.0 
+		temp_texture[i] = 0.0 if temp_texture[i] >= treshold else 1.0 
 
 # var BAYER_MATRIX: Array[PackedFloat32Array] = [
 # 	[ .0,  .5],
@@ -203,6 +210,7 @@ func copy_texture_to_final_bound(from_x: int, from_y: int, to_x: int, to_y: int)
 
 
 var used: Array[bool] 
+var key_placed: bool = false
 func convert_with_chance_merge(
 	chance_x: float = 0.0, 
 	chance_y: float = 0.0, 
@@ -210,6 +218,8 @@ func convert_with_chance_merge(
 	max_merge_y: int = BreakableGrid.GRID_SIZE.y,
 	block_type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL,
 	block_max_hp: int = 1,
+	use_ball_weights: bool = false,
+	wiggly: bool = false
 ) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 	# used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
@@ -291,22 +301,34 @@ func convert_with_chance_merge(
 			block.type = block_type
 			block.pos_on_grid = Vector2(x, y)
 			block.health = int(rng.randf() * block_max_hp) + 1
+			block.wiggly = wiggly
 			block.prepare_collision()
-			if rng.randf() < .1:
+			if rng.randf() < .05:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
 
 				# block.powerup.type = Powerup.Type.ICE_BALL
-				# block.powerup.ball_multiply_value = 10
-				block.powerup.type = Powerup.get_weighted_powerup(rng.randf())
+				block.powerup.ball_multiply_value = [
+					3, 3, 3, 4, 4, 5, 6
+				].pick_random()
+
+				if !use_ball_weights:
+					block.powerup.type = Powerup.get_weighted_powerup(rng.randf())
+				else:
+					block.powerup.type = Powerup.get_weighted_ball_powerup(rng.randf())
 
 			result.push_back(block)
 	
-	var key_block_index: int = floorf(result.size() * sqrt(rng.randf()))
-	var key_block: BreakableBlock = result[key_block_index]
-	key_block.has_powerup = true
-	key_block.powerup = Powerup.new()
-	key_block.powerup.type = Powerup.Type.KEY
+	if !key_placed:
+		var key_block_index: int = floorf(result.size() * sqrt(rng.randf()))
+		var key_block: BreakableBlock = result[key_block_index]
+		key_block.has_powerup = true
+		key_block.type = BreakableBlock.BlockType.NORMAL
+		key_block.health = 1
+		key_block.powerup = Powerup.new()
+		key_block.powerup.type = Powerup.Type.KEY
+
+		key_placed = true
 
 	return result
 

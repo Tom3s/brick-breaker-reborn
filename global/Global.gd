@@ -130,6 +130,11 @@ class GameContext extends Node:
 
 		
 		levels[level_index].completed = levels[level_index].blocks.is_empty()
+		if !is_boss_level():
+			levels[level_index].unlocked = levels[level_index].unlocked || levels[level_index].blocks.filter(
+				func(b: BreakableBlock) -> bool:
+					return b.type != BreakableBlock.BlockType.METAL
+			).is_empty()
 	
 	func update_block_pos(block: BreakableBlock, new_pos: Vector2i, level_index: int = current_level) -> void:
 		levels[level_index].block_grid.remove_block(block)
@@ -310,7 +315,7 @@ class GameContext extends Node:
 				block.type = BreakableBlock.BlockType.METAL
 				block.color = Vector3(0.525, 0.688, 0.71)
 				# block.health = Vector2i.MAX.x - 1
-				block.health = 30 # snake health hp
+				block.health = 100 # snake health hp
 
 			segment.block_ref = block
 
@@ -467,7 +472,7 @@ class GameContext extends Node:
 	
 	# this function only exists, so that later Skills can influence this value
 	static func get_laser_damage() -> int:
-		return 3
+		return 5
 
 	static func get_gun_damage() -> int:
-		return 2
+		return 1

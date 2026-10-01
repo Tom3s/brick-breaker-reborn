@@ -42,6 +42,8 @@ var asset_ref: Node
 var has_powerup: bool = false
 var powerup: Powerup
 
+var wiggly: bool = false
+
 signal just_broken(type: BlockType)
 
 func _process(delta: float) -> void:
@@ -88,8 +90,8 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 		LoggerMogyi.log(self, "Block at %v was broken" % pos_on_grid)
 
 
-	if type == BlockType.NORMAL:
-		asset_ref.set_hp(health)
+	# if type == BlockType.NORMAL:
+	asset_ref.set_hp(health)
 
 func hit_block_laser(context: Global.GameContext) -> void:
 	health -= context.get_laser_damage()
@@ -165,8 +167,9 @@ func fill_points_from_size() -> void:
 	points = [p1, p2, p3, p4]
 
 	# make it *wiggly* :3
-	# for i in points.size():
-	# 	points[i] += _hash_2d(_get_collision_vertex_position(points[i])) * 5.0
+	if wiggly:
+		for i in points.size():
+			points[i] += _hash_2d(_get_collision_vertex_position(points[i])) * 5.0
 	
 	for point in points:
 		bound_min.x = min(bound_min.x, point.x)

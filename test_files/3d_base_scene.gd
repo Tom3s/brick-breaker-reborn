@@ -61,8 +61,10 @@ func _ready() -> void:
 	grace_rng.seed = base_seed
 
 	for i in Global.LEVEL_COUNT - 1:
-		context.add_block_array(generate_sparse_map(base_seed + i), i)
+	# 	context.add_block_array(generate_sparse_map(base_seed + i), i)
+		context.add_block_array(generate_beta_maps(i, base_seed + i), i)
 		generate_block_assets(context.levels[i].blocks)
+
 	# boss level
 	context.init_snake_boss(base_seed)
 	generate_block_assets(context.levels.back().blocks)
@@ -684,6 +686,266 @@ func generate_sparse_map(seed: int = randi()) -> Array[BreakableBlock]:
 	return map_generator.convert_with_chance_merge(.5, .5)
 	# return map_generator.convert_with_chance_merge(.0, .0)
 
+func generate_beta_maps(level_index: int, seed: int = randi()) -> Array[BreakableBlock]:
+	var map_generator := MapGenerator.new()
+	map_generator.rng.seed = seed
+
+	map_generator.add_random_gradient_to_color()
+
+	match level_index:
+		0:
+			map_generator.add_random_gradient_to_color()
+			map_generator.add_perlin_noise()
+
+			map_generator.treshold_grayscale(0.4)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
+
+			return map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				1, # max HP
+				true, # use ball weights
+			)
+		
+		1:	
+			map_generator.add_random_gradient_to_color()
+			
+			map_generator.add_perlin_noise()
+			map_generator.treshold_grayscale(0.4)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
+
+			var final_blocks: Array[BreakableBlock] = map_generator.convert_with_chance_merge(
+				.4, .4, # chance to merge
+				BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y, # max merge size
+				BreakableBlock.BlockType.ICE, # block type
+				1, # max HP
+				true, # use ball weights
+			)
+
+			map_generator.add_perlin_noise()
+			map_generator.treshold_grayscale(0.5)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
+
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				.4, .4, # chance to merge
+				BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				1, # max HP
+				true, # use ball weights
+			))
+
+			return final_blocks
+		
+		2:	
+			map_generator.add_random_gradient_to_color()
+			
+			map_generator.add_voronoi_noise()
+			map_generator.treshold_grayscale(0.4)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			var final_blocks: Array[BreakableBlock] = map_generator.convert_with_chance_merge(
+				.3, .3, # chance to merge
+				3, 1, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				3, # max HP
+				false, # use ball weights
+			)
+
+			return final_blocks
+
+		3:
+			map_generator.add_random_gradient_to_color()
+			
+			map_generator.add_voronoi_noise()
+			map_generator.treshold_grayscale(0.3)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			var final_blocks: Array[BreakableBlock] = map_generator.convert_with_chance_merge(
+				.3, .3, # chance to merge
+				3, 2, # max merge size
+				BreakableBlock.BlockType.ICE, # block type
+				1, # max HP
+				false, # use ball weights
+				true, # make it wiggly
+			)
+
+			map_generator.add_perlin_noise()
+			map_generator.treshold_grayscale(0.5)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				.3, .3, # chance to merge
+				3, 2, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				3, # max HP
+				false, # use ball weights
+				true, # make it wiggly
+			))
+
+
+			return final_blocks
+		4:
+			map_generator.add_random_gradient_to_color()
+			
+			map_generator.clear_temp_texture()
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
+			
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			var final_blocks: Array[BreakableBlock] = map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				1, 3, # max merge size
+				BreakableBlock.BlockType.ICE, # block type
+				1, # max HP
+				false, # use ball weights
+				false, # make it wiggly
+			)
+			
+			map_generator.clear_temp_texture()
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
+			
+			map_generator.add_random_circle(
+				4, int(BreakableGrid.GRID_SIZE.y * 0.70)
+			)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				1, 3, # max merge size
+				BreakableBlock.BlockType.METAL, # block type
+				1, # max HP
+				false, # use ball weights
+				false, # make it wiggly
+			))
+			
+			map_generator.clear_temp_texture()
+
+			for i in 8:
+				map_generator.add_random_circle(
+					6, int(BreakableGrid.GRID_SIZE.y * 0.70)
+				)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				1, 1, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				4, # max HP
+				false, # use ball weights
+				true, # make it wiggly
+			))
+
+			return final_blocks
+		
+		5:
+			map_generator.add_random_gradient_to_color()
+			
+			var final_blocks: Array[BreakableBlock] = []
+
+			map_generator.add_random_grayscale_noise()
+			map_generator.treshold_grayscale(0.05)
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				.4, .4, # chance to merge
+				1, 1, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				3, # max HP
+				false, # use ball weights
+				true, # make it wiggly
+			))
+
+			for i in 16:
+				map_generator.clear_temp_texture()
+				map_generator.add_random_circle(
+					3, int(BreakableGrid.GRID_SIZE.y * 0.70)
+				)
+				map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.70))
+
+				final_blocks.append_array(map_generator.convert_with_chance_merge(
+					.4, .4, # chance to merge
+					1 + (i % 2), 1 + ((i + 1) % 2), # max merge size
+					BreakableBlock.BlockType.METAL if i % 2 == 1 else BreakableBlock.BlockType.ICE, # block type
+					5, # max HP
+					false, # use ball weights
+					true, # make it wiggly
+				))
+
+
+			return final_blocks
+
+		6:
+			# map_generator.add_random_gradient_to_color()
+			# 11d611
+			map_generator.fill_color(Vector3(0.703, 0.754, 0.79))
+			
+			var final_blocks: Array[BreakableBlock] = []
+
+			map_generator.add_perlin_noise()
+			map_generator.treshold_grayscale(0.33)
+			map_generator.copy_texture_to_final_bound(1, 1, BreakableGrid.GRID_SIZE.x - 1, int(BreakableGrid.GRID_SIZE.y * 0.70))
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				0, 0, # chance to merge
+				1, 1, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				5, # max HP
+				false, # use ball weights
+				false, # make it wiggly
+			))
+
+			map_generator.add_perlin_noise()
+			map_generator.treshold_grayscale(0.66)
+			map_generator.copy_texture_to_final_bound(1, 1, BreakableGrid.GRID_SIZE.x - 1, int(BreakableGrid.GRID_SIZE.y * 0.70))
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				0, 0, # chance to merge
+				1, 1, # max merge size
+				BreakableBlock.BlockType.ICE, # block type
+				1, # max HP
+				false, # use ball weights
+				false, # make it wiggly
+			))
+
+			map_generator.clear_temp_texture()
+			map_generator.invert()
+			map_generator.copy_texture_to_final_bound(1, 1, BreakableGrid.GRID_SIZE.x - 1, int(BreakableGrid.GRID_SIZE.y * 0.70))
+			final_blocks.append_array(map_generator.convert_with_chance_merge(
+				0, 0, # chance to merge
+				1, 1, # max merge size
+				BreakableBlock.BlockType.METAL, # block type
+				3, # max HP
+				false, # use ball weights
+				false, # make it wiggly
+			))
+
+
+			return final_blocks
+		
+
+		_:
+			return []
+
+
+
+
+	# map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
+
+	# return map_generator.convert_with_chance_merge(.5, .5)
 
 func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 	for block: BreakableBlock in blocks:
@@ -855,6 +1117,9 @@ func convert_blocks_to_ice(pos: Vector2) -> void:
 			if context.is_boss_level() && !context.win && \
 				context.levels.back().snake.segments.front().block_ref == block:
 					continue
+			
+			if block.has_powerup && block.powerup.type == Powerup.Type.KEY:
+				continue
 
 			if block.type != BreakableBlock.BlockType.SNAKE_FOOD:
 				block.type = BreakableBlock.BlockType.ICE
