@@ -90,8 +90,8 @@ func hit_block(context: Global.GameContext, ball: Ball) -> void:
 		LoggerMogyi.log(self, "Block at %v was broken" % pos_on_grid)
 
 
-	if type == BlockType.NORMAL:
-		asset_ref.set_hp(health)
+	# if type == BlockType.NORMAL:
+	asset_ref.set_hp(health)
 
 func hit_block_laser(context: Global.GameContext) -> void:
 	health -= context.get_laser_damage()

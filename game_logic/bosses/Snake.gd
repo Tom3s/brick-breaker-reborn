@@ -194,7 +194,7 @@ var is_dead: bool = false
 
 var last_move: float = 0.0
 # lower this to speed up snake
-var move_treshold: float = 1.0 / 4
+var move_treshold: float = 1.0 / 6
 
 func init_snake() -> void:
 	for i in initial_size:

@@ -303,7 +303,7 @@ func convert_with_chance_merge(
 			block.health = int(rng.randf() * block_max_hp) + 1
 			block.wiggly = wiggly
 			block.prepare_collision()
-			if rng.randf() < .1:
+			if rng.randf() < .05:
 				block.has_powerup = true
 				block.powerup = Powerup.new()
 
@@ -324,6 +324,7 @@ func convert_with_chance_merge(
 		var key_block: BreakableBlock = result[key_block_index]
 		key_block.has_powerup = true
 		key_block.type = BreakableBlock.BlockType.NORMAL
+		key_block.health = 1
 		key_block.powerup = Powerup.new()
 		key_block.powerup.type = Powerup.Type.KEY
 
