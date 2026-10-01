@@ -60,9 +60,12 @@ func _ready() -> void:
 	var base_seed: int = randi()
 	grace_rng.seed = base_seed
 
-	for i in Global.LEVEL_COUNT - 1:
-		context.add_block_array(generate_sparse_map(base_seed + i), i)
-		generate_block_assets(context.levels[i].blocks)
+	# for i in Global.LEVEL_COUNT - 1:
+	# 	context.add_block_array(generate_sparse_map(base_seed + i), i)
+	# 	generate_block_assets(context.levels[i].blocks)
+	context.add_block_array(generate_beta_maps(0, base_seed))
+	generate_block_assets(context.levels[0].blocks)
+	
 	# boss level
 	context.init_snake_boss(base_seed)
 	generate_block_assets(context.levels.back().blocks)
@@ -684,6 +687,37 @@ func generate_sparse_map(seed: int = randi()) -> Array[BreakableBlock]:
 	return map_generator.convert_with_chance_merge(.5, .5)
 	# return map_generator.convert_with_chance_merge(.0, .0)
 
+func generate_beta_maps(level_index: int, seed: int = randi()) -> Array[BreakableBlock]:
+	var map_generator := MapGenerator.new()
+	map_generator.rng.seed = seed
+
+	map_generator.add_random_gradient_to_color()
+
+	match level_index:
+		0:
+			map_generator.add_random_gradient_to_color()
+			map_generator.add_perlin_noise()
+
+			map_generator.treshold_grayscale(0.4)
+
+			map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
+
+			return map_generator.convert_with_chance_merge(
+				.5, .5, # chance to merge
+				BreakableGrid.GRID_SIZE.x, BreakableGrid.GRID_SIZE.y, # max merge size
+				BreakableBlock.BlockType.NORMAL, # block type
+				1, # max HP
+				true, # use ball weights
+			)
+		_:
+			return []
+
+
+
+
+	# map_generator.copy_texture_to_final_bound(0, 0, BreakableGrid.GRID_SIZE.x, int(BreakableGrid.GRID_SIZE.y * 0.66))
+
+	# return map_generator.convert_with_chance_merge(.5, .5)
 
 func generate_block_assets(blocks: Array[BreakableBlock]) -> void:
 	for block: BreakableBlock in blocks:

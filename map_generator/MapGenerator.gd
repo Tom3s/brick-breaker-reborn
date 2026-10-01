@@ -210,6 +210,7 @@ func convert_with_chance_merge(
 	max_merge_y: int = BreakableGrid.GRID_SIZE.y,
 	block_type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL,
 	block_max_hp: int = 1,
+	use_ball_weights: bool = false
 ) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 	# used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
@@ -297,8 +298,14 @@ func convert_with_chance_merge(
 				block.powerup = Powerup.new()
 
 				# block.powerup.type = Powerup.Type.ICE_BALL
-				# block.powerup.ball_multiply_value = 10
-				block.powerup.type = Powerup.get_weighted_powerup(rng.randf())
+				block.powerup.ball_multiply_value = [
+					3, 3, 3, 4, 4, 5, 6
+				].pick_random()
+				
+				if !use_ball_weights:
+					block.powerup.type = Powerup.get_weighted_powerup(rng.randf())
+				else:
+					block.powerup.type = Powerup.get_weighted_ball_powerup(rng.randf())
 
 			result.push_back(block)
 	

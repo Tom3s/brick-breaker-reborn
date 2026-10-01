@@ -8,7 +8,7 @@ var DEBUG_DRAW_VISIBLE: bool = true
 
 const BALL_LIMIT: int = 350
 
-const LEVEL_COUNT: int = 8
+const LEVEL_COUNT: int = 2
 
 const DEFAULT_BALL_RADIUS: int = 16.0 # 12.0
 
