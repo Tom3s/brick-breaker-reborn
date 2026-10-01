@@ -117,7 +117,7 @@ func add_rectangle(x1: int, y1: int, x2: int, y2: int) -> void:
 
 func treshold_grayscale(treshold: float) -> void:
 	for i in temp_texture.size():
-		temp_texture[i] = 1.0 if temp_texture[i] >= treshold else 0.0 
+		temp_texture[i] = 0.0 if temp_texture[i] >= treshold else 1.0 
 
 # var BAYER_MATRIX: Array[PackedFloat32Array] = [
 # 	[ .0,  .5],
@@ -301,7 +301,7 @@ func convert_with_chance_merge(
 				block.powerup.ball_multiply_value = [
 					3, 3, 3, 4, 4, 5, 6
 				].pick_random()
-				
+
 				if !use_ball_weights:
 					block.powerup.type = Powerup.get_weighted_powerup(rng.randf())
 				else:
