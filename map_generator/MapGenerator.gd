@@ -210,7 +210,8 @@ func convert_with_chance_merge(
 	max_merge_y: int = BreakableGrid.GRID_SIZE.y,
 	block_type: BreakableBlock.BlockType = BreakableBlock.BlockType.NORMAL,
 	block_max_hp: int = 1,
-	use_ball_weights: bool = false
+	use_ball_weights: bool = false,
+	wiggly: bool = false
 ) -> Array[BreakableBlock]:
 	var result: Array[BreakableBlock]
 	# used.resize(BreakableGrid.GRID_SIZE.x * BreakableGrid.GRID_SIZE.y)
@@ -292,6 +293,7 @@ func convert_with_chance_merge(
 			block.type = block_type
 			block.pos_on_grid = Vector2(x, y)
 			block.health = int(rng.randf() * block_max_hp) + 1
+			block.wiggly = wiggly
 			block.prepare_collision()
 			if rng.randf() < .1:
 				block.has_powerup = true
